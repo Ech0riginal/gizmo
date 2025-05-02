@@ -1,17 +1,34 @@
+use super::{Direction, T};
 use crate::error::GremlinError;
+use crate::prelude::{GremlinResult, Token};
 use crate::structure::{Edge, GValue, Vertex};
-use crate::GremlinResult;
-use crate::Token;
 use std::collections::hash_map::IntoIter;
 use std::collections::{BTreeMap, HashMap};
 use std::convert::{TryFrom, TryInto};
-
-use super::{Direction, T};
+use std::fmt::Formatter;
 
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 /// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Map(HashMap<GKey, GValue>);
+
+impl std::fmt::Debug for Map {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{ ")?;
+
+        if !self.0.is_empty() {
+            let mut iter = self.0.iter();
+            if let Some((k, v)) = iter.next() {
+                write!(f, "({:?}, {:?}), ", k, v)?;
+            }
+            while let Some((k, v)) = iter.next() {
+                write!(f, ", ({:?}, {:?})", k, v)?;
+            }
+        }
+
+        write!(f, "}}")
+    }
+}
 
 impl Map {
     pub(crate) fn empty() -> Map {
@@ -118,6 +135,14 @@ impl<T: Into<GKey>> std::ops::Index<T> for Map {
     }
 }
 
+impl std::ops::Deref for Map {
+    type Target = HashMap<GKey, GValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl IntoIterator for Map {
     type Item = (GKey, GValue);
     type IntoIter = IntoIter<GKey, GValue>;
@@ -134,7 +159,6 @@ impl std::iter::FromIterator<(String, GValue)> for Map {
             .collect())
     }
 }
-
 /// Possible key types in a [Map](struct.Map)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]

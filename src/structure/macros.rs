@@ -4,16 +4,16 @@ macro_rules! vertex {
     ({ id => $id:expr,label => $label:expr, properties => {$($key:expr => [$({ id => $p_id:expr, value => $p_value:expr}),*]),*}}) => {{
 
         #[allow(unused_mut)]
-        let mut properties  = ::std::collections::HashMap::<String,Vec<$crate::VertexProperty>>::new();
+        let mut properties  = ::std::collections::HashMap::<String,Vec<$crate::prelude::VertexProperty>>::new();
             $(
                 let mut sub_props = vec![];
                 $(
-                    let p = $crate::VertexProperty::new($p_id,$key,$p_value);
+                    let p = $crate::prelude::VertexProperty::new($p_id,$key,$p_value);
                     sub_props.push(p);
                 )*
                 properties.insert($key.into(),sub_props);
             )*
-        let v = $crate::Vertex::new($id.into(), $label,properties);
+        let v = $crate::prelude::Vertex::new($id.into(), $label,properties);
         v
     }};
 }
@@ -29,19 +29,19 @@ macro_rules! edge {
        properties => {$($key:expr => $value:expr),*}}) => {{
 
            #[allow(unused_mut)]
-        let mut properties  = ::std::collections::HashMap::<String,$crate::Property>::new();
+        let mut properties  = ::std::collections::HashMap::<String,$crate::prelude::Property>::new();
             $(
                 let p = Property::new($key.into(),$value.into());
                 properties.insert($key.into(),p);
             )*
-        $crate::Edge::new($id.into(), $label, $inVId.into(),$inVLabel,$outVId.into(),$outVLabel,properties)
+        $crate::prelude::Edge::new($id.into(), $label, $inVId.into(),$inVLabel,$outVId.into(),$outVLabel,properties)
     }};
 }
 
 #[cfg(test)]
 mod test {
+    use crate::prelude::{Vertex, VertexProperty};
     use std::collections::HashMap;
-    use {crate::Vertex, crate::VertexProperty};
 
     #[test]
     fn vertex_macro() {

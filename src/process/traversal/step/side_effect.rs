@@ -1,4 +1,4 @@
-use crate::{process::traversal::TraversalBuilder, GValue};
+use crate::prelude::{GValue, traversal::TraversalBuilder};
 
 pub struct SideEffectStep {
     params: Vec<GValue>,

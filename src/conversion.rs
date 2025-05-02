@@ -1,9 +1,11 @@
-use crate::{
-    process::traversal::Bytecode,
-    structure::{Null, TextP, P as Predicate},
-    Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
-    Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
-};
+use crate::prelude::{P as Predicate, traversal::Bytecode, *};
+
+// use crate::prelude::{
+//     process::traversal::Bytecode,
+//     structure::{Null, TextP, P as Predicate},
+//     Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
+//     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
+// };
 
 use crate::structure::Set;
 use crate::structure::Traverser;

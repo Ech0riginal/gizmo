@@ -1,77 +1,74 @@
 use crate::io::GraphSON;
-use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v2, Message, Response,
-};
 use crate::pool::GremlinConnectionManager;
-use crate::process::traversal::Bytecode;
-use crate::ToGValue;
-use crate::{ConnectionOptions, GremlinError, GremlinResult};
-use crate::{GResultSet, GValue};
-use base64::encode;
-use r2d2::Pool;
+use crate::prelude::{
+    ConnectionOptions, GResultSet, GValue, GremlinError, GremlinResult, Message, ToGValue,
+    traversal::Bytecode,
+};
+use base64::prelude::{BASE64_STANDARD, Engine};
+use futures::future::{BoxFuture, FutureExt};
+use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
 
-type SessionedClient = GremlinClient;
+pub type SessionedClient<SD> = GremlinClient<SD>;
 
-impl SessionedClient {
-    pub fn close_session(&mut self) -> GremlinResult<GResultSet> {
+impl<SD: GraphSON> SessionedClient<SD> {
+    pub async fn close_session(&mut self) -> GremlinResult<GResultSet<SD>> {
         if let Some(session_name) = self.session.take() {
             let mut args = HashMap::new();
             args.insert(String::from("session"), GValue::from(session_name.clone()));
-            let args = self.options.serializer.write(&GValue::from(args))?;
+            let args = SD::serialize(&GValue::from(args))?;
 
             let processor = "session".to_string();
 
-            let message = match self.options.serializer {
-                GraphSON::V2 => message_with_args_v2(String::from("close"), processor, args),
-                GraphSON::V3 => message_with_args(String::from("close"), processor, args),
-            };
+            let message = SD::message(String::from("close"), processor, args, None);
 
-            let conn = self.pool.get()?;
+            let conn = self.pool.get().await?;
 
-            self.send_message(conn, message)
+            self.send_message_new(conn, message).await
         } else {
             Err(GremlinError::Generic("No session to close".to_string()))
         }
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct GremlinClient {
-    pool: Pool<GremlinConnectionManager>,
+#[derive(Clone)]
+pub struct GremlinClient<SD: GraphSON> {
+    pool: Pool<GremlinConnectionManager<SD>>,
     session: Option<String>,
     alias: Option<String>,
-    options: ConnectionOptions,
+    pub(crate) options: ConnectionOptions<SD>,
 }
 
-impl GremlinClient {
-    pub fn connect<T>(options: T) -> GremlinResult<GremlinClient>
+impl<SD: GraphSON> GremlinClient<SD> {
+    pub async fn connect<T>(options: T) -> GremlinResult<GremlinClient<SD>>
     where
-        T: Into<ConnectionOptions>,
+        T: Into<ConnectionOptions<SD>>,
     {
         let opts = options.into();
         let pool_size = opts.pool_size;
         let manager = GremlinConnectionManager::new(opts.clone());
 
-        let mut pool_builder = Pool::builder().max_size(pool_size);
-
-        if let Some(get_connection_timeout) = opts.pool_get_connection_timeout {
-            pool_builder = pool_builder.connection_timeout(get_connection_timeout);
-        }
+        let pool = Pool::builder()
+            .get_timeout(opts.pool_get_connection_timeout)
+            .max_open(pool_size as u64)
+            //Makes max idle connections equal to max open, matching the behavior of the sync pool r2d2
+            .max_idle(0)
+            .health_check_interval(opts.pool_healthcheck_interval)
+            .build(manager);
 
         Ok(GremlinClient {
-            pool: pool_builder.build(manager)?,
+            pool,
             session: None,
             alias: None,
             options: opts,
         })
     }
 
-    pub fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient> {
+    pub async fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient<SD>> {
         let manager = GremlinConnectionManager::new(self.options.clone());
         Ok(SessionedClient {
-            pool: Pool::builder().max_size(1).build(manager)?,
+            pool: Pool::builder().max_open(1).build(manager),
             session: Some(name),
             alias: None,
             options: self.options.clone(),
@@ -79,7 +76,7 @@ impl GremlinClient {
     }
 
     /// Return a cloned client with the provided alias
-    pub fn alias<T>(&self, alias: T) -> GremlinClient
+    pub fn alias<T>(&mut self, alias: T) -> GremlinClient<SD>
     where
         T: Into<String>,
     {
@@ -88,11 +85,11 @@ impl GremlinClient {
         cloned
     }
 
-    pub fn execute<T>(
+    pub async fn execute<T>(
         &self,
         script: T,
         params: &[(&str, &dyn ToGValue)],
-    ) -> GremlinResult<GResultSet>
+    ) -> GremlinResult<GResultSet<SD>>
     where
         T: Into<String>,
     {
@@ -127,7 +124,7 @@ impl GremlinClient {
             args.insert(String::from("session"), GValue::from(session_name.clone()));
         }
 
-        let args = self.options.serializer.write(&GValue::from(args))?;
+        let args = SD::serialize(&GValue::from(args))?;
 
         let processor = if self.session.is_some() {
             "session".to_string()
@@ -135,50 +132,84 @@ impl GremlinClient {
             String::default()
         };
 
-        let message = match self.options.serializer {
-            GraphSON::V2 => message_with_args_v2(String::from("eval"), processor, args),
-            GraphSON::V3 => message_with_args(String::from("eval"), processor, args),
-        };
+        let message = SD::message(String::from("eval"), processor, args, None);
 
-        let conn = self.pool.get()?;
+        let conn = self.pool.get().await?;
 
-        self.send_message(conn, message)
+        self.send_message_new(conn, message).await
     }
 
-    pub(crate) fn write_message<T: Serialize>(
-        &self,
-        conn: &mut r2d2::PooledConnection<GremlinConnectionManager>,
+    pub(crate) fn send_message_new<'a, T: Serialize>(
+        &'a self,
+        mut conn: Connection<GremlinConnectionManager<SD>>,
         msg: Message<T>,
-    ) -> GremlinResult<()> {
-        let message = self.build_message(msg)?;
+    ) -> BoxFuture<'a, GremlinResult<GResultSet<SD>>> {
+        let id = msg.id().clone();
+        let message = self.build_message(msg).unwrap();
 
-        let content_type = self.options.serializer.content_type();
-        let payload = String::from("") + content_type + &message;
+        async move {
+            let span = tracing::span!(tracing::Level::DEBUG, "gremlin");
+            let _enter = span.enter();
 
-        let mut binary = payload.into_bytes();
-        binary.insert(0, content_type.len() as u8);
+            tracing::trace!(parent: &span, request=&id.to_string());
 
-        conn.send(binary)?;
+            let content_type = SD::content_type();
+            let payload = String::new() + content_type + &message;
+            let mut binary = payload.into_bytes();
+            binary.insert(0, content_type.len() as u8);
 
-        Ok(())
+            let (response, receiver) = conn.send(id.clone(), binary).await?;
+
+            // tracing::debug!(parent: &span, request=format!("{}", &id), code=response.status.code);
+
+            let (response, results) = match response.status.code {
+                200 | 206 => {
+                    let results: VecDeque<GValue> = SD::deserialize(&response.result.data)?.into();
+
+                    Ok((response, results))
+                }
+                204 => Ok((response, VecDeque::new())),
+                407 => match &self.options.credentials {
+                    Some(c) => {
+                        let mut args = HashMap::new();
+
+                        args.insert(
+                            String::from("sasl"),
+                            GValue::String(
+                                BASE64_STANDARD
+                                    .encode(&format!("\0{}\0{}", c.username, c.password)),
+                            ),
+                        );
+
+                        let args = SD::serialize(&GValue::from(args))?;
+                        let message = SD::message(
+                            String::from("authentication"),
+                            String::from("traversal"),
+                            args,
+                            Some(response.request_id),
+                        );
+
+                        return self.send_message_new(conn, message).await;
+                    }
+                    None => Err(GremlinError::Request((
+                        response.status.code,
+                        response.status.message,
+                    ))),
+                },
+                _ => Err(GremlinError::Request((
+                    response.status.code,
+                    response.status.message,
+                ))),
+            }?;
+
+            Ok(GResultSet::new(self.clone(), results, response, receiver))
+        }
+        .boxed()
     }
 
-    pub(crate) fn send_message<T: Serialize>(
-        &self,
-        mut conn: r2d2::PooledConnection<GremlinConnectionManager>,
-        msg: Message<T>,
-    ) -> GremlinResult<GResultSet> {
-        self.write_message(&mut conn, msg)?;
+    pub async fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet<SD>> {
+        tracing::trace!("{:?}", bytecode);
 
-        let (response, results) = self.read_response(&mut conn)?;
-
-        Ok(GResultSet::new(self.clone(), results, response, conn))
-    }
-
-    pub fn generate_message(
-        &self,
-        bytecode: &Bytecode,
-    ) -> GremlinResult<Message<serde_json::Value>> {
         let mut args = HashMap::new();
 
         args.insert(String::from("gremlin"), GValue::Bytecode(bytecode.clone()));
@@ -196,74 +227,20 @@ impl GremlinClient {
 
         args.insert(String::from("aliases"), GValue::from(aliases));
 
-        let args = self.options.serializer.write(&GValue::from(args))?;
+        let args = SD::serialize(&GValue::from(args))?;
 
-        Ok(message_with_args(
+        let message = SD::message(
             String::from("bytecode"),
             String::from("traversal"),
             args,
-        ))
+            None,
+        );
+
+        let conn = self.pool.get().await?;
+
+        self.send_message_new(conn, message).await
     }
 
-    pub(crate) fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet> {
-        let message = self.generate_message(bytecode)?;
-
-        let conn = self.pool.get()?;
-
-        self.send_message(conn, message)
-    }
-
-    pub(crate) fn read_response(
-        &self,
-        conn: &mut r2d2::PooledConnection<GremlinConnectionManager>,
-    ) -> GremlinResult<(Response, VecDeque<GValue>)> {
-        let result = conn.recv()?;
-        let response: Response = serde_json::from_slice(&result)?;
-
-        match response.status.code {
-            200 | 206 => {
-                let results: VecDeque<GValue> = self
-                    .options
-                    .deserializer
-                    .read(&response.result.data)?
-                    .map(|v| v.into())
-                    .unwrap_or_else(VecDeque::new);
-
-                Ok((response, results))
-            }
-            204 => Ok((response, VecDeque::new())),
-            407 => match &self.options.credentials {
-                Some(c) => {
-                    let mut args = HashMap::new();
-
-                    args.insert(
-                        String::from("sasl"),
-                        GValue::String(encode(&format!("\0{}\0{}", c.username, c.password))),
-                    );
-
-                    let args = self.options.serializer.write(&GValue::from(args))?;
-                    let message = message_with_args_and_uuid(
-                        String::from("authentication"),
-                        String::from("traversal"),
-                        response.request_id,
-                        args,
-                    );
-
-                    self.write_message(conn, message)?;
-
-                    self.read_response(conn)
-                }
-                None => Err(GremlinError::Request((
-                    response.status.code,
-                    response.status.message,
-                ))),
-            },
-            _ => Err(GremlinError::Request((
-                response.status.code,
-                response.status.message,
-            ))),
-        }
-    }
     fn build_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<String> {
         serde_json::to_string(&msg).map_err(GremlinError::from)
     }

@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use crate::process::traversal::TraversalBuilder;
-use crate::structure::GValue;
-use crate::GKey;
+use crate::prelude::{GKey, GValue, traversal::TraversalBuilder};
 
 pub struct MergeEdgeStep {
     params: Vec<GValue>,
@@ -29,5 +27,17 @@ impl From<TraversalBuilder> for MergeEdgeStep {
 impl From<HashMap<GKey, GValue>> for MergeEdgeStep {
     fn from(value: HashMap<GKey, GValue>) -> Self {
         MergeEdgeStep::new(vec![value.into()])
+    }
+}
+
+impl<K, V> From<(K, V)> for MergeEdgeStep
+where
+    K: Into<GKey>,
+    V: Into<GValue>,
+{
+    fn from(value: (K, V)) -> Self {
+        let mut map = HashMap::<GKey, GValue>::new();
+        map.insert(value.0.into(), value.1.into());
+        Self::from(map)
     }
 }

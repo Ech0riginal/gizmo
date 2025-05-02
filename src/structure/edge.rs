@@ -1,15 +1,16 @@
-use crate::structure::{Property, Vertex, GID};
-use std::collections::hash_map::{IntoIter, Iter};
+use crate::prelude::GValue;
+use crate::structure::{GID, Property, Vertex};
 use std::collections::HashMap;
+use std::collections::hash_map::{IntoIter, Iter};
 use std::hash::Hasher;
 
 #[derive(Debug, Clone)]
 pub struct Edge {
-    id: GID,
-    label: String,
-    in_v: Vertex,
-    out_v: Vertex,
-    properties: HashMap<String, Property>,
+    pub(crate) id: GID,
+    pub(crate) label: String,
+    pub(crate) in_v: Vertex,
+    pub(crate) out_v: Vertex,
+    pub(crate) properties: HashMap<String, Box<GValue>>,
 }
 
 impl Edge {
@@ -20,7 +21,7 @@ impl Edge {
         in_v_label: T,
         out_v_id: GID,
         out_v_label: T,
-        properties: HashMap<String, Property>,
+        properties: HashMap<String, Box<GValue>>,
     ) -> Edge
     where
         T: Into<String>,
@@ -49,18 +50,18 @@ impl Edge {
         &self.out_v
     }
 
-    pub fn iter(&self) -> Iter<String, Property> {
+    pub fn iter(&self) -> Iter<String, Box<GValue>> {
         self.properties.iter()
     }
 
-    pub fn property(&self, key: &str) -> Option<&Property> {
+    pub fn property(&self, key: &str) -> Option<&Box<GValue>> {
         self.properties.get(key)
     }
 }
 
 impl IntoIterator for Edge {
-    type Item = (String, Property);
-    type IntoIter = IntoIter<String, Property>;
+    type Item = (String, Box<GValue>);
+    type IntoIter = IntoIter<String, Box<GValue>>;
     fn into_iter(self) -> Self::IntoIter {
         self.properties.into_iter()
     }

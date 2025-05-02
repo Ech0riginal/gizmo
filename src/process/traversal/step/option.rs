@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use crate::process::traversal::TraversalBuilder;
-use crate::structure::{GValue, Merge};
-use crate::GKey;
+use crate::prelude::{GKey, GValue, Merge, traversal::TraversalBuilder};
 
 pub struct OptionStep {
     params: Vec<GValue>,

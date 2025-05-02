@@ -1,6 +1,6 @@
+use crate::prelude::{GValue, ToGValue};
 use crate::structure::either::Either2;
 use crate::structure::text_p::TextP;
-use crate::{GValue, ToGValue};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct P {

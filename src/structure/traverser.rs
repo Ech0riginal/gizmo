@@ -1,5 +1,5 @@
 use crate::conversion::FromGValue;
-use crate::{GValue, GremlinResult};
+use crate::prelude::{GValue, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Traverser {

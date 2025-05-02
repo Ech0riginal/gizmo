@@ -1,7 +1,7 @@
-use crate::GValue;
+use crate::prelude::GValue;
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct List(Vec<GValue>);
+pub struct List(pub(crate) Vec<GValue>);
 
 impl List {
     pub fn new(elements: Vec<GValue>) -> Self {
@@ -25,7 +25,7 @@ impl List {
     }
 }
 
-impl std::iter::IntoIterator for List {
+impl IntoIterator for List {
     type Item = GValue;
     type IntoIter = std::vec::IntoIter<Self::Item>;
     fn into_iter(self) -> Self::IntoIter {

@@ -1,11 +1,7 @@
+use crate::structure::GValue;
 use std::sync::Arc;
 
-use crate::structure::GValue;
-
 use thiserror::Error;
-
-#[cfg(feature = "async_gremlin")]
-use mobc;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
@@ -14,11 +10,13 @@ pub enum GremlinError {
     Generic(String),
 
     #[error(transparent)]
-    WebSocket(#[from] tungstenite::Error),
+    Websocket(#[from] tungstenite::Error),
 
-    #[error(transparent)]
-    Pool(#[from] r2d2::Error),
+    #[error("Tungstenite Error {0}")]
+    WebsocketClone(String),
 
+    // #[error(transparent)]
+    // Pool(#[from] r2d2::Error),
     #[error("Got wrong type {0:?}")]
     WrongType(GValue),
 
@@ -34,25 +32,29 @@ pub enum GremlinError {
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
 
-    #[cfg(feature = "async_gremlin")]
+    #[error("An error occurred while performing handshake: {0}")]
+    WebSocketHandshake(String),
+    #[error("An error occurred while performing handshake: {0}")]
+    WebSocketTlsHandshake(String),
     #[error(transparent)]
-    WebSocketAsync(#[from] Arc<async_tungstenite::tungstenite::Error>),
-    #[cfg(feature = "async_gremlin")]
-    #[error(transparent)]
-    WebSocketPoolAsync(#[from] Arc<mobc::Error<GremlinError>>),
-    #[cfg(feature = "async_gremlin")]
+    WebSocketPool(#[from] Arc<mobc::Error<GremlinError>>),
     #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
     #[error(transparent)]
     Uuid(#[from] uuid::Error),
+    #[error(transparent)]
+    IO(#[from] std::io::Error),
+    #[error(transparent)]
+    Tls(#[from] rustls::Error),
+    #[error(transparent)]
+    Pem(#[from] rustls_pki_types::pem::Error),
 }
 
-#[cfg(feature = "async_gremlin")]
 impl From<mobc::Error<GremlinError>> for GremlinError {
     fn from(e: mobc::Error<GremlinError>) -> GremlinError {
         match e {
             mobc::Error::Inner(e) => e,
-            other => GremlinError::WebSocketPoolAsync(Arc::new(other)),
+            other => GremlinError::WebSocketPool(Arc::new(other)),
         }
     }
 }

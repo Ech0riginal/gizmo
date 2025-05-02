@@ -1,17 +1,16 @@
-use crate::process::traversal::step::has::HasStep;
-use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::not::NotStep;
-use crate::process::traversal::step::or::OrStep;
-use crate::process::traversal::step::repeat::RepeatStep;
-use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::until::UntilStep;
-use crate::process::traversal::step::where_step::WhereStep;
-use crate::process::traversal::TraversalBuilder;
+use super::TraversalBuilder;
+use super::step::HasStep;
+use super::step::LoopsStep;
+use super::step::MergeEdgeStep;
+use super::step::MergeVertexStep;
+use super::step::NotStep;
+use super::step::OrStep;
+use super::step::RepeatStep;
+use super::step::SelectStep;
+use super::step::UntilStep;
+use super::step::WhereStep;
+use crate::prelude::GValue;
 use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
-use crate::GValue;
-
-use super::merge_edge::MergeEdgeStep;
-use super::merge_vertex::MergeVertexStep;
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,

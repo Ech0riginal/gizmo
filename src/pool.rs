@@ -1,35 +1,33 @@
-use r2d2::ManageConnection;
+use mobc::Manager;
 
-use crate::connection::Connection;
-use crate::connection::ConnectionOptions;
+use crate::connection::Conn;
 use crate::error::GremlinError;
-use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v2, Response,
-};
-use crate::{GValue, GraphSON, GremlinResult};
-use base64::encode;
+use crate::options::ConnectionOptions;
+use crate::prelude::{GValue, GraphSON};
+use base64::prelude::{BASE64_STANDARD, Engine};
 use std::collections::HashMap;
 
 #[derive(Debug)]
-pub(crate) struct GremlinConnectionManager {
-    options: ConnectionOptions,
+pub(crate) struct GremlinConnectionManager<SD: GraphSON> {
+    options: ConnectionOptions<SD>,
 }
 
-impl GremlinConnectionManager {
-    pub(crate) fn new(options: ConnectionOptions) -> GremlinConnectionManager {
+impl<SD: GraphSON> GremlinConnectionManager<SD> {
+    pub(crate) fn new(options: ConnectionOptions<SD>) -> GremlinConnectionManager<SD> {
         GremlinConnectionManager { options }
     }
 }
 
-impl ManageConnection for GremlinConnectionManager {
-    type Connection = Connection;
+#[async_trait::async_trait]
+impl<SD: GraphSON> Manager for GremlinConnectionManager<SD> {
+    type Connection = Conn;
     type Error = GremlinError;
 
-    fn connect(&self) -> GremlinResult<Connection> {
-        Connection::connect(self.options.clone())
+    async fn connect(&self) -> Result<Self::Connection, Self::Error> {
+        Conn::connect(self.options.clone()).await
     }
 
-    fn is_valid(&self, conn: &mut Connection) -> Result<(), GremlinError> {
+    async fn check(&self, mut conn: Self::Connection) -> Result<Self::Connection, Self::Error> {
         let mut args = HashMap::new();
 
         args.insert(
@@ -40,66 +38,58 @@ impl ManageConnection for GremlinConnectionManager {
             String::from("language"),
             GValue::String(String::from("gremlin-groovy")),
         );
-        let args = self.options.serializer.write(&GValue::from(args))?;
+        let args = SD::serialize(&GValue::from(args))?;
 
-        let message = match self.options.serializer {
-            GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
-            GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
-        };
+        let message = SD::message(String::from("eval"), String::default(), args, None);
 
+        let id = message.id().clone();
         let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-        let content_type = match self.options.serializer {
-            GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
-            GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
-        };
-        let payload = String::from("") + content_type + &msg;
+        let content_type = SD::content_type();
 
+        let payload = String::from("") + content_type + &msg;
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
 
-        conn.send(binary)?;
-
-        let result = conn.recv()?;
-        let response: Response = serde_json::from_slice(&result)?;
+        let (response, _receiver) = conn.send(id, binary).await?;
 
         match response.status.code {
-            200 | 206 => Ok(()),
-            204 => Ok(()),
+            200 | 206 => Ok(conn),
+            204 => Ok(conn),
             407 => match &self.options.credentials {
                 Some(c) => {
                     let mut args = HashMap::new();
 
                     args.insert(
                         String::from("sasl"),
-                        GValue::String(encode(&format!("\0{}\0{}", c.username, c.password))),
+                        GValue::String(
+                            BASE64_STANDARD.encode(&format!("\0{}\0{}", c.username, c.password)),
+                        ),
                     );
 
-                    let args = self.options.serializer.write(&GValue::from(args))?;
-                    let message = message_with_args_and_uuid(
+                    let args = SD::serialize(&GValue::from(args))?;
+                    let message = SD::message(
                         String::from("authentication"),
                         String::from("traversal"),
-                        response.request_id,
                         args,
+                        Some(response.request_id),
                     );
 
+                    let id = message.id().clone();
                     let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-                    let content_type = self.options.serializer.content_type();
+                    let content_type = SD::content_type();
                     let payload = String::from("") + content_type + &msg;
 
                     let mut binary = payload.into_bytes();
                     binary.insert(0, content_type.len() as u8);
 
-                    conn.send(binary)?;
-
-                    let result = conn.recv()?;
-                    let response: Response = serde_json::from_slice(&result)?;
+                    let (response, _receiver) = conn.send(id, binary).await?;
 
                     match response.status.code {
-                        200 | 206 => Ok(()),
-                        204 => Ok(()),
-                        401 => Ok(()),
+                        200 | 206 => Ok(conn),
+                        204 => Ok(conn),
+                        401 => Ok(conn),
                         // 401 is actually a username/password incorrect error, but if not
                         // not returned as okay, the pool loops infinitely trying
                         // to authenticate.
@@ -121,8 +111,8 @@ impl ManageConnection for GremlinConnectionManager {
         }
     }
 
-    fn has_broken(&self, conn: &mut Connection) -> bool {
-        conn.is_broken()
+    fn validate(&self, conn: &mut Self::Connection) -> bool {
+        conn.is_valid()
     }
 }
 
@@ -130,26 +120,35 @@ impl ManageConnection for GremlinConnectionManager {
 mod tests {
 
     use super::GremlinConnectionManager;
-    use crate::ConnectionOptions;
+    use crate::prelude::ConnectionOptions;
 
-    use r2d2::Pool;
+    use mobc::Pool;
+    use std::time::Duration;
 
-    #[test]
-    fn it_should_create_a_connection_pool() {
-        let manager = GremlinConnectionManager::new(ConnectionOptions::default());
+    use tokio::task;
 
-        let result = Pool::builder().max_size(16).build(manager);
+    #[tokio::test]
+    #[allow(unused_must_use)]
+    async fn it_should_create_a_connection_pool() {
+        let manager = GremlinConnectionManager::<()>::new(ConnectionOptions::default());
 
-        let pool = result.unwrap();
+        let pool = Pool::builder().max_open(16).build(manager);
 
-        let connection = pool.get();
+        let conn = pool.get().await.expect("Failed to get the connection");
 
-        assert_eq!(16, pool.state().connections);
+        pool.state().await;
 
-        assert_eq!(15, pool.state().idle_connections);
+        assert_eq!(1, pool.state().await.connections);
 
-        drop(connection);
+        assert_eq!(0, pool.state().await.idle);
 
-        assert_eq!(16, pool.state().idle_connections);
+        drop(conn);
+
+        task::spawn_blocking(move || {
+            std::thread::sleep(Duration::from_millis(200));
+        })
+        .await;
+
+        assert_eq!(1, pool.state().await.idle);
     }
 }

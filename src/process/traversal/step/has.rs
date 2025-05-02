@@ -1,5 +1,5 @@
 use crate::structure::GValue;
-use crate::structure::{Either2, TextP, T};
+use crate::structure::{Either2, T, TextP};
 use crate::structure::{IntoPredicate, P};
 
 pub enum HasStepKey {

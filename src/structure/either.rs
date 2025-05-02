@@ -1,4 +1,4 @@
-use crate::structure::{GValue, Vertex, T};
+use crate::structure::{GValue, T, Vertex};
 
 pub enum Either2<A: Into<GValue>, B: Into<GValue>> {
     A(A),

@@ -1,22 +1,24 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::GValue;
-use crate::GremlinResult;
+use crate::prelude::{GValue, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Property {
-    label: String,
-    value: Box<GValue>,
+    pub(crate) key: String,
+    pub(crate) value: Box<GValue>,
+    pub(crate) element: Box<GValue>,
 }
 
 impl Property {
-    pub fn new<T, GT>(label: T, value: GT) -> Property
+    pub fn new<K, V, E>(key: K, value: V, element: E) -> Property
     where
-        T: Into<String>,
-        GT: Into<GValue>,
+        K: Into<String>,
+        V: Into<GValue>,
+        E: Into<GValue>,
     {
         Property {
-            label: label.into(),
+            key: key.into(),
             value: Box::new(value.into()),
+            element: Box::new(element.into()), // TODO
         }
     }
 
@@ -39,6 +41,6 @@ impl Property {
     }
 
     pub fn label(&self) -> &String {
-        &self.label
+        &self.key
     }
 }

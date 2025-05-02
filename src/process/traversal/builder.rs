@@ -1,30 +1,8 @@
-use crate::conversion::{FromGValue, ToGValue};
-use crate::process::traversal::step::by::ByStep;
-use crate::process::traversal::step::choose::IntoChooseStep;
-use crate::process::traversal::step::coalesce::CoalesceStep;
-use crate::process::traversal::step::dedup::DedupStep;
-use crate::process::traversal::step::from::FromStep;
-use crate::process::traversal::step::has::HasStep;
-use crate::process::traversal::step::limit::LimitStep;
-use crate::process::traversal::step::local::LocalStep;
-use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::match_step::MatchStep;
-use crate::process::traversal::step::not::NotStep;
-use crate::process::traversal::step::or::OrStep;
-use crate::process::traversal::step::repeat::RepeatStep;
-use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::to::ToStep;
-use crate::process::traversal::step::until::UntilStep;
-use crate::process::traversal::step::where_step::WhereStep;
-
-use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
-use crate::GValue;
-
-use super::merge_edge::MergeEdgeStep;
-use super::merge_vertex::MergeVertexStep;
-use super::option::OptionStep;
-use super::side_effect::SideEffectStep;
+use crate::prelude::{
+    Cardinality, FromGValue, GID, GIDs, GValue, IntoPredicate, Labels, ToGValue,
+    traversal::step::*,
+    traversal::{Bytecode, Scope},
+};
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -97,8 +75,8 @@ impl TraversalBuilder {
         K: Into<GValue>,
         A: Into<GValue>,
     {
-        self.bytecode
-            .add_step(String::from("property"), vec![key.into(), value.into()]);
+        let args = vec![key.into(), value.into()];
+        self.bytecode.add_step(String::from("property"), args);
         self
     }
 
@@ -140,6 +118,12 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("has"), step.into().into());
+        self
+    }
+
+    pub fn has_id(mut self, id: &GID) -> Self {
+        self.bytecode
+            .add_step(String::from("hasId"), vec![id.to_gvalue()]);
         self
     }
 

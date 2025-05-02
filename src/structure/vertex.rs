@@ -1,14 +1,14 @@
-use crate::structure::VertexProperty;
 use crate::structure::GID;
-use std::collections::hash_map::{IntoIter, Iter};
+use crate::structure::VertexProperty;
 use std::collections::HashMap;
+use std::collections::hash_map::{IntoIter, Iter};
 use std::hash::Hasher;
 
 #[derive(Debug, Clone)]
 pub struct Vertex {
-    id: GID,
-    label: String,
-    properties: HashMap<String, Vec<VertexProperty>>,
+    pub(crate) id: GID,
+    pub(crate) label: String,
+    pub(crate) properties: HashMap<String, Vec<VertexProperty>>,
 }
 
 impl Vertex {

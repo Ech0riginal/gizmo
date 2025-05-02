@@ -1,3 +1,5 @@
+#![feature(never_type)]
+
 //! Experimental Rust client for Apache Tinkerpop Gremlin Server.
 //! The driver supports the execution of raw Gremlin queries and GLV traversal
 //!
@@ -22,7 +24,7 @@
 //!
 //! ```rust,no_run
 //!     
-//! use gremlin_client::{GremlinClient, Vertex};
+//! use gremlin_client::prelude::{GremlinClient, Vertex};
 //!
 //! fn main() -> Result<(), Box<std::error::Error>> {
 //!    let client = GremlinClient::connect("localhost")?;
@@ -73,7 +75,7 @@
 //!
 //! ```rust,no_run
 //!     
-//! use gremlin_client::{GremlinClient, Vertex, process::traversal::traversal};
+//! use gremlin_client::prelude::{GremlinClient, Vertex, traversal};
 //!
 //! fn main() -> Result<(), Box<std::error::Error>> {
 //!    let client = GremlinClient::connect("localhost")?;
@@ -110,40 +112,51 @@
 //!    })
 //!}
 //!
+
+#![feature(trait_alias)]
+#![feature(type_changing_struct_update)]
+#![feature(try_trait_v2)]
 #[macro_use]
 extern crate lazy_static;
 
-mod client;
-mod connection;
 mod conversion;
 mod error;
 mod io;
 mod message;
+
 mod pool;
 
-pub use client::GremlinClient;
-pub use connection::{
-    ConnectionOptions, ConnectionOptionsBuilder, TlsOptions, WebSocketOptions,
-    WebSocketOptionsBuilder,
-};
-pub use conversion::{BorrowFromGValue, FromGValue, ToGValue};
-pub use error::GremlinError;
-pub use io::GraphSON;
-pub use message::Message;
+mod client;
 
-pub type GremlinResult<T> = Result<T, error::GremlinError>;
+mod connection;
 
-pub use structure::{
-    Cardinality, Edge, GKey, GResultSet, GValue, IntermediateRepr, List, Map, Metric, Path,
-    Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
-};
-
-#[cfg(feature = "async_gremlin")]
-pub mod aio;
+mod options;
 
 pub mod process;
 pub mod structure;
 pub mod utils;
+
+pub mod prelude {
+    pub use tokio_stream::StreamExt;
+
+    pub use crate::error::GremlinError;
+    pub type GremlinResult<T> = Result<T, GremlinError>;
+
+    pub use crate::client::GremlinClient;
+    pub use crate::io::{GraphSON, GraphSONDeserializer, GraphSONSerializer, V2, V3, V3g};
+    pub use crate::options::*;
+    pub use crate::{edge, vertex};
+
+    pub use crate::process::traversal;
+    pub use crate::process::traversal::__;
+    pub use crate::process::traversal::AsyncTerminator;
+    pub use crate::process::traversal::GraphTraversalSource;
+    pub use crate::process::traversal::traversal;
+
+    pub use crate::conversion::{BorrowFromGValue, FromGValue, ToGValue};
+    pub(crate) use crate::message::Message;
+    pub use crate::structure::*;
+}
 
 #[cfg(feature = "derive")]
 pub mod derive {

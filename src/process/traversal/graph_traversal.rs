@@ -1,38 +1,9 @@
-use crate::conversion::FromGValue;
-use crate::process::traversal::step::by::ByStep;
-use crate::process::traversal::step::choose::IntoChooseStep;
-use crate::process::traversal::step::coalesce::CoalesceStep;
-use crate::process::traversal::step::dedup::DedupStep;
-use crate::process::traversal::step::from::FromStep;
-use crate::process::traversal::step::has::HasStep;
-use crate::process::traversal::step::limit::LimitStep;
-use crate::process::traversal::step::local::LocalStep;
-use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::match_step::MatchStep;
-use crate::process::traversal::step::not::NotStep;
-use crate::process::traversal::step::or::OrStep;
-use crate::process::traversal::step::repeat::RepeatStep;
-use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::to::ToStep;
-use crate::process::traversal::step::until::UntilStep;
-use crate::process::traversal::step::where_step::WhereStep;
-
-use crate::process::traversal::remote::{SyncTerminator, Terminator};
-use crate::process::traversal::strategies::{
-    RemoteStrategy, TraversalStrategies, TraversalStrategy,
-};
-use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
-use crate::structure::{Cardinality, Labels, Null};
-use crate::{
-    structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
-    List, Map, Path, Vertex,
+use crate::prelude::{
+    Cardinality, Edge, FromGValue, GIDs, GProperty, GValue, IntoPredicate, Labels, List, Map, Null,
+    Path, Vertex,
+    traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS, remote::Terminator, step::*},
 };
 use std::marker::PhantomData;
-
-use super::merge_edge::MergeEdgeStep;
-use super::merge_vertex::MergeVertexStep;
-use super::option::OptionStep;
-use super::side_effect::SideEffectStep;
 
 #[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
@@ -49,19 +20,6 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
             end: PhantomData,
             builder,
             terminator,
-        }
-    }
-
-    pub fn change_remote(self, client: GremlinClient) -> GraphTraversal<S, E, SyncTerminator> {
-        let mut strategies = TraversalStrategies::new(vec![]);
-
-        strategies.add_strategy(TraversalStrategy::Remote(RemoteStrategy::new(client)));
-
-        GraphTraversal {
-            start: self.start,
-            end: self.end,
-            builder: self.builder,
-            terminator: SyncTerminator::new(strategies),
         }
     }
 
@@ -94,12 +52,25 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn property<K, V>(mut self, key: K, value: V) -> Self
+    pub fn property<K, A>(mut self, key: K, value: A) -> Self
     where
         K: Into<GValue>,
-        V: Into<GValue>,
+        A: Into<GValue>,
     {
-        self.builder = self.builder.property(key, value);
+        self.builder = self.builder.property(key.into(), value);
+        self
+    }
+
+    pub fn property_opt<K, A>(mut self, key: K, value: &Option<A>) -> Self
+    where
+        K: Into<GValue>,
+        A: Into<GValue>,
+        GValue: for<'a> From<&'a A>,
+    {
+        if let Some(a) = value {
+            self.builder = self.builder.property(key, a);
+        }
+
         self
     }
 

@@ -1,20 +1,16 @@
-use crate::structure::{GValue, List};
+use crate::structure::GValue;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Path {
-    labels: Box<GValue>,
-    objects: List,
+    pub(crate) labels: Box<GValue>,
+    pub(crate) objects: Box<GValue>,
 }
 
 impl Path {
-    pub fn new(labels: GValue, objects: List) -> Self {
+    pub fn new(labels: GValue, objects: GValue) -> Self {
         Path {
             labels: Box::new(labels),
-            objects,
+            objects: Box::new(objects),
         }
-    }
-
-    pub fn objects(&self) -> &List {
-        &self.objects
     }
 }

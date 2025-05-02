@@ -1,50 +1,86 @@
-use crate::message::Response;
-use crate::pool::GremlinConnectionManager;
-use crate::structure::GValue;
-use crate::{GremlinClient, GremlinResult};
-use r2d2::PooledConnection;
-use std::collections::VecDeque;
+use crate::io::GraphSONDeserializer;
 
-#[derive(Debug)]
-pub struct GResultSet {
-    client: GremlinClient,
-    results: VecDeque<GValue>,
-    response: Response,
-    conn: PooledConnection<GremlinConnectionManager>,
+use crate::message::Response;
+use crate::prelude::{GraphSON, GremlinClient, GremlinResult};
+use crate::structure::GValue;
+use futures::Stream;
+
+use core::task::Context;
+use core::task::Poll;
+use futures::channel::mpsc::Receiver;
+use pin_project_lite::pin_project;
+use std::collections::VecDeque;
+use std::pin::Pin;
+
+pin_project! {
+    pub struct GResultSet<SD: GraphSON> {
+        client: GremlinClient<SD>,
+        results: VecDeque<GValue>,
+        pub response: Response,
+        #[pin]
+        receiver: Receiver<GremlinResult<Response>>,
+    }
 }
 
-impl GResultSet {
+impl<SD: GraphSON> std::fmt::Debug for GResultSet<SD> {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(
+            fmt,
+            "GResultSet {{ response: {:?}, resuls: {:?} }}",
+            self.response, self.results
+        )
+    }
+}
+
+impl<SD: GraphSON> GResultSet<SD> {
     pub(crate) fn new(
-        client: GremlinClient,
+        client: GremlinClient<SD>,
         results: VecDeque<GValue>,
         response: Response,
-        conn: PooledConnection<GremlinConnectionManager>,
-    ) -> GResultSet {
+        receiver: Receiver<GremlinResult<Response>>,
+    ) -> GResultSet<SD> {
         GResultSet {
             client,
             results,
             response,
-            conn,
+            receiver,
         }
-    }
-
-    fn fetch(&mut self) -> GremlinResult<()> {
-        if self.results.is_empty() && self.response.status.code == 206 {
-            let (response, resuts) = self.client.read_response(&mut self.conn)?;
-            self.response = response;
-            self.results = resuts;
-        }
-        Ok(())
     }
 }
 
-impl Iterator for GResultSet {
+impl<SD: GraphSON> Stream for GResultSet<SD>
+where
+    SD: GraphSONDeserializer,
+{
     type Item = GremlinResult<GValue>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.fetch() {
-            Ok(_) => self.results.pop_front().map(Ok),
-            Err(e) => Some(Err(e)),
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let mut this = self.project();
+        loop {
+            match this.results.pop_front() {
+                Some(r) => return Poll::Ready(Some(Ok(r))),
+                None => {
+                    if this.response.status.code == 206 {
+                        match futures::ready!(this.receiver.as_mut().poll_next(cx)) {
+                            Some(Ok(response)) => {
+                                let results: VecDeque<GValue> =
+                                    SD::deserialize(&response.result.data)?.into();
+
+                                *this.results = results;
+                                *this.response = response;
+                            }
+                            Some(Err(e)) => {
+                                return Poll::Ready(Some(Err(e)));
+                            }
+                            None => {
+                                return Poll::Ready(None);
+                            }
+                        }
+                    } else {
+                        return Poll::Ready(None);
+                    }
+                }
+            }
         }
     }
 }

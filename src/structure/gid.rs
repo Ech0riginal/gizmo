@@ -1,4 +1,5 @@
-use crate::{GremlinError, GremlinResult};
+use crate::prelude::{GKey, GremlinError, GremlinResult};
+use std::convert::TryFrom;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -71,6 +72,35 @@ impl From<&GID> for GID {
 impl From<Uuid> for GID {
     fn from(val: Uuid) -> Self {
         GID::String(val.to_string())
+    }
+}
+
+impl TryFrom<GKey> for GID {
+    type Error = GremlinError;
+
+    fn try_from(value: GKey) -> Result<Self, Self::Error> {
+        Self::try_from(&value)
+    }
+}
+
+impl TryFrom<&GKey> for GID {
+    type Error = GremlinError;
+
+    fn try_from(value: &GKey) -> Result<Self, Self::Error> {
+        match value {
+            GKey::String(s) => {
+                let gid = if let Ok(i) = s.parse::<i64>() {
+                    Self::Int64(i)
+                } else {
+                    Self::String(s.to_string())
+                };
+                Ok(gid)
+            }
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot convert {:?} to GID",
+                value
+            ))),
+        }
     }
 }
 

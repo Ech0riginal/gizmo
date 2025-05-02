@@ -1,23 +1,25 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
+use crate::prelude::{GID, GremlinError, GremlinResult, ToGValue};
 use crate::process::traversal::{Bytecode, Order, Scope, TraversalBuilder};
 use crate::structure::traverser::Traverser;
-use crate::structure::{
-    label::LabelType, Cardinality, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property,
-    Set, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
-};
-use crate::structure::{Pop, TextP, P, T};
-use crate::{GremlinError, GremlinResult, ToGValue, GID};
+use crate::structure::*;
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
-pub type Date = chrono::DateTime<chrono::offset::Utc>;
+pub type Date = chrono::DateTime<Utc>;
+use super::{Column, Direction, Merge};
+use crate::structure::tree::Tree;
+use chrono::{NaiveDate, NaiveDateTime, TimeZone, Utc};
+use geo_types::{Point, Polygon};
 use std::convert::TryInto;
+use std::fmt::Formatter;
 use std::hash::Hash;
 
-use super::{Column, Direction, Merge};
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum GValue {
     Null,
+    Tree(Tree),
+    TinkerGraph(TinkerGraph),
     Vertex(Vertex),
     Edge(Edge),
     VertexProperty(VertexProperty),
@@ -28,6 +30,7 @@ pub enum GValue {
     Float(f32),
     Double(f64),
     Date(Date),
+    Timestamp(Date),
     List(List),
     Set(Set),
     Map(Map),
@@ -48,9 +51,13 @@ pub enum GValue {
     TextP(TextP),
     Pop(Pop),
     Cardinality(Cardinality),
+    Geometry(geo_types::Geometry),
     Merge(Merge),
     Direction(Direction),
     Column(Column),
+    BulkSet(Map),
+    Class(String),
+    StarGraph(StarGraph),
 }
 
 impl GValue {
@@ -69,9 +76,126 @@ impl GValue {
     }
 }
 
+impl std::fmt::Debug for GValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GValue::Null => write!(f, "null"),
+            GValue::Vertex(v) => write!(f, "{:?}", v),
+            GValue::Edge(e) => write!(f, "{:?}", e),
+            GValue::VertexProperty(vp) => write!(f, "{:?}", vp),
+            GValue::Property(p) => write!(f, "{:?}", p),
+            GValue::Uuid(uuid) => write!(f, "\"{}\"", uuid.to_string()),
+            GValue::Int32(v) => write!(f, "{}", v),
+            GValue::Int64(v) => write!(f, "{}", v),
+            GValue::Float(v) => write!(f, "{}", v),
+            GValue::Double(v) => write!(f, "{}", v),
+            GValue::Date(d) => write!(f, "{}", d),
+            GValue::Timestamp(d) => write!(f, "{}", d),
+            GValue::List(l) => write!(f, "{:?}", l),
+            GValue::Set(s) => write!(f, "{:?}", s),
+            GValue::Map(map) => write!(f, "{:?}", map),
+            GValue::Token(t) => write!(f, "{}", t.value()),
+            GValue::String(string) => write!(f, "\"{}\"", string),
+            GValue::Path(_) => write!(f, "Path"),
+            GValue::TraversalMetrics(_) => write!(f, "TraversalMetrics"),
+            GValue::Metric(_) => write!(f, "Metric"),
+            GValue::TraversalExplanation(_) => write!(f, "TraversalExplanation"),
+            GValue::IntermediateRepr(_) => write!(f, "IntermediateRepr"),
+            GValue::P(_) => write!(f, "P"),
+            GValue::T(t) => write!(f, "{:?}", t),
+            GValue::Bytecode(bytecode) => write!(f, "{:?}", bytecode),
+            GValue::Traverser(_) => write!(f, "Traverser"),
+            GValue::Scope(_) => write!(f, "Scope"),
+            GValue::Order(_) => write!(f, "Order"),
+            GValue::Bool(_) => write!(f, "Bool"),
+            GValue::TextP(_) => write!(f, "TextP"),
+            GValue::Pop(_) => write!(f, "Pop"),
+            GValue::Cardinality(_) => write!(f, "Cardinality"),
+            GValue::Geometry(_) => write!(f, "Geometry"),
+            GValue::Merge(_) => write!(f, "Merge"),
+            GValue::Direction(_) => write!(f, "Direction"),
+            GValue::Column(_) => write!(f, "Column"),
+            GValue::BulkSet(_) => write!(f, "BulkSet"),
+            GValue::Class(class) => write!(f, "{}", class),
+            GValue::StarGraph(star) => write!(f, "{:?}", star),
+            GValue::Tree(tree) => write!(f, "{:?}", tree),
+            GValue::TinkerGraph(graph) => write!(f, "{:?}", graph),
+        }
+    }
+}
+
+impl std::fmt::Debug for Bytecode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", &self.step_instructions[0])?;
+
+        for step in self.step_instructions.iter().skip(1) {
+            write!(f, ".{:?}", &step)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for crate::process::traversal::bytecode::Instruction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if !self.args.is_empty() {
+            match &self.args[0] {
+                GValue::P(_) => write!(f, "P{:?}", &self.args[0])?,
+                GValue::T(_) => write!(f, "T{:?}", &self.args[0])?,
+                _ => {
+                    write!(f, "{}", &self.operator)?;
+                    write!(f, "(")?;
+                    write!(f, "{:?}", &self.args[0])?
+                }
+            }
+
+            for arg in self.args.iter().skip(1) {
+                write!(f, ", {:?}", arg)?;
+            }
+        }
+
+        if !self.args.is_empty() {
+            match &self.args[0] {
+                GValue::P(_) | GValue::T(_) => Ok(()),
+                _ => {
+                    write!(f, ")")
+                }
+            }
+        } else {
+            Ok(())
+        }
+    }
+}
+
+impl From<&Point> for GValue {
+    fn from(value: &Point) -> Self {
+        GValue::Geometry(geo_types::Geometry::Point(*value))
+    }
+}
+
+impl From<Point> for GValue {
+    fn from(value: Point) -> Self {
+        GValue::Geometry(geo_types::Geometry::Point(value))
+    }
+}
+
+impl From<&Polygon> for GValue {
+    fn from(value: &Polygon) -> Self {
+        GValue::Geometry(geo_types::Geometry::Polygon(value.clone()))
+    }
+}
+
 impl From<Date> for GValue {
     fn from(val: Date) -> Self {
         GValue::Date(val)
+    }
+}
+
+impl From<NaiveDate> for GValue {
+    fn from(val: NaiveDate) -> Self {
+        let naive_dt: NaiveDateTime = val.and_hms_opt(0, 0, 0).unwrap();
+        let date: Date = Utc.from_utc_datetime(&naive_dt);
+        GValue::Date(date)
     }
 }
 
@@ -329,7 +453,7 @@ impl From<TraversalBuilder> for GValue {
 }
 
 impl std::convert::TryFrom<GValue> for String {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -346,7 +470,7 @@ impl std::convert::TryFrom<GValue> for String {
 }
 
 impl std::convert::TryFrom<GValue> for i32 {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -363,7 +487,7 @@ impl std::convert::TryFrom<GValue> for i32 {
 }
 
 impl std::convert::TryFrom<GValue> for i64 {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -380,7 +504,7 @@ impl std::convert::TryFrom<GValue> for i64 {
 }
 
 impl std::convert::TryFrom<GValue> for uuid::Uuid {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -397,7 +521,7 @@ impl std::convert::TryFrom<GValue> for uuid::Uuid {
 }
 
 impl std::convert::TryFrom<GValue> for Date {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -414,7 +538,7 @@ impl std::convert::TryFrom<GValue> for Date {
 }
 
 impl std::convert::TryFrom<GValue> for bool {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -431,7 +555,7 @@ impl std::convert::TryFrom<GValue> for bool {
 }
 
 impl std::convert::TryFrom<GValue> for f32 {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -448,7 +572,7 @@ impl std::convert::TryFrom<GValue> for f32 {
 }
 
 impl std::convert::TryFrom<GValue> for f64 {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
@@ -465,7 +589,7 @@ impl std::convert::TryFrom<GValue> for f64 {
 }
 
 impl std::convert::TryFrom<GValue> for BTreeMap<String, GValue> {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         if let GValue::Map(m) = value {
@@ -480,7 +604,7 @@ impl std::convert::TryFrom<GValue> for BTreeMap<String, GValue> {
 }
 
 impl std::convert::TryFrom<GValue> for HashMap<GKey, GValue> {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         if let GValue::Map(m) = value {
@@ -495,7 +619,7 @@ impl std::convert::TryFrom<GValue> for HashMap<GKey, GValue> {
 }
 
 impl std::convert::TryFrom<GValue> for HashMap<String, GValue> {
-    type Error = crate::GremlinError;
+    type Error = GremlinError;
 
     fn try_from(value: GValue) -> GremlinResult<Self> {
         if let GValue::Map(m) = value {
@@ -524,12 +648,24 @@ where
     }
 }
 
+impl<T> From<Option<T>> for GValue
+where
+    T: Into<GValue>,
+{
+    fn from(value: Option<T>) -> Self {
+        match value {
+            Some(v) => v.into(),
+            None => GValue::Null,
+        }
+    }
+}
+
 // Optional
 
 macro_rules! impl_try_from_option {
     ($t:ty) => {
         impl std::convert::TryFrom<GValue> for Option<$t> {
-            type Error = crate::GremlinError;
+            type Error = GremlinError;
 
             fn try_from(value: GValue) -> GremlinResult<Self> {
                 if let GValue::Null = value {
@@ -599,7 +735,7 @@ macro_rules! impl_try_from_set {
         }
 
         impl std::convert::TryFrom<GValue> for HashSet<$t> {
-            type Error = crate::GremlinError;
+            type Error = GremlinError;
 
             fn try_from(value: GValue) -> GremlinResult<Self> {
                 match value {
@@ -615,7 +751,7 @@ macro_rules! impl_try_from_set {
         }
 
         impl std::convert::TryFrom<&GValue> for HashSet<$t> {
-            type Error = crate::GremlinError;
+            type Error = GremlinError;
 
             fn try_from(value: &GValue) -> GremlinResult<Self> {
                 match value {
@@ -645,7 +781,7 @@ impl_try_from_set!(bool);
 macro_rules! impl_try_from_list {
     ($t:ty) => {
         impl std::convert::TryFrom<GValue> for Vec<$t> {
-            type Error = crate::GremlinError;
+            type Error = GremlinError;
 
             fn try_from(value: GValue) -> GremlinResult<Self> {
                 match value {
@@ -660,7 +796,7 @@ macro_rules! impl_try_from_list {
         }
 
         impl std::convert::TryFrom<&GValue> for Vec<$t> {
-            type Error = crate::GremlinError;
+            type Error = GremlinError;
 
             fn try_from(value: &GValue) -> GremlinResult<Self> {
                 match value {
