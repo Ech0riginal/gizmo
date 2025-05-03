@@ -41,6 +41,10 @@ pub enum GremlinError {
     #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
     #[error(transparent)]
+    TokioChannelSend(#[from] tokio::sync::mpsc::error::SendError<tungstenite::Message>),
+    #[error(transparent)]
+    BrokenChannel(#[from] tokio::sync::oneshot::error::RecvError),
+    #[error(transparent)]
     Uuid(#[from] uuid::Error),
     #[error(transparent)]
     IO(#[from] std::io::Error),
