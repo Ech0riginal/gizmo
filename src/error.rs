@@ -1,5 +1,5 @@
+use bb8::RunError;
 use crate::structure::GValue;
-use std::sync::Arc;
 
 use thiserror::Error;
 
@@ -37,8 +37,6 @@ pub enum GremlinError {
     #[error("An error occurred while performing handshake: {0}")]
     WebSocketTlsHandshake(String),
     #[error(transparent)]
-    WebSocketPool(#[from] Arc<mobc::Error<GremlinError>>),
-    #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
     #[error(transparent)]
     TokioChannelSend(#[from] tokio::sync::mpsc::error::SendError<tungstenite::Message>),
@@ -52,13 +50,15 @@ pub enum GremlinError {
     Tls(#[from] rustls::Error),
     #[error(transparent)]
     Pem(#[from] rustls_pki_types::pem::Error),
+    #[error("Timed out while making connection")]
+    ConnectionTimeout,
 }
 
-impl From<mobc::Error<GremlinError>> for GremlinError {
-    fn from(e: mobc::Error<GremlinError>) -> GremlinError {
-        match e {
-            mobc::Error::Inner(e) => e,
-            other => GremlinError::WebSocketPool(Arc::new(other)),
+impl From<bb8::RunError<Self>> for GremlinError {
+    fn from(value: RunError<Self>) -> Self {
+        match value {
+            RunError::User(e) => e,
+            RunError::TimedOut => Self::ConnectionTimeout
         }
     }
 }

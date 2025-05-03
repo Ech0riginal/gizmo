@@ -33,6 +33,7 @@ pub trait GraphSON:
     + Default
     + 'static
 {
+    fn new() -> Self;
 }
 
 // Wow, I hate this

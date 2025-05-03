@@ -1,4 +1,6 @@
+use crate::io::{V2, V3};
 use crate::prelude::{GraphSON, GremlinError};
+use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
 use std::io::BufReader;
@@ -7,7 +9,8 @@ use std::path::PathBuf;
 use std::time::Duration;
 use webpki_roots::TLS_SERVER_ROOTS;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Builder)]
+#[builder(pattern = "owned")]
 pub struct TlsOptions {
     /// A path to your CA file
     pub authority: Option<PathBuf>,
@@ -15,16 +18,6 @@ pub struct TlsOptions {
     pub private_key: Option<String>,
     /// Authentication certificates
     pub auth_certs: Option<String>,
-}
-
-impl Default for TlsOptions {
-    fn default() -> Self {
-        Self {
-            authority: None,
-            private_key: None,
-            auth_certs: None,
-        }
-    }
 }
 
 impl TlsOptions {
@@ -73,184 +66,76 @@ impl TlsOptions {
     }
 }
 
-impl<'a, SD: GraphSON> Into<ConnectionOptions<SD>> for &'a str {
-    fn into(self) -> ConnectionOptions<SD> {
-        let default = ConnectionOptions::<SD>::default();
-        ConnectionOptions {
-            host: self.to_string(),
-            serde: PhantomData::<SD>,
-            ..default
-        }
-    }
-}
-
-macro_rules! into_connection_options {
-    ($kind:ty) => {
-        impl<H, SD> Into<ConnectionOptions<SD>> for (H, $kind)
-        where
-            H: AsRef<str>,
-            SD: GraphSON,
-        {
-            fn into(self) -> ConnectionOptions<SD> {
-                (self.0, self.1 as u16).into()
-            }
-        }
-    };
-}
-
-// The assumption here is the compiler's assigned a user-supplied value " ::connect(("", >2749<))"
-// some random integer length. Ofc we lose precision casting down but since the standard's
-// u16::MAX_SIZE whoever's putting in the numbers is intrinsically limited already. If they do
-// put in a huge number, it just won't connect.
-into_connection_options!(i16);
-into_connection_options!(i32);
-into_connection_options!(i64);
-impl<H, SD> Into<ConnectionOptions<SD>> for (H, u16)
-where
-    H: AsRef<str>,
-    SD: GraphSON,
-{
-    fn into(self) -> ConnectionOptions<SD> {
-        let default = ConnectionOptions::<SD>::default();
-        ConnectionOptions {
-            host: String::from(self.0.as_ref()),
-            port: self.1,
-            serde: PhantomData::<SD>,
-            ..default
-        }
-    }
-}
-
-impl<H, P, SD> Into<ConnectionOptions<SD>> for (H, P, SD)
-where
-    H: AsRef<str>,
-    P: Into<u16>,
-    SD: GraphSON,
-{
-    fn into(self) -> ConnectionOptions<SD> {
-        let default = ConnectionOptions::<SD>::default();
-        ConnectionOptions {
-            host: String::from(self.0.as_ref()),
-            port: self.1.into(),
-            serde: PhantomData::<SD>,
-            ..default
-        }
-    }
-}
-
-// impl Into<ConnectionOptions<V3>> for (&str, u16) {
-//     fn into(self) -> ConnectionOptions<V3> {
-//         let default = ConnectionOptions::<V3>::default();
-//         ConnectionOptions {
-//             host: String::from(self.0),
-//             port: self.1,
-//             serde: PhantomData::<V3>,
-//             ..default
-//         }
-//     }
-// }
-//
-// impl Into<ConnectionOptions<V3>> for &str {
-//     fn into(self) -> ConnectionOptions<V3> {
-//         let default = ConnectionOptions::<V3>::default();
-//         ConnectionOptions {
-//             host: String::from(self),
-//             serde: PhantomData::<V3>,
-//             ..default
-//         }
-//     }
-// }
-
-pub struct ConnectionOptionsBuilder<SD: GraphSON>(ConnectionOptions<SD>);
-
-impl<_SD: GraphSON> ConnectionOptionsBuilder<_SD> {
-    pub fn host<T>(mut self, host: T) -> Self
-    where
-        T: Into<String>,
-    {
-        self.0.host = host.into();
-        self
-    }
-
-    pub fn port(mut self, port: u16) -> Self {
-        self.0.port = port;
-        self
-    }
-
-    pub fn pool_size(mut self, pool_size: u32) -> Self {
-        self.0.pool_size = pool_size;
-        self
-    }
-
-    /// Only applicable to async client. By default a connection is checked on each return to the pool (None)
-    /// This allows setting an interval of how often it is checked on return.
-    pub fn pool_healthcheck_interval(
-        mut self,
-        pool_healthcheck_interval: Option<Duration>,
-    ) -> Self {
-        self.0.pool_healthcheck_interval = pool_healthcheck_interval;
-        self
-    }
-
-    /// Both the sync and async pool providers use a default of 30 seconds,
-    /// Async pool interprets `None` as no timeout. Sync pool maps `None` to the default value
-    pub fn pool_connection_timeout(mut self, pool_connection_timeout: Option<Duration>) -> Self {
-        self.0.pool_get_connection_timeout = pool_connection_timeout;
-        self
-    }
-
-    pub fn build(self) -> ConnectionOptions<_SD> {
-        self.0
-    }
-
-    pub fn credentials(mut self, username: &str, password: &str) -> Self {
-        self.0.credentials = Some(Credentials {
-            username: String::from(username),
-            password: String::from(password),
-        });
-        self
-    }
-
-    pub fn ssl(mut self, ssl: bool) -> Self {
-        self.0.ssl = ssl;
-        self
-    }
-
-    pub fn tls_options(mut self, options: TlsOptions) -> Self {
-        self.0.tls_options = Some(options);
-        self
-    }
-
-    pub fn websocket_options(mut self, options: WebSocketOptions) -> Self {
-        self.0.websocket_options = Some(options);
-        self
-    }
-
-    pub fn serde<SD: GraphSON>(self, _: SD) -> ConnectionOptionsBuilder<SD> {
-        let cloned = ConnectionOptions {
-            serde: PhantomData::<SD>,
-            ..self.0
-        };
-
-        ConnectionOptionsBuilder(cloned)
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Builder)]
+#[builder(pattern = "owned")]
 pub struct ConnectionOptions<SD: GraphSON> {
+    #[builder(setter(custom))]
+    #[builder(default = "self.default_version()")]
+    pub(crate) version: SD,
+    #[builder(default = "self.default_host()")]
     pub(crate) host: String,
+    #[builder(default = "self.default_port()")]
     pub(crate) port: u16,
+    #[builder(default = "self.default_poolsize()")]
     pub(crate) pool_size: u32,
-    pub(crate) pool_healthcheck_interval: Option<Duration>,
-    pub(crate) pool_get_connection_timeout: Option<Duration>,
+    #[builder(default = "self.default_idletimeout()")]
+    pub(crate) idle_timeout: Duration,
+    #[builder(default = "self.default_timeout()")]
+    pub(crate) connection_timeout: Duration,
+    #[builder(default = "self.default_credentials()")]
     pub(crate) credentials: Option<Credentials>,
+    #[builder(default = "self.default_ssl()")]
     pub(crate) ssl: bool,
+    #[builder(default = "self.default_tlsoptions()")]
     pub(crate) tls_options: Option<TlsOptions>,
-    pub(crate) serde: PhantomData<SD>,
+    #[builder(default = "self.default_wsoptions()")]
     pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
-#[derive(Clone, Debug)]
+impl<V_: GraphSON> ConnectionOptionsBuilder<V_> {
+    fn version<V: GraphSON>(self, version: V) -> ConnectionOptionsBuilder<V> {
+        ConnectionOptionsBuilder::<V> {
+            version: Some(version),
+            ..self
+        }
+    }
+}
+
+impl<SD: GraphSON> ConnectionOptionsBuilder<SD> {
+    fn default_version(&self) -> SD {
+        SD::new()
+    }
+    fn default_host(&self) -> String {
+        "127.0.0.1".into()
+    }
+    fn default_port(&self) -> u16 {
+        8182
+    }
+    fn default_poolsize(&self) -> u32 {
+        8
+    }
+    fn default_idletimeout(&self) -> Duration {
+        Duration::from_secs(60)
+    }
+    fn default_timeout(&self) -> Duration {
+        Duration::from_secs(30)
+    }
+    fn default_credentials(&self) -> Option<Credentials> {
+        None
+    }
+    fn default_ssl(&self) -> bool {
+        false
+    }
+    fn default_tlsoptions(&self) -> Option<TlsOptions> {
+        None
+    }
+    fn default_wsoptions(&self) -> Option<WebSocketOptions> {
+        None
+    }
+}
+
+#[derive(Clone, Debug, Builder)]
+#[builder(pattern = "owned")]
 pub(crate) struct Credentials {
     pub(crate) username: String,
     pub(crate) password: String,
@@ -315,26 +200,9 @@ impl WebSocketOptionsBuilder {
     }
 }
 
-impl<SD: GraphSON> Default for ConnectionOptions<SD> {
-    fn default() -> ConnectionOptions<SD> {
-        ConnectionOptions {
-            host: String::from("localhost"),
-            port: 8182,
-            pool_size: 10,
-            pool_get_connection_timeout: Some(Duration::from_secs(30)),
-            pool_healthcheck_interval: None,
-            credentials: None,
-            ssl: false,
-            tls_options: None,
-            serde: PhantomData::<SD>,
-            websocket_options: None,
-        }
-    }
-}
-
 impl ConnectionOptions<()> {
     pub fn builder() -> ConnectionOptionsBuilder<()> {
-        ConnectionOptionsBuilder(ConnectionOptions::default())
+        ConnectionOptionsBuilder::create_empty()
     }
 }
 

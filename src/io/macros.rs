@@ -3,7 +3,9 @@ macro_rules! graphson_io {
         #[derive(Clone, Debug, Default)]
         pub struct $id;
 
-        impl crate::io::GraphSON for $id {}
+        impl crate::io::GraphSON for $id {
+            fn new() -> Self { $id }
+        }
 
         unsafe impl Send for $id {}
 

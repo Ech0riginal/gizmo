@@ -93,56 +93,6 @@ pub trait Terminator<T: FromGValue>: Clone {
         E: Terminator<T>;
 }
 
-// #[derive(Clone)]
-// pub struct SyncTerminator<SD: GraphSON> {
-//     strategies: TraversalStrategies<SD>,
-// }
-
-// impl<SD: GraphSON> SyncTerminator<SD> {
-//     pub fn new(strategies: TraversalStrategies<SD>) -> SyncTerminator<SD> {
-//         SyncTerminator { strategies }
-//     }
-// }
-
-// impl<SD: GraphSON, T: FromGValue> Terminator<T> for SyncTerminator<SD> {
-//     type List = GremlinResult<Vec<T>>;
-//     type Next = GremlinResult<Option<T>>;
-//     type HasNext = GremlinResult<bool>;
-//     type Iter = GremlinResult<RemoteTraversalIterator<SD, T>>;
-//
-//     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
-//     where
-//         E: Terminator<T>,
-//     {
-//         self.strategies.apply(traversal)?.collect()
-//     }
-//
-//     fn next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Next
-//     where
-//         E: Terminator<T>,
-//     {
-//         let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
-//
-//         Ok(results?.into_iter().next())
-//     }
-//
-//     fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
-//     where
-//         E: Terminator<T>,
-//     {
-//         let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
-//
-//         Ok(results?.iter().next().is_some())
-//     }
-//
-//     fn iter<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Iter
-//     where
-//         E: Terminator<T>,
-//     {
-//         self.strategies.apply(traversal)
-//     }
-// }
-
 use crate::process::traversal::RemoteTraversalStream;
 use futures::StreamExt;
 use futures::future::{BoxFuture, FutureExt};

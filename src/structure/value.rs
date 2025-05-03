@@ -341,8 +341,11 @@ impl From<Token> for GValue {
     }
 }
 
-impl From<HashMap<String, GValue>> for GValue {
-    fn from(val: HashMap<String, GValue>) -> Self {
+impl<S> From<HashMap<S, GValue>> for GValue
+where
+    S: AsRef<str>,
+{
+    fn from(val: HashMap<S, GValue>) -> Self {
         GValue::Map(Map::from(val))
     }
 }

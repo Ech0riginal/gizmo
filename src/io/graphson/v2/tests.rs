@@ -8,10 +8,6 @@ mod core {
     use ::uuid::Uuid;
     use std::str::FromStr;
 
-    fn a() {
-        GraphTraversalSource {}.add_e()
-    }
-
     test_prelude!();
 
     test!(

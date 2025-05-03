@@ -4,6 +4,7 @@ mod macros;
 #[macro_use]
 mod graphson;
 mod binary;
+mod message;
 
 #[allow(unused)]
 pub use graphson::{
@@ -12,5 +13,3 @@ pub use graphson::{
 
 #[allow(unused)]
 pub use graphson::{V2, V3, V3g};
-
-trait ServerMessage {}

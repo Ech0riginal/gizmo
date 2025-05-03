@@ -48,10 +48,15 @@ impl From<Map> for HashMap<GKey, GValue> {
     }
 }
 
-impl From<HashMap<String, GValue>> for Map {
-    fn from(val: HashMap<String, GValue>) -> Self {
-        let map = val.into_iter().map(|(k, v)| (GKey::String(k), v)).collect();
-        Map(map)
+impl<S> From<HashMap<S, GValue>> for Map
+where
+    S: AsRef<str>,
+{
+    fn from(val: HashMap<S, GValue>) -> Self {
+        Map(val
+            .into_iter()
+            .map(|(k, v)| (GKey::String(k.as_ref().to_string()), v))
+            .collect())
     }
 }
 

@@ -1,288 +1,411 @@
-use crate::prelude::{ConnectionOptions, GraphSON, GremlinError, GremlinResult};
-
+use crate::error::GremlinError;
+use crate::io::GraphSON;
 use crate::message::Response;
-
+use crate::options::{ConnectionOptions, Credentials};
+use crate::prelude::GremlinResult;
+use crate::structure::GValue;
 use async_tungstenite::WebSocketStream;
-use async_tungstenite::tungstenite::protocol::{Message, WebSocketConfig};
-use async_tungstenite::{self, stream};
-use futures::{
-    SinkExt, StreamExt,
-    lock::Mutex,
-    stream::{SplitSink, SplitStream},
-};
-
-use async_tungstenite::tokio::TokioAdapter;
 use async_tungstenite::tokio::{
-    connect_async_with_config, connect_async_with_tls_connector_and_config,
+    ConnectStream, connect_async_with_config, connect_async_with_tls_connector_and_config,
 };
+use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
+use bb8::{ManageConnection};
 use bytes::Bytes;
-use futures::channel::mpsc::{Receiver, Sender, channel};
+use futures::stream::{SplitSink, SplitStream};
+use futures::{SinkExt, StreamExt};
 use std::collections::HashMap;
+use std::marker::PhantomData;
+use std::pin::Pin;
 use std::sync::Arc;
-use tokio::net::TcpStream;
-use tokio::task::{self};
+use std::task::Poll;
+use serde::Serialize;
+use tokio::pin;
+use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::error::TryRecvError;
+use tokio::sync::{RwLock, mpsc};
+use tokio::task::yield_now;
 use tokio_rustls::TlsConnector;
-use tungstenite::{
-    Connector,
-    client::{IntoClientRequest, uri_mode},
-    stream::{Mode, NoDelay},
-};
+use tokio_stream::Stream;
+use tokio_stream::wrappers::UnboundedReceiverStream;
+use tungstenite::client::{IntoClientRequest, uri_mode};
+use tungstenite::stream::{Mode, NoDelay};
+use tungstenite::{Connector, Message};
 use uuid::Uuid;
 
-type WSStream = WebSocketStream<
-    stream::Stream<
-        TokioAdapter<TcpStream>,
-        TokioAdapter<tokio_rustls::client::TlsStream<TcpStream>>,
-    >,
->;
-
-#[derive(Debug)]
-#[allow(dead_code)]
-pub enum Cmd {
-    Msg((Sender<GremlinResult<Response>>, Uuid, Vec<u8>)),
-    Pong(Vec<u8>),
-    Shutdown,
+pub struct Connection {
+    outbound: mpsc::UnboundedSender<Message>,
+    valid: Arc<RwLock<bool>>,
+    buffer: Arc<RwLock<HashMap<Uuid, mpsc::UnboundedSender<GremlinResult<Response>>>>>,
 }
 
-pub(crate) struct Conn {
-    sender: Sender<Cmd>,
-    valid: bool,
+#[pin_project::pin_project]
+pub struct GremlinStream<V> {
+    #[doc(hidden)]
+    _v: PhantomData<V>,
+    #[pin]
+    inner: UnboundedReceiverStream<GremlinResult<Response>>,
 }
 
-impl std::fmt::Debug for Conn {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Conn")
+impl<V: GraphSON> Stream for GremlinStream<V> {
+    type Item = GremlinResult<GValue>;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> Poll<Option<Self::Item>> {
+        let this = self.project();
+        
+        match this.inner.poll_next(cx) {
+            Poll::Ready(Some(Ok(response))) => {
+                match serde_json::to_value(&response.result.data) {
+                    Ok(value) => {
+                        let result = V::deserialize(&value);
+                        Poll::Ready(Some(result))
+                    }
+                    Err(e) => {
+                        Poll::Ready(Some(Err(GremlinError::from(e))))
+                    },
+                }
+            }
+            Poll::Ready(Some(Err(e))) => {
+                Poll::Ready(Some(Err(e)))
+            }
+            Poll::Ready(None) => Poll::Ready(None),
+            Poll::Pending => Poll::Pending,
+        }
     }
 }
 
-impl Conn {
-    pub async fn connect<SD: GraphSON, T>(options: T) -> GremlinResult<Conn>
-    where
-        T: Into<ConnectionOptions<SD>>,
-    {
-        let options = options.into();
-        let websocket_url = options.websocket_url();
-        let request = websocket_url
-            .clone()
-            .into_client_request()
-            .map_err(|e| GremlinError::Generic(e.to_string()))?;
+// pub trait GremlinStream: Stream<Item = GremlinResult<Response>> {}
+// impl<S> GremlinStream for S where S: Stream<Item = GremlinResult<Response>> {}
 
-        let connector = if let Some(opts) = options.tls_options {
-            let config = opts.config()?;
-            let config = Arc::new(config);
-            Connector::Rustls(config)
-        } else {
-            Connector::Plain
+struct Context {
+    callback: UnboundedSender<Message>,
+    requests: Arc<RwLock<HashMap<Uuid, UnboundedSender<GremlinResult<Response>>>>>,
+    validity: Arc<RwLock<bool>>,
+    credentials: Option<Credentials>,
+}
+
+type WSStream = WebSocketStream<ConnectStream>;
+
+impl<SD: GraphSON> ManageConnection for ConnectionOptions<SD> {
+    type Connection = Connection;
+    type Error = GremlinError;
+
+    fn connect(&self) -> impl Future<Output = Result<Self::Connection, Self::Error>> + Send {
+        async move {
+            let websocket_url = self.websocket_url();
+            let request = websocket_url
+                .clone()
+                .into_client_request()
+                .map_err(|e| GremlinError::Generic(e.to_string()))?;
+
+            let connector = if let Some(opts) = &self.tls_options {
+                let config = opts.clone().config()?;
+                let config = Arc::new(config);
+                Connector::Rustls(config)
+            } else {
+                Connector::Plain
+            };
+            let url = request.uri();
+            let mode = uri_mode(url).map_err(|e| GremlinError::Generic(e.to_string()))?;
+            let host = request
+                .uri()
+                .host()
+                .ok_or_else(|| GremlinError::Generic("No Hostname".into()))?;
+            let port = url.port_u16().unwrap_or(match mode {
+                Mode::Plain => 80,
+                Mode::Tls => 443,
+            });
+            let mut stream = std::net::TcpStream::connect((host, port))
+                .map_err(|e| GremlinError::Generic(format!("Unable to connect {e:?}")))?;
+            NoDelay::set_nodelay(&mut stream, true)
+                .map_err(|e| GremlinError::Generic(e.to_string()))?;
+
+            let websocket_config = self.websocket_options.clone().map(Into::into);
+
+            let (client, _) = match connector {
+                Connector::Plain => connect_async_with_config(url, websocket_config).await,
+                Connector::Rustls(config) => {
+                    let connector = TlsConnector::from(config);
+                    connect_async_with_tls_connector_and_config(
+                        url,
+                        Some(connector),
+                        websocket_config,
+                    )
+                    .await
+                }
+
+                _ => panic!(),
+            }?;
+
+            Ok(Connection::new(client, &self))
+        }
+    }
+
+    fn is_valid(
+        &self,
+        conn: &mut Self::Connection,
+    ) -> impl Future<Output = Result<(), Self::Error>> + Send {
+        async move {
+            if !*conn.valid.read().await {
+                Err(GremlinError::Generic("Connection is disconnected".into()))
+            } else {
+                Ok(())
+            }
+        }
+    }
+
+    fn has_broken(&self, conn: &mut Self::Connection) -> bool {
+        !*conn.valid.blocking_read()
+    }
+}
+
+impl Connection {
+    fn new<V: GraphSON>(value: WSStream, options: &ConnectionOptions<V>) -> Self {
+        let (sink, stream) = value.split();
+        let (outbound, outbound_rx) = mpsc::unbounded_channel();
+        let valid = Arc::new(RwLock::new(true));
+        let buffer = Arc::new(RwLock::new(HashMap::with_capacity(32)));
+        let ctx = Context {
+            callback: outbound.clone(),
+            requests: buffer.clone(),
+            validity: valid.clone(),
+            credentials: options.credentials.clone(),
         };
 
-        let url = request.uri();
-        let mode = uri_mode(url).map_err(|e| GremlinError::Generic(e.to_string()))?;
-        let host = request
-            .uri()
-            .host()
-            .ok_or_else(|| GremlinError::Generic("No Hostname".into()))?;
-        let port = url.port_u16().unwrap_or(match mode {
-            Mode::Plain => 80,
-            Mode::Tls => 443,
+        Self::proxy::<V>(outbound_rx, sink, valid.clone());
+
+        Self::recv::<V>(ctx, stream);
+
+        Self {
+            outbound,
+            valid,
+            buffer,
+        }
+    }
+
+    fn proxy<V: GraphSON>(
+        mut rx: mpsc::UnboundedReceiver<Message>,
+        mut sink: SplitSink<WSStream, Message>,
+        validity: Arc<RwLock<bool>>,
+    ) {
+        tokio::spawn(async move {
+            let close = async || {
+                *validity.write().await = false;
+            };
+
+            loop {
+                if !*validity.read().await {
+                    break;
+                }
+
+                match rx.try_recv() {
+                    Ok(message) => match sink.send(message).await {
+                        Ok(_) => {}
+                        Err(error) => {
+                            tracing::warn!("{:?}", error);
+                            close().await;
+                        }
+                    },
+                    Err(recv_err) => match recv_err {
+                        TryRecvError::Empty => {}
+                        TryRecvError::Disconnected => close().await,
+                    },
+                }
+
+                yield_now().await;
+            }
         });
-        let mut stream = std::net::TcpStream::connect((host, port))
-            .map_err(|e| GremlinError::Generic(format!("Unable to connect {e:?}")))?;
-        NoDelay::set_nodelay(&mut stream, true)
-            .map_err(|e| GremlinError::Generic(e.to_string()))?;
-
-        let websocket_config = options.websocket_options.map(Into::into);
-
-        let (client, _) = match connector {
-            Connector::Plain => connect_async_with_config(url, websocket_config).await,
-            Connector::Rustls(config) => {
-                let connector = TlsConnector::from(config);
-                connect_async_with_tls_connector_and_config(url, Some(connector), websocket_config)
-                    .await
-            }
-            _ => panic!(),
-        }?;
-
-        let (sink, stream) = client.split();
-        let (sender, receiver) = channel(20);
-        let requests = Arc::new(Mutex::new(HashMap::new()));
-
-        sender_loop(sink, requests.clone(), receiver);
-
-        receiver_loop(stream, requests.clone(), sender.clone());
-
-        Ok(Conn {
-            sender,
-            valid: true,
-        })
     }
 
-    pub async fn send(
-        &mut self,
-        id: Uuid,
-        payload: Vec<u8>,
-    ) -> GremlinResult<(Response, Receiver<GremlinResult<Response>>)> {
-        let (sender, mut receiver) = channel(1);
+    fn recv<V: GraphSON>(ctx: Context, stream: SplitStream<WSStream>) {
+        tokio::spawn(async move {
+            pin!(stream);
 
-        self.sender
-            .send(Cmd::Msg((sender, id, payload)))
-            .await
-            .map_err(|e| {
-                self.valid = false;
-                e
-            })?;
-
-        receiver
-            .next()
-            .await
-            .expect("It should contain the response")
-            .map(|r| (r, receiver))
-            .map_err(|e| {
-                //If there's been an websocket layer error, mark the connection as invalid
-                match e {
-                    GremlinError::WebsocketClone(_) | GremlinError::WebSocketPool(_) => {
-                        self.valid = false;
-                    }
-                    _ => {}
-                }
-                e
-            })
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.valid
-    }
-}
-
-impl Drop for Conn {
-    fn drop(&mut self) {
-        send_shutdown(self);
-    }
-}
-
-fn send_shutdown(conn: &mut Conn) {
-    conn.sender.close_channel();
-}
-
-fn sender_loop(
-    mut sink: SplitSink<WSStream, Message>,
-    requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    mut receiver: Receiver<Cmd>,
-) {
-    task::spawn(async move {
-        loop {
-            match receiver.next().await {
-                Some(item) => match item {
-                    Cmd::Msg(msg) => {
-                        let mut guard = requests.lock().await;
-
-                        guard.insert(msg.1, msg.0);
-
-                        let result = sink.send(Message::Binary(msg.2.into())).await;
-
-                        if let Err(e) = result {
-                            let mut sender = guard.remove(&msg.1).unwrap();
-                            sender
-                                .send(Err(GremlinError::from(e)))
-                                .await
-                                .expect("Failed to send error");
-                        }
-
-                        drop(guard);
-                    }
-                    Cmd::Pong(data) => {
-                        sink.send(Message::Pong(data.into()))
-                            .await
-                            .expect("Failed to send pong message.");
-                    }
-                    Cmd::Shutdown => {
-                        let mut guard = requests.lock().await;
-                        guard.clear();
-                    }
-                },
-                None => {
+            loop {
+                if !*ctx.validity.read().await {
                     break;
                 }
-            }
-        }
-        let _ = sink.close().await;
-    });
-}
 
-fn receiver_loop(
-    mut stream: SplitStream<WSStream>,
-    requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    mut sender: Sender<Cmd>,
-) {
-    task::spawn(async move {
-        // let span = tracing::span!(tracing::Level::DEBUG, "rx");
-        // let _enter = span.enter();
-
-        loop {
-            match stream.next().await {
-                Some(Err(error)) => {
-                    let err_str = error.to_string();
-                    let mut guard = requests.lock().await;
-                    for s in guard.values_mut() {
-                        let error = Err(GremlinError::WebsocketClone(err_str.clone()));
-                        match s.send(error).await {
-                            Ok(_r) => {}
-                            Err(_e) => {}
-                        }
+                match stream.next().await {
+                    Some(Ok(message)) => Self::message_handler::<V>(&ctx, message).await,
+                    Some(Err(e)) => {
+                        ctx.close().await;
+                        tracing::warn!("{}", e);
                     }
-                    guard.clear();
-                }
-                Some(Ok(item)) => match item {
-                    Message::Binary(data) => {
-                        let response: Response = serde_json::from_slice(&data).unwrap();
-
-                        tracing::trace!(
-                            request = &response.request_id.to_string(),
-                            status = &response.status.code
-                        );
-
-                        let mut guard = requests.lock().await;
-                        if response.status.code != 206 {
-                            let item = guard.remove(&response.request_id);
-                            drop(guard);
-                            if let Some(mut s) = item {
-                                match s.send(Ok(response)).await {
-                                    Ok(_r) => {}
-                                    Err(_e) => {}
-                                };
-                            }
-                        } else {
-                            let item = guard.get_mut(&response.request_id);
-                            if let Some(s) = item {
-                                match s.send(Ok(response)).await {
-                                    Ok(_r) => {}
-                                    Err(_e) => {}
-                                };
-                            }
-                            drop(guard);
-                        }
+                    None => {
+                        ctx.close().await;
                     }
-                    Message::Ping(data) => {
-                        let _ = sender.send(Cmd::Pong(data.into())).await;
-                    }
-                    _ => {}
-                },
-                None => {
-                    break;
                 }
             }
+        });
+    }
+
+    #[tracing::instrument(skip(ctx, message))]
+    async fn message_handler<V: GraphSON>(ctx: &Context, message: Message) {
+        match message {
+            Message::Text(string) => {
+                tracing::warn!("we got a string? {}", string);
+            }
+            Message::Binary(blob) => match serde_json::from_slice::<Response>(&blob) {
+                Ok(response) => Self::response_handler::<V>(&ctx, response).await,
+                Err(e) => tracing::warn!("{}", e),
+            },
+            Message::Ping(msg) => ctx.callback(Message::Pong(msg)).await,
+            Message::Pong(msg) => ctx.callback(Message::Ping(msg)).await,
+            Message::Close(_) => ctx.close().await,
+            Message::Frame(_) => {} // idk
         }
-    });
+    }
+
+    #[tracing::instrument(skip(ctx, response), fields(request = %response.request_id, status = %response.status.code))]
+    async fn response_handler<V: GraphSON>(ctx: &Context, response: Response) {
+        match response.status.code {
+            200 | 206 => ctx.callback(response).await,
+            407 => match &ctx.credentials {
+                Some(c) => Self::authenticate::<V>(ctx, c, &response.request_id).await,
+                None => ctx.callback(response).await,
+            },
+            n if n > 500 => ctx.remove(response).await,
+            _ => {}
+        }
+    }
+
+    #[tracing::instrument(skip(ctx, credentials, id))]
+    async fn authenticate<V: GraphSON>(ctx: &Context, credentials: &Credentials, id: &Uuid) {
+        let mut args = HashMap::new();
+
+        args.insert(
+            String::from("sasl"),
+            GValue::String(BASE64_STANDARD.encode(&format!(
+                "\0{}\0{}",
+                credentials.username, credentials.password
+            ))),
+        );
+
+        let args = match V::serialize(&GValue::from(args)) {
+            Ok(value) => value,
+            Err(e) => {
+                tracing::error!("{}", e);
+                *ctx.validity.write().await = false;
+                return;
+            }
+        };
+        let message = V::message(
+            String::from("authentication"),
+            String::from("traversal"),
+            args,
+            Some(id.clone()),
+        );
+        let blob = serde_json::to_vec(&message).unwrap();
+        let bytes = Bytes::from(blob);
+
+        ctx.callback(Message::Binary(bytes)).await;
+    }
+
+    pub async fn send<I, V>(&self, payload: I) -> GremlinResult<GremlinStream<V>>
+    where
+        I: Payload,
+        V: GraphSON
+    {
+        payload.send(self).await
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::prelude::V3g;
+trait Payload {
+    fn send<V: GraphSON>(
+        self,
+        conn: &Connection,
+    ) -> impl Future<Output = GremlinResult<GremlinStream<V>>>;
+}
 
-    #[tokio::test]
-    async fn it_should_connect() {
-        Conn::connect::<V3g, _>(("localhost", 8182u16))
-            .await
-            .unwrap();
+impl Payload for Message {
+    fn send<V: GraphSON>(
+        self,
+        conn: &Connection,
+    ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
+        let id = Uuid::new_v4();
+        send(conn, id, self)
+    }
+}
+
+impl<T: Serialize> Payload for crate::message::Message<T> {
+    fn send<V: GraphSON>(self, conn: &Connection) -> impl Future<Output=GremlinResult<GremlinStream<V>>> {
+        async move {
+            let blob = serde_json::to_vec(&self)?;
+            blob.send(conn).await
+        }
+    }
+}
+
+impl Payload for Vec<u8> {
+    fn send<V: GraphSON>(
+        self,
+        conn: &Connection,
+    ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
+        let id = Uuid::new_v4();
+        send(conn, id, Message::binary(self))
+    }
+}
+
+async fn send<V: GraphSON>(conn: &Connection, id: Uuid, msg: Message) -> Result<GremlinStream<V>, GremlinError>
+{
+    let (tx, rx) = mpsc::unbounded_channel();
+    let inner = UnboundedReceiverStream::new(rx);
+
+    conn.buffer.write().await.insert(id, tx);
+    conn.outbound.send(Message::binary(msg))?;
+
+    Ok(GremlinStream { inner, _v: Default::default() })
+}
+
+
+impl Context {
+    async fn callback<I>(&self, message: I)
+    where
+        I: Callback,
+    {
+        message.callback(self).await;
+    }
+
+    async fn close(&self) {
+        *self.validity.write().await = false;
+    }
+
+    async fn remove(&self, response: Response) {
+        self.requests.write().await.remove(&response.request_id);
+    }
+}
+
+trait Callback {
+    fn callback(self, ctx: &Context) -> impl Future<Output = ()>;
+}
+
+impl Callback for Response {
+    fn callback(self, ctx: &Context) -> impl Future<Output = ()> {
+        async move {
+            let mut guard = ctx.requests.write().await;
+            let id = self.request_id.clone();
+            let item = guard.get_mut(&id);
+
+            if let Some(callback) = item {
+                if let Err(error) = callback.send(Ok(self)) {
+                    tracing::warn!(request = id.to_string(), error = error.to_string());
+                    ctx.close().await;
+                }
+            } else {
+                tracing::warn!(request = id.to_string(), error = "Missing callback");
+            }
+        }
+    }
+}
+
+impl Callback for Message {
+    fn callback(self, ctx: &Context) -> impl Future<Output = ()> {
+        async move {
+            if let Err(e) = ctx.callback.send(self) {
+                tracing::warn!("{}", e);
+                ctx.close().await;
+            }
+        }
     }
 }

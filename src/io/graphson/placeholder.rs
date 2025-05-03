@@ -26,4 +26,6 @@ impl MessageHandler for () {
 }
 
 /// This allows us to have 'empty' serde functionality during init
-impl GraphSON for () {}
+impl GraphSON for () {
+    fn new() -> Self { () }
+}
