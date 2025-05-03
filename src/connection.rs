@@ -1,4 +1,5 @@
-use crate::prelude::{ConnectionOptions, GraphSON, GremlinError, GremlinResult};
+use crate::{Gremlin, GremlinResult, GremlinError};
+use crate::prelude::{ConnectionOptions};
 
 use crate::message::Response;
 
@@ -21,7 +22,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::net::TcpStream;
 use tokio::task::{self};
-use tokio_rustls::TlsConnector;
+use tokio::rustls::TlsConnector;
+use tokio::tracing;
 use tungstenite::{
     Connector,
     client::{IntoClientRequest, uri_mode},
@@ -32,7 +34,7 @@ use uuid::Uuid;
 type WSStream = WebSocketStream<
     stream::Stream<
         TokioAdapter<TcpStream>,
-        TokioAdapter<tokio_rustls::client::TlsStream<TcpStream>>,
+        TokioAdapter<tokio::rustls::client::TlsStream<TcpStream>>,
     >,
 >;
 
@@ -56,7 +58,7 @@ impl std::fmt::Debug for Conn {
 }
 
 impl Conn {
-    pub async fn connect<SD: GraphSON, T>(options: T) -> GremlinResult<Conn>
+    pub async fn connect<SD: Gremlin, T>(options: T) -> GremlinResult<Conn>
     where
         T: Into<ConnectionOptions<SD>>,
     {

@@ -7,11 +7,11 @@ use crate::prelude::{
 };
 
 // #[derive(Clone)]
-// pub struct RemoteStrategy<SD: GraphSON> {
+// pub struct RemoteStrategy<SD: Gremlin> {
 //     client: GremlinClient<SD>,
 // }
 //
-// impl<SD: GraphSON> RemoteStrategy<SD> {
+// impl<SD: Gremlin> RemoteStrategy<SD> {
 //     pub fn new(client: GremlinClient<SD>) -> RemoteStrategy<SD> {
 //         RemoteStrategy { client }
 //     }

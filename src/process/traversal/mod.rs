@@ -1,5 +1,6 @@
+use crate::{Gremlin, GremlinResult};
 use crate::conversion::FromGValue;
-use crate::prelude::{GResultSet, GraphSON, GremlinResult};
+use crate::prelude::{GResultSet};
 use crate::structure::Traverser;
 use std::marker::PhantomData;
 
@@ -31,12 +32,12 @@ pub trait Traversal<S, E> {
     fn bytecode(&self) -> &Bytecode;
 }
 
-// pub struct RemoteTraversalIterator<SD: GraphSON, T: FromGValue> {
+// pub struct RemoteTraversalIterator<SD: Gremlin, T: FromGValue> {
 //     data: PhantomData<T>,
 //     result: GResultSet<SD>,
 // }
 
-// impl<SD: GraphSON, T: FromGValue> RemoteTraversalIterator<SD, T> {
+// impl<SD: Gremlin, T: FromGValue> RemoteTraversalIterator<SD, T> {
 //     pub fn new(result: GResultSet<SD>) -> RemoteTraversalIterator<SD, T> {
 //         RemoteTraversalIterator {
 //             result,
@@ -45,7 +46,7 @@ pub trait Traversal<S, E> {
 //     }
 // }
 
-// impl<SD: GraphSON> RemoteTraversalIterator<SD, crate::structure::Null> {
+// impl<SD: Gremlin> RemoteTraversalIterator<SD, crate::structure::Null> {
 //     pub fn iterate(&mut self) -> GremlinResult<()> {
 //         while let Some(response) = self.next() {
 //             //consume the entire iterator, returning any errors
@@ -55,7 +56,7 @@ pub trait Traversal<S, E> {
 //     }
 // }
 
-// impl<SD: GraphSON, T: FromGValue> Iterator for RemoteTraversalIterator<SD, T> {
+// impl<SD: Gremlin, T: FromGValue> Iterator for RemoteTraversalIterator<SD, T> {
 //     type Item = GremlinResult<T>;
 //
 //     // todo remove unwrap
@@ -77,17 +78,17 @@ use futures::Stream;
 use std::pin::Pin;
 
 use pin_project_lite::pin_project;
-use tokio_stream::StreamExt;
+use tokio::stream::StreamExt;
 
 pin_project! {
-    pub struct RemoteTraversalStream<SD: GraphSON, T> {
+    pub struct RemoteTraversalStream<SD: Gremlin, T> {
         phantom: PhantomData<T>,
         #[pin]
         stream: GResultSet<SD>,
     }
 }
 
-impl<SD: GraphSON, T> RemoteTraversalStream<SD, T> {
+impl<SD: Gremlin, T> RemoteTraversalStream<SD, T> {
     pub fn new(stream: GResultSet<SD>) -> Self {
         RemoteTraversalStream {
             phantom: PhantomData,
@@ -96,7 +97,7 @@ impl<SD: GraphSON, T> RemoteTraversalStream<SD, T> {
     }
 }
 
-impl<SD: GraphSON> RemoteTraversalStream<SD, crate::structure::Null> {
+impl<SD: Gremlin> RemoteTraversalStream<SD, crate::structure::Null> {
     pub async fn iterate(&mut self) -> GremlinResult<()> {
         while let Some(response) = self.next().await {
             //consume the entire stream, returning any errors
@@ -106,7 +107,7 @@ impl<SD: GraphSON> RemoteTraversalStream<SD, crate::structure::Null> {
     }
 }
 
-impl<SD: GraphSON, T: FromGValue> Stream for RemoteTraversalStream<SD, T> {
+impl<SD: Gremlin, T: FromGValue> Stream for RemoteTraversalStream<SD, T> {
     type Item = GremlinResult<T>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {

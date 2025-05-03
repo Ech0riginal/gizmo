@@ -1,8 +1,8 @@
-use crate::prelude::{GremlinError, GremlinResult};
 use crate::structure::{GID, GValue, Property};
 use std::collections::HashMap;
 
 use crate::conversion::{BorrowFromGValue, FromGValue};
+use crate::{GremlinError, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum GProperty {

@@ -1,41 +1,92 @@
 //! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/)
 
-use crate::io::graphson::GraphSONDeserializer;
+use crate::io::macros::*;
 use crate::io::graphson::v3::types::*;
-use crate::io::{V2, V3};
+use crate::io::Gremlin;
 use crate::prelude::*;
 use serde_json::Value;
 use std::collections::HashMap;
-
+use crate::{GremlinError, GremlinResult};
 pub(crate) use crate::io::graphson::v2::de::*;
 
-impl GraphSONDeserializer for V3 {
-    fn deserialize(value: &Value) -> GremlinResult<GValue> {
-        match value {
-            Value::Bool(_) | Value::String(_) => V2::deserialize(value),
-            _ => {
-                let _type = match &value["@type"] {
-                    Value::String(e) => Ok(e),
-                    _type => Err(GremlinError::Json(format!("Unexpected type: {:?}", _type))),
-                }?;
+pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
+    match value {
+        Value::Bool(_) | Value::String(_) => V2::deserialize(value),
+        _ => {
+            let _type = match &value["@type"] {
+                Value::String(e) => Ok(e),
+                _type => Err(GremlinError::Json(format!("Unexpected type: {:?}", _type))),
+            }?;
+            let value = &value["@value"];
 
-                match _type.as_str() {
-                    LIST => list::<Self>(&value["@value"]),
-                    MAP => map::<Self>(&value["@value"]),
-                    PATH => path::<Self>(&value["@value"]),
-                    METRICS => metrics::<Self>(&value["@value"]),
-                    TRAVERSAL_METRICS => traversal_metrics::<Self>(&value["@value"]),
-                    SET => set::<Self>(&value["@value"]),
-                    BULK_SET => bulkset::<Self>(&value["@value"]),
-                    _ => V2::deserialize(value),
-                }
+            match _type.as_str() {
+                CLASS => todo!("CLASS deserializer"),
+                DATE => todo!("DATE deserializer"),
+                DOUBLE => todo!("DOUBLE deserializer"),
+                FLOAT => todo!("FLOAT deserializer"),
+                INT => todo!("INT deserializer"),
+                LIST => todo!("LIST deserializer"),
+                LONG => todo!("LONG deserializer"),
+                MAP => todo!("MAP deserializer"),
+                SET => todo!("SET deserializer"),
+                TIMESTAMP => todo!("TIMESTAMP deserializer"),
+                UUID => todo!("UUID deserializer"),
+
+                EDGE => todo!("EDGE deserializer"),
+                PATH => todo!("PATH deserializer"),
+                PROPERTY => todo!("PROPERTY deserializer"),
+                TINKER_GRAPH => todo!("TINKER_GRAPH deserializer"),
+                VERTEX => todo!("VERTEX deserializer"),
+                VERTEX_PROPERTY => todo!("VERTEX_PROPERTY deserializer"),
+
+                BARRIER => todo!("BARRIER deserializer"),
+                BINDING => todo!("BINDING deserializer"),
+                BULK_SET => todo!("BULK_SET deserializer"),
+                BYTECODE => todo!("BYTECODE deserializer"),
+                CARDINALITY => todo!("CARDINALITY deserializer"),
+                COLUMN => todo!("COLUMN deserializer"),
+                DIRECTION => todo!("DIRECTION deserializer"),
+                DT => todo!("DT deserializer"),
+                LAMBDA => todo!("LAMBDA deserializer"),
+                MERGE => todo!("MERGE deserializer"),
+                METRICS => todo!("METRICS deserializer"),
+                OPERATOR => todo!("OPERATOR deserializer"),
+                ORDER => todo!("ORDER deserializer"),
+                P => todo!("P deserializer"),
+                PICK => todo!("PICK deserializer"),
+                POP => todo!("POP deserializer"),
+                SCOPE => todo!("SCOPE deserializer"),
+                T => todo!("T deserializer"),
+                TEXT_P => todo!("TEXT_P deserializer"),
+                TRAVERSAL_METRICS => todo!("TRAVERSAL_METRICS deserializer"),
+                TRAVERSER => todo!("TRAVERSER deserializer"),
+
+                // LIST => list::<D>(value),
+                // MAP => map::<D>(value),
+                // PATH => path::<D>(value),
+                // METRICS => metrics::<D>(value),
+                // TRAVERSAL_METRICS => traversal_metrics::<D>(value),
+                // SET => set::<D>(value),
+                // BULK_SET => bulkset::<D>(value),
+                _ => V2::deserialize(value),
             }
         }
     }
 }
 
+// /// String deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_string_3)
+// pub fn string<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+//     let val = match val {
+//         Value::String(str) => str.to_string(),
+//         _ => panic!("Invalid JSON"),
+//     };
+//
+//     Ok(GValue::String(val))
+// }
+
+
 /// List deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_list)
-pub(crate) fn list<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn list<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     if val.to_string().contains("[null]") {
         // TODO Speak to the sKG lads about this
         return Ok(GValue::List(List::new(vec![])));
@@ -52,7 +103,7 @@ pub(crate) fn list<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue
 }
 
 /// Map deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_map)
-pub(crate) fn map<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn map<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     let val = get_value!(val, Value::Array)?;
     let mut map = HashMap::new();
     if !val.is_empty() {
@@ -71,7 +122,7 @@ pub(crate) fn map<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue>
 }
 
 /// Bulkset deserializer [docs](https://tinkerpop.apache.org/docs/3.4.1/dev/io/#_bulkset)
-pub(crate) fn bulkset<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn bulkset<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     if val.to_string().contains("[null]") {
         // TODO Gremlin docs!
         return Ok(GValue::List(List::new(vec![])));
@@ -122,7 +173,7 @@ pub(crate) fn bulkset<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GVa
 }
 
 /// Traversal Metrics deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_traversalmetrics)
-pub(crate) fn traversal_metrics<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn traversal_metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     let mut metrics = D::deserialize(&val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metrics, "dur", TRAVERSAL_METRICS)?.take::<f64>()?;
@@ -139,7 +190,7 @@ pub(crate) fn traversal_metrics<D: GraphSONDeserializer>(val: &Value) -> Gremlin
 }
 
 /// Metrics deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_metrics)
-pub(crate) fn metrics<D: GraphSONDeserializer>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     let mut metric = D::deserialize(&val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metric, "dur", METRICS)?.take::<f64>()?;

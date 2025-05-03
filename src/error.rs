@@ -18,7 +18,7 @@ pub enum GremlinError {
     // #[error(transparent)]
     // Pool(#[from] r2d2::Error),
     #[error("Got wrong type {0:?}")]
-    WrongType(GValue),
+    WrongType(String),
 
     #[error("Cast error: {0}")]
     Cast(String),
@@ -48,6 +48,8 @@ pub enum GremlinError {
     Tls(#[from] rustls::Error),
     #[error(transparent)]
     Pem(#[from] rustls_pki_types::pem::Error),
+    #[error(transparent)]
+    Parse(#[from] crate::io::Error),
 }
 
 impl From<mobc::Error<GremlinError>> for GremlinError {

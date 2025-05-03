@@ -1,10 +1,11 @@
-use crate::prelude::{GraphSON, GremlinError};
+use crate::{Gremlin, GremlinResult, GremlinError};
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
 use std::io::BufReader;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::Duration;
+use tokio::tracing;
 use webpki_roots::TLS_SERVER_ROOTS;
 
 #[derive(Clone, Debug)]
@@ -30,7 +31,7 @@ impl Default for TlsOptions {
 impl TlsOptions {
     /// Copied pretty directly from https://github.com/rustls/rustls/blob/main/examples/src/bin/tlsclient-mio.rs
     /// and https://github.com/rustls/tokio-rustls/blob/main/examples/client.rs
-    pub(crate) fn config(self) -> Result<tokio_rustls::rustls::ClientConfig, GremlinError> {
+    pub(crate) fn config(self) -> Result<tokio::rustls::rustls::ClientConfig, GremlinError> {
         let mut cert_store = rustls::RootCertStore::empty();
 
         if let Some(ca_file) = self.authority {
@@ -44,7 +45,7 @@ impl TlsOptions {
         }
 
         let base_config =
-            tokio_rustls::rustls::ClientConfig::builder().with_root_certificates(cert_store);
+            tokio::rustls::rustls::ClientConfig::builder().with_root_certificates(cert_store);
         match (&self.private_key, &self.auth_certs) {
             (None, None) => Ok(base_config.with_no_client_auth()),
             (Some(key_file), Some(certs_file)) => {
@@ -73,7 +74,7 @@ impl TlsOptions {
     }
 }
 
-impl<'a, SD: GraphSON> Into<ConnectionOptions<SD>> for &'a str {
+impl<'a, SD: Gremlin> Into<ConnectionOptions<SD>> for &'a str {
     fn into(self) -> ConnectionOptions<SD> {
         let default = ConnectionOptions::<SD>::default();
         ConnectionOptions {
@@ -89,7 +90,7 @@ macro_rules! into_connection_options {
         impl<H, SD> Into<ConnectionOptions<SD>> for (H, $kind)
         where
             H: AsRef<str>,
-            SD: GraphSON,
+            SD: Gremlin,
         {
             fn into(self) -> ConnectionOptions<SD> {
                 (self.0, self.1 as u16).into()
@@ -108,7 +109,7 @@ into_connection_options!(i64);
 impl<H, SD> Into<ConnectionOptions<SD>> for (H, u16)
 where
     H: AsRef<str>,
-    SD: GraphSON,
+    SD: Gremlin,
 {
     fn into(self) -> ConnectionOptions<SD> {
         let default = ConnectionOptions::<SD>::default();
@@ -125,7 +126,7 @@ impl<H, P, SD> Into<ConnectionOptions<SD>> for (H, P, SD)
 where
     H: AsRef<str>,
     P: Into<u16>,
-    SD: GraphSON,
+    SD: Gremlin,
 {
     fn into(self) -> ConnectionOptions<SD> {
         let default = ConnectionOptions::<SD>::default();
@@ -161,9 +162,9 @@ where
 //     }
 // }
 
-pub struct ConnectionOptionsBuilder<SD: GraphSON>(ConnectionOptions<SD>);
+pub struct ConnectionOptionsBuilder<SD: Gremlin>(ConnectionOptions<SD>);
 
-impl<_SD: GraphSON> ConnectionOptionsBuilder<_SD> {
+impl<_SD: Gremlin> ConnectionOptionsBuilder<_SD> {
     pub fn host<T>(mut self, host: T) -> Self
     where
         T: Into<String>,
@@ -226,7 +227,7 @@ impl<_SD: GraphSON> ConnectionOptionsBuilder<_SD> {
         self
     }
 
-    pub fn serde<SD: GraphSON>(self, _: SD) -> ConnectionOptionsBuilder<SD> {
+    pub fn serde<SD: Gremlin>(self, _: SD) -> ConnectionOptionsBuilder<SD> {
         let cloned = ConnectionOptions {
             serde: PhantomData::<SD>,
             ..self.0
@@ -237,7 +238,7 @@ impl<_SD: GraphSON> ConnectionOptionsBuilder<_SD> {
 }
 
 #[derive(Clone, Debug)]
-pub struct ConnectionOptions<SD: GraphSON> {
+pub struct ConnectionOptions<SD: Gremlin> {
     pub(crate) host: String,
     pub(crate) port: u16,
     pub(crate) pool_size: u32,
@@ -315,7 +316,7 @@ impl WebSocketOptionsBuilder {
     }
 }
 
-impl<SD: GraphSON> Default for ConnectionOptions<SD> {
+impl<SD: Gremlin> Default for ConnectionOptions<SD> {
     fn default() -> ConnectionOptions<SD> {
         ConnectionOptions {
             host: String::from("localhost"),
@@ -338,7 +339,7 @@ impl ConnectionOptions<()> {
     }
 }
 
-impl<SD: GraphSON> ConnectionOptions<SD> {
+impl<SD: Gremlin> ConnectionOptions<SD> {
     pub fn websocket_url(&self) -> String {
         let protocol = if self.ssl { "wss" } else { "ws" };
         format!("{}://{}:{}/gremlin", protocol, self.host, self.port)

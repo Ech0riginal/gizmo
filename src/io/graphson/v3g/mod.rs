@@ -1,55 +1,46 @@
 // TODO move this into Hedwig for proper separation
 // you wrote it here bc it's where we're working but, ya know, move it sometime :)
 
-use crate::io::graphson::{ContentType, GraphSONDeserializer, GraphSONSerializer, MessageHandler};
-use crate::prelude::*;
 use serde_json::Value;
 use uuid::Uuid;
-
-use crate::prelude::{GValue, GremlinResult, Message};
+use crate::io::{Gremlin, V3};
 
 pub(crate) mod de;
 pub(crate) mod ser;
 pub(crate) mod types;
 
-graphson_io!(V3g);
+crate::io::macros::io!(V3g);
 
-impl GraphSONDeserializer for V3g {
-    fn deserialize(value: &Value) -> GremlinResult<GValue> {
+impl Gremlin for V3g {
+    fn mime() -> &'static str {
+        V3::mime()
+    }
+
+    fn deserialize(value: &Value) -> crate::GremlinResult<crate::GValue> {
         match value {
             Value::Object(_) => {
                 let _type = match &value["@type"] {
                     Value::String(e) => Ok(e),
-                    _type => Err(GremlinError::Json(format!("Unexpected type: {:?}", _type))),
+                    _type => Err(crate::GremlinError::Json(format!("Unexpected type: {:?}", _type))),
                 }?;
 
                 match _type.as_str() {
                     types::G_GEOMETRY | types::G_GEOSHAPE => de::geometry(value),
-                    _ => super::V3::deserialize(value),
+                    _ => V3::deserialize(value),
                 }
             }
-            _ => super::V3::deserialize(value),
+            _ => V3::deserialize(value),
         }
     }
-}
 
-impl GraphSONSerializer for V3g {
-    fn serialize(value: &GValue) -> GremlinResult<Value> {
+    fn serialize(value: &crate::GValue) -> crate::GremlinResult<Value> {
         match value {
-            GValue::Geometry(_) => ser::geometry(value),
-            _ => super::V3::serialize(value),
+            crate::GValue::Geometry(_) => ser::geometry(value),
+            _ => V3::serialize(value),
         }
     }
-}
 
-impl MessageHandler for V3g {
-    fn message<T>(op: String, processor: String, args: T, id: Option<Uuid>) -> Message<T> {
-        super::V3::message(op, processor, args, id)
-    }
-}
-
-impl ContentType for V3g {
-    fn content_type() -> &'static str {
-        super::V3::content_type()
+    fn message<T>(op: String, processor: String, args: T, id: Option<Uuid>) -> crate::message::Message<T> {
+        V3::message(op, processor, args, id)
     }
 }

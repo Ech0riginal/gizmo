@@ -1,25 +1,25 @@
+use crate::{Gremlin, GremlinError};
 use mobc::Manager;
 
 use crate::connection::Conn;
-use crate::error::GremlinError;
 use crate::options::ConnectionOptions;
-use crate::prelude::{GValue, GraphSON};
+use crate::prelude::{GValue};
 use base64::prelude::{BASE64_STANDARD, Engine};
 use std::collections::HashMap;
 
 #[derive(Debug)]
-pub(crate) struct GremlinConnectionManager<SD: GraphSON> {
+pub(crate) struct GremlinConnectionManager<SD: Gremlin> {
     options: ConnectionOptions<SD>,
 }
 
-impl<SD: GraphSON> GremlinConnectionManager<SD> {
+impl<SD: Gremlin> GremlinConnectionManager<SD> {
     pub(crate) fn new(options: ConnectionOptions<SD>) -> GremlinConnectionManager<SD> {
         GremlinConnectionManager { options }
     }
 }
 
 #[async_trait::async_trait]
-impl<SD: GraphSON> Manager for GremlinConnectionManager<SD> {
+impl<SD: Gremlin> Manager for GremlinConnectionManager<SD> {
     type Connection = Conn;
     type Error = GremlinError;
 
@@ -45,7 +45,7 @@ impl<SD: GraphSON> Manager for GremlinConnectionManager<SD> {
         let id = message.id().clone();
         let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-        let content_type = SD::content_type();
+        let content_type = SD::mime();
 
         let payload = String::from("") + content_type + &msg;
         let mut binary = payload.into_bytes();
@@ -78,7 +78,7 @@ impl<SD: GraphSON> Manager for GremlinConnectionManager<SD> {
                     let id = message.id().clone();
                     let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-                    let content_type = SD::content_type();
+                    let content_type = SD::mime();
                     let payload = String::from("") + content_type + &msg;
 
                     let mut binary = payload.into_bytes();

@@ -1,7 +1,7 @@
-use crate::io::GraphSON;
+use crate::{Gremlin, GremlinResult, GremlinError};
 use crate::pool::GremlinConnectionManager;
 use crate::prelude::{
-    ConnectionOptions, GResultSet, GValue, GremlinError, GremlinResult, Message, ToGValue,
+    ConnectionOptions, GResultSet, GValue, Message, ToGValue,
     traversal::Bytecode,
 };
 use base64::prelude::{BASE64_STANDARD, Engine};
@@ -9,10 +9,11 @@ use futures::future::{BoxFuture, FutureExt};
 use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
+use tokio::tracing;
 
 pub type SessionedClient<SD> = GremlinClient<SD>;
 
-impl<SD: GraphSON> SessionedClient<SD> {
+impl<SD: Gremlin> SessionedClient<SD> {
     pub async fn close_session(&mut self) -> GremlinResult<GResultSet<SD>> {
         if let Some(session_name) = self.session.take() {
             let mut args = HashMap::new();
@@ -33,14 +34,14 @@ impl<SD: GraphSON> SessionedClient<SD> {
 }
 
 #[derive(Clone)]
-pub struct GremlinClient<SD: GraphSON> {
+pub struct GremlinClient<SD: Gremlin> {
     pool: Pool<GremlinConnectionManager<SD>>,
     session: Option<String>,
     alias: Option<String>,
     pub(crate) options: ConnectionOptions<SD>,
 }
 
-impl<SD: GraphSON> GremlinClient<SD> {
+impl<SD: Gremlin> GremlinClient<SD> {
     pub async fn connect<T>(options: T) -> GremlinResult<GremlinClient<SD>>
     where
         T: Into<ConnectionOptions<SD>>,
@@ -153,7 +154,7 @@ impl<SD: GraphSON> GremlinClient<SD> {
 
             tracing::trace!(parent: &span, request=&id.to_string());
 
-            let content_type = SD::content_type();
+            let content_type = SD::mime();
             let payload = String::new() + content_type + &message;
             let mut binary = payload.into_bytes();
             binary.insert(0, content_type.len() as u8);

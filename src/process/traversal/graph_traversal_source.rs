@@ -1,5 +1,6 @@
+use crate::Gremlin;
 use crate::prelude::{
-    Edge, FromGValue, GIDs, GValue, GraphSON, GremlinClient, Labels, ToGValue, Vertex,
+    Edge, FromGValue, GIDs, GValue, GremlinClient, Labels, ToGValue, Vertex,
     traversal::remote::{AsyncTerminator, MockTerminator, Terminator},
     traversal::step::*,
     traversal::{Bytecode, GraphTraversal, TraversalBuilder},
@@ -19,7 +20,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
         GraphTraversalSource::new(MockTerminator {})
     }
 
-    pub fn with_remote<SD: GraphSON>(
+    pub fn with_remote<SD: Gremlin>(
         &self,
         client: GremlinClient<SD>,
     ) -> GraphTraversalSource<AsyncTerminator<SD>> {

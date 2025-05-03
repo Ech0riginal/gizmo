@@ -1,4 +1,4 @@
-pub(self) use crate::io::graphson::tests::*;
+pub(self) use crate::io::macros::*;
 pub(self) use crate::io::graphson::v2::types::*;
 pub(self) use std::collections::HashMap;
 
@@ -7,10 +7,6 @@ mod core {
 
     use ::uuid::Uuid;
     use std::str::FromStr;
-
-    fn a() {
-        GraphTraversalSource {}.add_e()
-    }
 
     test_prelude!();
 
@@ -70,7 +66,6 @@ mod core {
             object: GValue::Int64(100),
         }
     );
-
     test!(
         uuid,
         V2,

@@ -106,12 +106,12 @@ mod cases {
     }
 
     impl TestCase {
-        pub fn test<DS: GraphSON>(&self) {
+        pub fn test<DS: Gremlin>(&self) {
             self.deserialize::<DS>();
             self.serialialize::<DS>();
         }
 
-        pub fn deserialize<DS: GraphSON>(&self) {
+        pub fn deserialize<DS: Gremlin>(&self) {
             let result = DS::deserialize(&self.serial);
             assert!(result.is_ok(), "Deserialization failed");
             assert_eq!(
@@ -122,7 +122,7 @@ mod cases {
         }
 
         /// I had a stroke typing this but its great so it stays
-        pub fn serialialize<DS: GraphSON>(&self) {
+        pub fn serialialize<DS: Gremlin>(&self) {
             let result = DS::serialize(&self.object);
             assert!(result.is_ok(), "Serialization failed");
             assert_eq!(
