@@ -27,6 +27,7 @@ pub enum GValue {
     Uuid(uuid::Uuid),
     Int32(i32),
     Int64(i64),
+    Int128(i128),
     Float(f32),
     Double(f64),
     Date(Date),
@@ -120,6 +121,7 @@ impl std::fmt::Debug for GValue {
             GValue::StarGraph(star) => write!(f, "{:?}", star),
             GValue::Tree(tree) => write!(f, "{:?}", tree),
             GValue::TinkerGraph(graph) => write!(f, "{:?}", graph),
+            GValue::Int128(int) => write!(f, "{:?}", int),
         }
     }
 }

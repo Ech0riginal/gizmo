@@ -18,7 +18,7 @@ pub enum GremlinError {
     // #[error(transparent)]
     // Pool(#[from] r2d2::Error),
     #[error("Got wrong type {0:?}")]
-    WrongType(GValue),
+    WrongType(String),
 
     #[error("Cast error: {0}")]
     Cast(String),
@@ -52,6 +52,8 @@ pub enum GremlinError {
     Pem(#[from] rustls_pki_types::pem::Error),
     #[error("Timed out while making connection")]
     ConnectionTimeout,
+    #[error(transparent)]
+    Parse(#[from] crate::io::Error),
 }
 
 impl From<bb8::RunError<Self>> for GremlinError {

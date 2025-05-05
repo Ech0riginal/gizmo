@@ -1,9 +1,7 @@
-use serde_json::Value;
-use uuid::Uuid;
 
-pub trait Message {
-    fn request_id(&self) -> Uuid;
+pub trait GremlinMessage {
+    fn request_id(&self) -> uuid::Uuid;
     fn op (&self) -> String;
     fn processor(&self) -> String;
-    fn args(&self) -> Value;
+    fn args(&self) -> serde_json::Value;
 }

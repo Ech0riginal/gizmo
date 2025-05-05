@@ -1,5 +1,4 @@
-use crate::io::{V2, V3};
-use crate::prelude::{GraphSON, GremlinError};
+use crate::prelude::{GremlinError};
 use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
@@ -7,7 +6,9 @@ use std::io::BufReader;
 use std::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::Duration;
+use tokio::tracing;
 use webpki_roots::TLS_SERVER_ROOTS;
+use crate::Gremlin;
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
@@ -23,7 +24,7 @@ pub struct TlsOptions {
 impl TlsOptions {
     /// Copied pretty directly from https://github.com/rustls/rustls/blob/main/examples/src/bin/tlsclient-mio.rs
     /// and https://github.com/rustls/tokio-rustls/blob/main/examples/client.rs
-    pub(crate) fn config(self) -> Result<tokio_rustls::rustls::ClientConfig, GremlinError> {
+    pub(crate) fn config(self) -> Result<tokio::rustls::rustls::ClientConfig, GremlinError> {
         let mut cert_store = rustls::RootCertStore::empty();
 
         if let Some(ca_file) = self.authority {
@@ -37,7 +38,7 @@ impl TlsOptions {
         }
 
         let base_config =
-            tokio_rustls::rustls::ClientConfig::builder().with_root_certificates(cert_store);
+            tokio::rustls::rustls::ClientConfig::builder().with_root_certificates(cert_store);
         match (&self.private_key, &self.auth_certs) {
             (None, None) => Ok(base_config.with_no_client_auth()),
             (Some(key_file), Some(certs_file)) => {
@@ -68,7 +69,7 @@ impl TlsOptions {
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
-pub struct ConnectionOptions<SD: GraphSON> {
+pub struct ConnectionOptions<SD: Gremlin> {
     #[builder(setter(custom))]
     #[builder(default = "self.default_version()")]
     pub(crate) version: SD,
@@ -92,8 +93,8 @@ pub struct ConnectionOptions<SD: GraphSON> {
     pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
-impl<V_: GraphSON> ConnectionOptionsBuilder<V_> {
-    fn version<V: GraphSON>(self, version: V) -> ConnectionOptionsBuilder<V> {
+impl<V_: Gremlin> ConnectionOptionsBuilder<V_> {
+    fn version<V: Gremlin>(self, version: V) -> ConnectionOptionsBuilder<V> {
         ConnectionOptionsBuilder::<V> {
             version: Some(version),
             ..self
@@ -101,7 +102,7 @@ impl<V_: GraphSON> ConnectionOptionsBuilder<V_> {
     }
 }
 
-impl<SD: GraphSON> ConnectionOptionsBuilder<SD> {
+impl<SD: Gremlin> ConnectionOptionsBuilder<SD> {
     fn default_version(&self) -> SD {
         SD::new()
     }
@@ -206,7 +207,7 @@ impl ConnectionOptions<()> {
     }
 }
 
-impl<SD: GraphSON> ConnectionOptions<SD> {
+impl<SD: Gremlin> ConnectionOptions<SD> {
     pub fn websocket_url(&self) -> String {
         let protocol = if self.ssl { "wss" } else { "ws" };
         format!("{}://{}:{}/gremlin", protocol, self.host, self.port)

@@ -1,4 +1,4 @@
-graphson_types! {
+crate::io::macros::types! {
     core,
     CLASS, "g:Class",
     INT, "g:Int32",
@@ -10,7 +10,7 @@ graphson_types! {
     UUID, "g:UUID"
 }
 
-graphson_types! {
+crate::io::macros::types! {
     structure,
     EDGE, "g:Edge",
     PATH, "g:Path",
@@ -23,7 +23,7 @@ graphson_types! {
 
 }
 
-graphson_types! {
+crate::io::macros::types! {
     process,
     BARRIER, "g:Barrier",
     BINDING, "g:Binding",

@@ -1,7 +1,6 @@
 use crate::connection::Connection;
-use crate::io::GraphSON;
 use crate::prelude::{
-    ConnectionOptions, GResultSet, GValue, GremlinError, GremlinResult, Message, ToGValue,
+    ConnectionOptions, GResultSet, GValue, Message, ToGValue,
     traversal::Bytecode,
 };
 use crate::structure::GKey;
@@ -12,24 +11,25 @@ use futures::future::{BoxFuture, FutureExt};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
 use tokio::pin;
+use crate::{Gremlin, GremlinError, GremlinResult};
 
-pub struct SessionedClient<'c, SD: GraphSON> {
+pub struct SessionedClient<'c, SD: Gremlin> {
     connection: PooledConnection<'c, ConnectionOptions<SD>>,
     session: Option<String>,
     alias: Option<String>,
 }
 
-// impl<'c, SD: GraphSON> SessionedClient<'c, SD> {
+// impl<'c, SD: Gremlin> SessionedClient<'c, SD> {
 //     pub async fn close_session(mut self) -> GremlinResult<GResultSet<SD>> {
 //         if let Some(session_name) = self.session.take() {
 //             let mut args = HashMap::new();
 //             args.insert(String::from("session"), GValue::from(session_name.clone()));
 //             let args = SD::serialize(&GValue::from(args))?;
-// 
+//
 //             let processor = "session".to_string();
-// 
+//
 //             let message = SD::message(String::from("close"), processor, args, None);
-// 
+//
 //             GremlinClient::send_message_new(self.connection, message).await
 //         } else {
 //             Err(GremlinError::Generic("No session to close".to_string()))
@@ -38,7 +38,7 @@ pub struct SessionedClient<'c, SD: GraphSON> {
 // }
 
 #[derive(Clone)]
-pub struct GremlinClient<SD: GraphSON> {
+pub struct GremlinClient<SD: Gremlin> {
     pool: bb8::Pool<ConnectionOptions<SD>>,
     session: Option<String>,
     alias: Option<String>,
@@ -54,7 +54,7 @@ const BINDINGS: &'static str = "bindings";
 const SESSION: &'static str = "session";
 const EVAL: &'static str = "eval";
 
-impl<SD: GraphSON> GremlinClient<SD> {
+impl<SD: Gremlin> GremlinClient<SD> {
     pub async fn connect(options: ConnectionOptions<SD>) -> GremlinResult<GremlinClient<SD>> {
         let pool = Pool::builder()
             .min_idle(3)
@@ -76,7 +76,7 @@ impl<SD: GraphSON> GremlinClient<SD> {
             .pool
             .get()
             .await?;
-        
+
         Ok(SessionedClient {
             connection,
             session: Some(name),
@@ -94,7 +94,7 @@ impl<SD: GraphSON> GremlinClient<SD> {
         cloned
     }
 
-    pub fn execute<T>(
+    pub async fn execute<T>(
         &self,
         script: T,
         params: &[(&str, &dyn ToGValue)],
@@ -102,6 +102,7 @@ impl<SD: GraphSON> GremlinClient<SD> {
     where
         T: Into<String>,
     {
+        todo!();
         let args = {
             let mut tmp = HashMap::new();
 
@@ -129,26 +130,29 @@ impl<SD: GraphSON> GremlinClient<SD> {
                 tmp.insert(SESSION, GValue::from(session_name.clone()));
             }
 
-            SD::serialize(&GValue::from(tmp))
+            todo!()
+            // SD::serialize(&GValue::from(tmp))
         }?;
         let processor = if self.session.is_some() {
             SESSION.into()
         } else {
             String::default()
         };
-        let message = SD::message(EVAL.into(), processor, args, None);
-        let conn = self.pool.get().await?;
-        let stream = conn.send::<_, SD>(message).await?;
-        Ok(stream)
+        
+        todo!()
+        // let message = SD::message(EVAL.into(), processor, args, None);
+        // let conn = self.pool.get().await?;
+        // let stream = conn.send::<_, SD>(message).await?;
+        // Ok(stream)
     }
 
     // pub async fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet<SD>> {
     //     tracing::trace!("{:?}", bytecode);
-    // 
+    //
     //     let mut args = HashMap::new();
-    // 
+    //
     //     args.insert(String::from("gremlin"), GValue::Bytecode(bytecode.clone()));
-    // 
+    //
     //     let aliases = self
     //         .alias
     //         .clone()
@@ -159,20 +163,20 @@ impl<SD: GraphSON> GremlinClient<SD> {
     //             map
     //         })
     //         .unwrap_or_else(HashMap::new);
-    // 
+    //
     //     args.insert(String::from("aliases"), GValue::from(aliases));
-    // 
+    //
     //     let args = SD::serialize(&GValue::from(args))?;
-    // 
+    //
     //     let message = SD::message(
     //         String::from("bytecode"),
     //         String::from("traversal"),
     //         args,
     //         None,
     //     );
-    // 
+    //
     //     let conn = self.pool.get().await?;
-    // 
+    //
     //     // self.send_message_new(conn, message).await
     // }
 }

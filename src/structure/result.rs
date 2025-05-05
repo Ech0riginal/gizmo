@@ -1,7 +1,6 @@
-use crate::io::GraphSONDeserializer;
+use crate::{Gremlin, GremlinResult, GremlinError};
 
 use crate::message::Response;
-use crate::prelude::{GraphSON, GremlinClient, GremlinResult};
 use crate::structure::GValue;
 use futures::Stream;
 
@@ -11,9 +10,10 @@ use futures::channel::mpsc::Receiver;
 use pin_project_lite::pin_project;
 use std::collections::VecDeque;
 use std::pin::Pin;
+use crate::client::GremlinClient;
 
 pin_project! {
-    pub struct GResultSet<SD: GraphSON> {
+    pub struct GResultSet<SD: Gremlin> {
         client: GremlinClient<SD>,
         results: VecDeque<GValue>,
         pub response: Response,
@@ -22,7 +22,7 @@ pin_project! {
     }
 }
 
-impl<SD: GraphSON> std::fmt::Debug for GResultSet<SD> {
+impl<SD: Gremlin> std::fmt::Debug for GResultSet<SD> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
         write!(
             fmt,
@@ -32,7 +32,7 @@ impl<SD: GraphSON> std::fmt::Debug for GResultSet<SD> {
     }
 }
 
-impl<SD: GraphSON> GResultSet<SD> {
+impl<SD: Gremlin> GResultSet<SD> {
     pub(crate) fn new(
         client: GremlinClient<SD>,
         results: VecDeque<GValue>,
@@ -48,9 +48,9 @@ impl<SD: GraphSON> GResultSet<SD> {
     }
 }
 
-impl<SD: GraphSON> Stream for GResultSet<SD>
+impl<SD: Gremlin> Stream for GResultSet<SD>
 where
-    SD: GraphSONDeserializer,
+    SD: Gremlin,
 {
     type Item = GremlinResult<GValue>;
 

@@ -1,31 +1,24 @@
-use super::*;
-use crate::prelude::{GValue, GremlinResult, Message};
+//! A virtual placeholder for when we initialize the client.
 
-impl GraphSONDeserializer for () {
-    fn deserialize(_: &serde_json::Value) -> GremlinResult<GValue> {
-        todo!()
-    }
-}
+use serde_json::Value;
+use uuid::Uuid;
+use crate::{GValue, Gremlin, GremlinResult};
+// use crate::message::Message;
 
-impl GraphSONSerializer for () {
-    fn serialize(_: &GValue) -> GremlinResult<serde_json::Value> {
-        todo!()
-    }
-}
-
-impl ContentType for () {
-    fn content_type() -> &'static str {
-        todo!()
-    }
-}
-
-impl MessageHandler for () {
-    fn message<T>(_: String, _: String, _: T, _: Option<uuid::Uuid>) -> Message<T> {
-        todo!()
-    }
-}
-
-/// This allows us to have 'empty' serde functionality during init
-impl GraphSON for () {
-    fn new() -> Self { () }
-}
+// impl Gremlin for () {
+//     fn mime() -> &'static str {
+//         todo!()
+//     }
+// 
+//     fn deserialize(value: &Value) -> GremlinResult<GValue> {
+//         todo!()
+//     }
+// 
+//     fn serialize(value: &GValue) -> GremlinResult<Value> {
+//         todo!()
+//     }
+// 
+//     fn message<T>(op: String, processor: String, args: T, id: Option<Uuid>) -> Message<T> {
+//         todo!()
+//     }
+// }

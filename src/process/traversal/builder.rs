@@ -80,10 +80,10 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property_many<K, V>(mut self, values: Vec<(K, V)>) -> Self
+    pub fn property_many<K, A>(mut self, values: Vec<(K, A)>) -> Self
     where
         K: Into<GValue>,
-        V: Into<GValue>,
+        A: Into<GValue>,
     {
         for property in values {
             self.bytecode.add_step(
@@ -95,15 +95,15 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property_with_cardinality<K, V>(
+    pub fn property_with_cardinality<K, A>(
         mut self,
         cardinality: Cardinality,
         key: K,
-        value: V,
+        value: A,
     ) -> Self
     where
         K: Into<GValue>,
-        V: Into<GValue>,
+        A: Into<GValue>,
     {
         self.bytecode.add_step(
             String::from("property"),

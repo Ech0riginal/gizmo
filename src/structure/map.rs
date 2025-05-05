@@ -10,7 +10,7 @@ use std::fmt::Formatter;
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 /// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 #[derive(PartialEq, Clone)]
-pub struct Map(HashMap<GKey, GValue>);
+pub struct Map(pub(crate) HashMap<GKey, GValue>);
 
 impl std::fmt::Debug for Map {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

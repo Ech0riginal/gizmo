@@ -1,11 +1,7 @@
-macro_rules! graphson_io {
+macro_rules! io {
     ($id:ident) => {
         #[derive(Clone, Debug, Default)]
         pub struct $id;
-
-        impl crate::io::GraphSON for $id {
-            fn new() -> Self { $id }
-        }
 
         unsafe impl Send for $id {}
 
@@ -13,13 +9,94 @@ macro_rules! graphson_io {
     };
 }
 
-macro_rules! graphson_types {
+macro_rules! types {
     ($name:ident, $value:expr) => {
         pub const $name: &'static str = $value;
     };
     { $module:ident, $($name:ident, $value:expr),* } => {
         pub mod $module {
-            $(graphson_types!($name, $value);)*
+            $(crate::io::macros::types!($name, $value);)*
+        }
+    };
+}
+
+pub struct Test {
+    pub serial: serde_json::Value,
+    pub object: crate::prelude::GValue,
+}
+
+macro_rules! test_prelude {
+    () => {
+        use crate::io::macros::Test;
+        use crate::prelude::*;
+        use serde_json::json;
+        #[allow(unused_imports)]
+        use chrono::TimeZone;
+    };
+}
+
+macro_rules! test {
+    ($fun:ident, $engine:ident, $case:expr) => {
+        mod $fun {
+            pub(self) use super::*;
+
+            lazy_static::lazy_static! {
+                pub static ref TEST_CASE: Test = $case;
+            }
+
+            mod deserialize {
+                use crate::Gremlin;
+                pub(self) use super::*;
+
+                #[test]
+                fn ok() {
+                    let result = $engine::deserialize(&TEST_CASE.serial);
+                    match result {
+                        Ok(_) => assert!(true),
+                        Err(e) => {
+                            assert!(false, "Deserialization failed: {:?}", e);
+                        }
+                    }
+                }
+
+                #[test]
+                fn accurate() {
+                    let result = $engine::deserialize(&TEST_CASE.serial);
+                    assert!(result.is_ok(), "Deserialization failed");
+                    assert_eq!(
+                        TEST_CASE.object,
+                        result.unwrap(),
+                        "Deserialization doesn't match expectation"
+                    );
+                }
+            }
+
+            mod serialize {
+                use crate::Gremlin;
+                pub(self) use super::*;
+
+                #[test]
+                fn ok() {
+                    let result = $engine::serialize(&TEST_CASE.object);
+                    match result {
+                        Ok(_) => assert!(true),
+                        Err(e) => {
+                            assert!(false, "Serialization failed: {:?}", e);
+                        }
+                    }
+                }
+
+                #[test]
+                fn accurate() {
+                    let result = $engine::serialize(&TEST_CASE.object);
+                    assert!(result.is_ok(), "Serialization failed");
+                    assert_eq!(
+                        TEST_CASE.serial,
+                        result.unwrap(),
+                        "Serialization doesn't match expectation"
+                    );
+                }
+            }
         }
     };
 }
@@ -56,6 +133,18 @@ macro_rules! expect_i64 {
         }?
     };
 }
+
+macro_rules! expect_i128 {
+    ($value:expr) => {
+        match $value.as_i128() {
+            Some(v) => Ok(v),
+            None => Err($crate::prelude::GremlinError::Json(String::from(
+                "Expected i64",
+            ))),
+        }?
+    };
+}
+
 macro_rules! expect_float {
     ($value:expr) => {
         match $value.as_f64() {
@@ -66,6 +155,7 @@ macro_rules! expect_float {
         }? as f32
     };
 }
+
 macro_rules! expect_double {
     ($value:expr) => {
         match $value.as_f64() {
@@ -76,3 +166,6 @@ macro_rules! expect_double {
         }?
     };
 }
+
+pub(crate) use {io, types, test, test_prelude};
+pub(crate) use {get_value, expect_i32, expect_i64, expect_i128, expect_float, expect_double};

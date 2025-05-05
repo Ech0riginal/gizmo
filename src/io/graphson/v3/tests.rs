@@ -1,4 +1,6 @@
-pub(self) use crate::io::graphson::tests::*;
+pub(self) use crate::io::macros::*;
+pub(self) use crate::io::graphson::v2::types::*;
+pub(self) use std::collections::HashMap;
 
 mod core {
     pub(self) use super::*;
@@ -9,42 +11,42 @@ mod core {
 
     test!(
         class,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Class", "@value" : "java.io.File"}),
-            object: GValue::Null,
+            serial: json!({ "@type" : CLASS, "@value" : "java.io.File"}),
+            object: GValue::Class("java.io.File".into()),
         }
     );
     test!(
         date,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Date", "@value" : 1481750076295u64 }),
-            object: GValue::Null,
+            serial: json!({ "@type" : DATE, "@value" : 1481750076295i64 }),
+            object: GValue::Date(chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()),
         }
     );
     test!(
         double,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Double", "@value" : 100.0f64 }),
+            serial: json!({ "@type" : DOUBLE, "@value" : 100.0f64 }),
             object: GValue::Double(100.0),
         }
     );
     test!(
         float,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Float", "@value" : 100.0f32 }),
+            serial: json!({ "@type" : FLOAT, "@value" : 100.0f32 }),
             object: GValue::Float(100.0),
         }
     );
     test!(
         integer,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Int32", "@value" : 100i32 }),
-            object: GValue::Int32(100i32),
+            serial: json!({ "@type" : INT, "@value" : 100i32 }),
+            object: GValue::Int32(100),
         }
     );
     test!(
@@ -57,10 +59,10 @@ mod core {
     );
     test!(
         long,
-        V3,
+        V2,
         Test {
-            serial: json!({ "@type" : "g:Int64", "@value" : 100}),
-            object: GValue::Null,
+            serial: json!({ "@type" : LONG, "@value" : 100u64 }),
+            object: GValue::Int64(100),
         }
     );
     test!(
@@ -78,18 +80,13 @@ mod core {
                     { "@type" : "g:Int32", "@value" : 3 }
                 ]
                 }, { "@type" : "g:Date", "@value" : 1481750076295u64 }, "test", { "@type" : "g:Int32", "@value" : 123 } ]}),
-            object: GValue::Map(
-                [
-                    ("label".into(), GValue::String(String::from("person"))),
-                    (
-                        "name".into(),
-                        GValue::List(vec![String::from("marko").into()].into()),
-                    ),
-                ]
-                .iter()
-                .cloned()
-                .collect::<Map>()
-            ),
+            object: GValue::Map(Map([
+                ("label".into(), GValue::String(String::from("person"))),
+                (
+                    "name".into(),
+                    GValue::List(vec![String::from("marko").into()].into()),
+                ),
+            ].into())),
         }
     );
     test!(

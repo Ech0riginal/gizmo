@@ -1,38 +1,46 @@
-use crate::error::GremlinError;
-use crate::io::GraphSON;
-use crate::message::Response;
-use crate::options::{ConnectionOptions, Credentials};
-use crate::prelude::GremlinResult;
+use crate::{Gremlin, GremlinResult, GremlinError};
+use crate::prelude::{ConnectionOptions};
+use crate::message::{Message, Response};
 use crate::structure::GValue;
 use async_tungstenite::WebSocketStream;
-use async_tungstenite::tokio::{
-    ConnectStream, connect_async_with_config, connect_async_with_tls_connector_and_config,
-};
+use async_tungstenite::tokio::{ConnectStream, connect_async_with_config, connect_async_with_tls_connector_and_config, TokioAdapter};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bb8::{ManageConnection};
 use bytes::Bytes;
 use futures::stream::{SplitSink, SplitStream};
-use futures::{SinkExt, StreamExt};
+use futures::{stream, SinkExt, StreamExt};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::pin::Pin;
 use std::sync::Arc;
+use tokio::task::{self};
+use tokio::rustls::TlsConnector;
+use tokio::tracing;
+use tungstenite::{
+    Connector,
+    client::{IntoClientRequest, uri_mode},
+    stream::{Mode, NoDelay},
+};
 use std::task::Poll;
 use serde::Serialize;
+use serde_json::Value;
 use tokio::pin;
+use tokio::stream::Stream;
+use tokio::stream::wrappers::UnboundedReceiverStream;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::{RwLock, mpsc};
 use tokio::task::yield_now;
-use tokio_rustls::TlsConnector;
-use tokio_stream::Stream;
-use tokio_stream::wrappers::UnboundedReceiverStream;
-use tungstenite::client::{IntoClientRequest, uri_mode};
-use tungstenite::stream::{Mode, NoDelay};
-use tungstenite::{Connector, Message};
 use uuid::Uuid;
+use crate::options::Credentials;
 
+type WSStream = WebSocketStream<
+    stream::Stream<
+        TokioAdapter<TcpStream>,
+        TokioAdapter<tokio::rustls::client::TlsStream<TcpStream>>,
+    >,
+>;
 pub struct Connection {
     outbound: mpsc::UnboundedSender<Message>,
     valid: Arc<RwLock<bool>>,
@@ -47,7 +55,7 @@ pub struct GremlinStream<V> {
     inner: UnboundedReceiverStream<GremlinResult<Response>>,
 }
 
-impl<V: GraphSON> Stream for GremlinStream<V> {
+impl<V: Gremlin> Stream for GremlinStream<V> {
     type Item = GremlinResult<GValue>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> Poll<Option<Self::Item>> {
@@ -86,7 +94,7 @@ struct Context {
 
 type WSStream = WebSocketStream<ConnectStream>;
 
-impl<SD: GraphSON> ManageConnection for ConnectionOptions<SD> {
+impl<SD: Gremlin> ManageConnection for ConnectionOptions<SD> {
     type Connection = Connection;
     type Error = GremlinError;
 
@@ -160,7 +168,7 @@ impl<SD: GraphSON> ManageConnection for ConnectionOptions<SD> {
 }
 
 impl Connection {
-    fn new<V: GraphSON>(value: WSStream, options: &ConnectionOptions<V>) -> Self {
+    fn new<V: Gremlin>(value: WSStream, options: &ConnectionOptions<V>) -> Self {
         let (sink, stream) = value.split();
         let (outbound, outbound_rx) = mpsc::unbounded_channel();
         let valid = Arc::new(RwLock::new(true));
@@ -183,7 +191,7 @@ impl Connection {
         }
     }
 
-    fn proxy<V: GraphSON>(
+    fn proxy<V: Gremlin>(
         mut rx: mpsc::UnboundedReceiver<Message>,
         mut sink: SplitSink<WSStream, Message>,
         validity: Arc<RwLock<bool>>,
@@ -217,7 +225,7 @@ impl Connection {
         });
     }
 
-    fn recv<V: GraphSON>(ctx: Context, stream: SplitStream<WSStream>) {
+    fn recv<V: Gremlin>(ctx: Context, stream: SplitStream<WSStream>) {
         tokio::spawn(async move {
             pin!(stream);
 
@@ -241,7 +249,7 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(ctx, message))]
-    async fn message_handler<V: GraphSON>(ctx: &Context, message: Message) {
+    async fn message_handler<V: Gremlin>(ctx: &Context, message: Message) {
         match message {
             Message::Text(string) => {
                 tracing::warn!("we got a string? {}", string);
@@ -258,7 +266,7 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(ctx, response), fields(request = %response.request_id, status = %response.status.code))]
-    async fn response_handler<V: GraphSON>(ctx: &Context, response: Response) {
+    async fn response_handler<V: Gremlin>(ctx: &Context, response: Response) {
         match response.status.code {
             200 | 206 => ctx.callback(response).await,
             407 => match &ctx.credentials {
@@ -271,7 +279,7 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(ctx, credentials, id))]
-    async fn authenticate<V: GraphSON>(ctx: &Context, credentials: &Credentials, id: &Uuid) {
+    async fn authenticate<V: Gremlin>(ctx: &Context, credentials: &Credentials, id: &Uuid) {
         let mut args = HashMap::new();
 
         args.insert(
@@ -305,21 +313,21 @@ impl Connection {
     pub async fn send<I, V>(&self, payload: I) -> GremlinResult<GremlinStream<V>>
     where
         I: Payload,
-        V: GraphSON
+        V: Gremlin
     {
         payload.send(self).await
     }
 }
 
 trait Payload {
-    fn send<V: GraphSON>(
+    fn send<V: Gremlin>(
         self,
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>>;
 }
 
 impl Payload for Message {
-    fn send<V: GraphSON>(
+    fn send<V: Gremlin>(
         self,
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
@@ -329,7 +337,7 @@ impl Payload for Message {
 }
 
 impl<T: Serialize> Payload for crate::message::Message<T> {
-    fn send<V: GraphSON>(self, conn: &Connection) -> impl Future<Output=GremlinResult<GremlinStream<V>>> {
+    fn send<V: Gremlin>(self, conn: &Connection) -> impl Future<Output=GremlinResult<GremlinStream<V>>> {
         async move {
             let blob = serde_json::to_vec(&self)?;
             blob.send(conn).await
@@ -338,7 +346,7 @@ impl<T: Serialize> Payload for crate::message::Message<T> {
 }
 
 impl Payload for Vec<u8> {
-    fn send<V: GraphSON>(
+    fn send<V: Gremlin>(
         self,
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
@@ -347,7 +355,7 @@ impl Payload for Vec<u8> {
     }
 }
 
-async fn send<V: GraphSON>(conn: &Connection, id: Uuid, msg: Message) -> Result<GremlinStream<V>, GremlinError>
+async fn send<V: Gremlin>(conn: &Connection, id: Uuid, msg: Message) -> Result<GremlinStream<V>, GremlinError>
 {
     let (tx, rx) = mpsc::unbounded_channel();
     let inner = UnboundedReceiverStream::new(rx);
