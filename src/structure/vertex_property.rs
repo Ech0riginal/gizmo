@@ -1,7 +1,7 @@
 use crate::structure::{GID, GValue, Property};
 use std::collections::HashMap;
 
-use crate::conversion::{BorrowFromGValue, FromGValue};
+
 use crate::{GremlinError, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -20,7 +20,7 @@ impl GProperty {
 
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: From<GValue>,
     {
         match self {
             GProperty::Property(p) => p.take(),
@@ -30,7 +30,7 @@ impl GProperty {
 
     pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
     where
-        T: BorrowFromGValue,
+        T: BorrowFrom<GValue>,
     {
         match self {
             GProperty::Property(p) => p.get(),
@@ -46,7 +46,7 @@ impl GProperty {
     }
 }
 
-impl FromGValue for GProperty {
+impl From<GValue> for GProperty {
     fn from_gvalue(v: GValue) -> GremlinResult<Self> {
         match v {
             GValue::VertexProperty(p) => Ok(GProperty::VertexProperty(p)),
@@ -92,14 +92,14 @@ impl VertexProperty {
 
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: From<GValue>,
     {
         T::from_gvalue(*self.value)
     }
 
     pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
     where
-        T: BorrowFromGValue,
+        T: BorrowFrom<GValue>,
     {
         T::from_gvalue(&self.value)
     }

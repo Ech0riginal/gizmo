@@ -1,6 +1,6 @@
 pub use crate::io::graphson::v2::ser::*;
-use crate::io::{GremlinIO, Serializer, get_value};
-use crate::prelude::{GValue, ToGValue};
+use crate::io::{Serializer, get_value};
+use crate::prelude::{GValue};
 use crate::{GremlinError, GremlinResult};
 use serde_json::{Map, Value, json};
 

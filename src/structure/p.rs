@@ -1,4 +1,4 @@
-use crate::prelude::{GValue, ToGValue};
+use crate::prelude::{GValue};
 use crate::structure::either::Either2;
 use crate::structure::text_p::TextP;
 
@@ -28,42 +28,42 @@ impl P {
     }
     pub fn eq<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("eq", value.to_gvalue())
     }
 
     pub fn neq<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("neq", value.to_gvalue())
     }
 
     pub fn gt<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("gt", value.to_gvalue())
     }
 
     pub fn gte<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("gte", value.to_gvalue())
     }
 
     pub fn lt<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("lt", value.to_gvalue())
     }
 
     pub fn lte<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         P::new("lte", value.to_gvalue())
     }
@@ -80,7 +80,7 @@ pub trait IntoPredicate {
     fn into_predicate(self) -> Either2<P, TextP>;
 }
 
-impl<T: ToGValue> IntoPredicate for T {
+impl<T: Into<GValue>> IntoPredicate for T {
     fn into_predicate(self) -> Either2<P, TextP> {
         let val = self.to_gvalue();
         match val {
@@ -101,7 +101,7 @@ pub trait IntoRange {
 
 impl<T> IntoRange for (T, T)
 where
-    T: ToGValue,
+    T: Into<GValue>,
 {
     fn into_range(self) -> Range {
         let v1 = self.0.to_gvalue();
@@ -115,7 +115,7 @@ where
 
 impl<T> IntoRange for Vec<T>
 where
-    T: ToGValue,
+    T: Into<GValue>,
 {
     fn into_range(self) -> Range {
         Range {

@@ -1,7 +1,7 @@
 use crate::io::graphson::de::validate;
 use crate::io::graphson::v2::types::*;
 use crate::io::macros::*;
-use crate::io::{Deserializer, Error, GremlinIO};
+use crate::io::{Deserializer, Error};
 use crate::structure::*;
 use crate::{GremlinError, GremlinResult};
 use chrono::{TimeZone, Utc};

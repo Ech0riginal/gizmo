@@ -1,8 +1,7 @@
 // TODO move this into Hedwig for proper separation
 // you wrote it here bc it's where we're working but, ya know, move it sometime :)
 
-use crate::io::{Deserializer, GremlinIO, Serializer, V3};
-use crate::message::{Request, Response};
+use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer, V3};
 use crate::{GValue, GremlinResult};
 use serde_json::Value;
 

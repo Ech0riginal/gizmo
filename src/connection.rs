@@ -1,5 +1,4 @@
-use crate::io::{Deserializer, GremlinIO, Serializer};
-use crate::message::{Request, Response};
+use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer};
 use crate::options::Credentials;
 use crate::prelude::ConnectionOptions;
 use crate::structure::GValue;

@@ -1,5 +1,4 @@
 use crate::io::Error;
-use serde::de::MapAccess;
 use serde_json::Value;
 
 const TYPE_TAG: &'static str = "@type";

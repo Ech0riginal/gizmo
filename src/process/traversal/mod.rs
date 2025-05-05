@@ -1,5 +1,4 @@
-use crate::GremlinResult;
-use crate::conversion::FromGValue;
+use crate::{GValue, GremlinResult};
 // use crate::prelude::{GResultSet};
 use crate::structure::{GResultSet, Traverser};
 use futures::FutureExt;
@@ -33,12 +32,12 @@ pub trait Traversal<S, E> {
     fn bytecode(&self) -> &Bytecode;
 }
 
-pub struct RemoteTraversalIterator<V: GremlinIO, T: FromGValue> {
+pub struct RemoteTraversalIterator<V: GremlinIO, T: From<GValue>> {
     data: PhantomData<T>,
     result: GResultSet<V>,
 }
 
-impl<V: GremlinIO, T: FromGValue> RemoteTraversalIterator<V, T> {
+impl<V: GremlinIO, T: From<GValue>> RemoteTraversalIterator<V, T> {
     pub fn new(result: GResultSet<V>) -> RemoteTraversalIterator<V, T> {
         RemoteTraversalIterator {
             result,
@@ -57,7 +56,7 @@ impl<V: GremlinIO> RemoteTraversalIterator<V, crate::structure::Null> {
     }
 }
 
-impl<V: GremlinIO, T: FromGValue> Iterator for RemoteTraversalIterator<V, T> {
+impl<V: GremlinIO, T: From<GValue>> Iterator for RemoteTraversalIterator<V, T> {
     type Item = GremlinResult<T>;
 
     // todo remove unwrap
@@ -110,7 +109,7 @@ impl<V: GremlinIO> RemoteTraversalStream<V, crate::structure::Null> {
     }
 }
 
-impl<V: GremlinIO, T: FromGValue> Stream for RemoteTraversalStream<V, T> {
+impl<V: GremlinIO, T: From<GValue>> Stream for RemoteTraversalStream<V, T> {
     type Item = GremlinResult<T>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {

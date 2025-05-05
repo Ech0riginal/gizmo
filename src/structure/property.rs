@@ -1,4 +1,3 @@
-use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::prelude::{GValue, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -28,14 +27,14 @@ impl Property {
 
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: From<GValue>,
     {
         T::from_gvalue(*self.value)
     }
 
     pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
     where
-        T: BorrowFromGValue,
+        T: BorrowFrom<GValue>,
     {
         T::from_gvalue(&self.value)
     }

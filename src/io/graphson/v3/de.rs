@@ -109,7 +109,7 @@ pub(crate) fn map<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue>
         let mut x = 0;
         while x < val.len() {
             let key_value = D::deserialize(&val[x])?;
-            let key: GKey = FromGValue::from_gvalue(key_value)?;
+            let key: GKey = GKey::from(key_value);
             let vald = &val[x + 1];
             let _debug_val = format!("{}", &vald);
             let value = D::deserialize(vald)?;

@@ -8,8 +8,6 @@
 extern crate lazy_static;
 
 mod io;
-mod message;
-
 mod client;
 
 mod connection;
@@ -40,8 +38,5 @@ pub mod prelude {
     pub use crate::process::traversal::GraphTraversalSource;
     pub use crate::process::traversal::traversal;
 
-    pub use crate::conversion::{BorrowFromGValue, FromGValue, ToGValue};
     pub use crate::structure::*;
-
-    pub(crate) use crate::message::Message;
 }

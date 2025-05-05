@@ -1,4 +1,4 @@
-use crate::conversion::FromGValue;
+
 
 use crate::process::traversal::remote::Terminator;
 use crate::prelude::{
@@ -16,7 +16,7 @@ use crate::prelude::{
 //         RemoteStrategy { client }
 //     }
 //
-//     pub(crate) fn apply<S, E: FromGValue, A>(
+//     pub(crate) fn apply<S, E: From<GValue>, A>(
 //         &self,
 //         traversal: &GraphTraversal<S, E, A>,
 //     ) -> GremlinResult<RemoteTraversalIterator<SD, E>>

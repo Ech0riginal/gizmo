@@ -1,13 +1,13 @@
 use crate::GremlinResult;
 use crate::io::graphson::types::v2::*;
 use crate::io::macros::*;
-use crate::io::{GremlinIO, Serializer};
+use crate::io::Serializer;
 use crate::prelude::{
-    Cardinality, Direction, GValue, Merge, T, ToGValue,
+    Cardinality, Direction, GValue, Merge, T,
     traversal::{Order, Scope},
 };
 use crate::structure::Branch;
-use serde_json::{Map, Value, json};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 
 pub fn serialize<S: Serializer<GValue>>(value: &GValue) -> GremlinResult<Value> {

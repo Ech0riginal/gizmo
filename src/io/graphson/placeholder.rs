@@ -1,8 +1,6 @@
 //! A virtual placeholder for when we initialize the client.
 
-use crate::io::graphson::v2::de;
-use crate::io::{Deserializer, GremlinIO, Serializer, V2, V3};
-use crate::message::{Request, Response};
+use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer};
 use crate::{GValue, GremlinResult};
 use serde_json::Value;
 

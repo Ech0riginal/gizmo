@@ -1,17 +1,11 @@
-use crate::connection::Connection;
-use crate::io::{Deserializer, GremlinIO, Serializer};
-use crate::message::{Request, Response};
-use crate::prelude::{ConnectionOptions, GValue, Message, ToGValue, traversal::Bytecode};
+use crate::io::{Args, GremlinIO, Request};
+use crate::prelude::{ConnectionOptions, GValue};
 use crate::structure::GKey;
 use crate::{GremlinError, GremlinResult};
-use base64::prelude::{BASE64_STANDARD, Engine};
-use bb8::{Pool, PooledConnection, RunError};
-use futures::future::{BoxFuture, FutureExt};
-use futures::{Stream, StreamExt};
+use bb8::{Pool, PooledConnection};
+use futures::Stream;
 use serde::Serialize;
-use serde_json::Value;
-use std::collections::{HashMap, VecDeque};
-use tokio::pin;
+use std::collections::HashMap;
 
 pub struct SessionedClient<'c, V: GremlinIO> {
     connection: PooledConnection<'c, ConnectionOptions<V>>,
@@ -97,11 +91,29 @@ where
     pub async fn execute_raw<T>(
         &self,
         script: T,
-        params: &[(&str, &dyn ToGValue)],
+        params: &[(&str, &dyn Into<GValue>)],
     ) -> GremlinResult<impl Stream<Item = GremlinResult<GValue>>>
     where
         T: Into<String>,
     {
+        let args2 = Args::new()
+            .arg(GREMLIN, script)
+            .arg(LANGUAGE, GREMLIN_GROOVY)
+            .arg(
+                ALIASES,
+                 self.alias
+                     .iter()
+                     .map(|string| (GKey::String(G.into()), GValue::String(string.clone())))
+                     .collect::<HashMap<_, _>>(),
+            )
+            .arg(
+                BINDINGS,
+                params
+                    .iter()
+                    .map(|(k, v)| ((*k).into(), v.to_gvalue()))
+                    .collect::<HashMap<GKey, _>>(),
+            )
+        ;
         let args = {
             let mut tmp = HashMap::new();
 
@@ -137,15 +149,16 @@ where
             "traversal" // TODO ?
         };
 
-        let request = Request {
-            id: uuid::Uuid::new_v4(),
-            op: EVAL.into(),
-            proc: processor,
-            args,
-        };
+        let request = Request::builder()
+            .op(EVAL)
+            .proc(processor)
+            .args(args2)
+            .build()
+            .unwrap();
 
         let conn = self.pool.get().await?;
         let stream = conn.send::<_, V>(request).await?;
+
         Ok(stream)
     }
 
@@ -184,6 +197,6 @@ where
     // }
 }
 
-fn build_message<T: Serialize>(msg: Message<T>) -> GremlinResult<String> {
-    serde_json::to_string(&msg).map_err(GremlinError::from)
-}
+// fn build_message<T: Serialize>(msg: Message<T>) -> GremlinResult<String> {
+//     serde_json::to_string(&msg).map_err(GremlinError::from)
+// }

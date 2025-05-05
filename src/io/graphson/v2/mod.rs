@@ -1,6 +1,5 @@
-use crate::io::{Deserializer, GremlinIO, IOHelpers, Serializer, V3};
-use crate::message::{Message, Request, Response, Status};
-use crate::{GValue, GremlinError, GremlinResult};
+use crate::io::{Deserializer, GremlinIO, IOHelpers, Request, Response, Serializer, Status, V3};
+use crate::{GValue, GremlinResult};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use uuid::Uuid;

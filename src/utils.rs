@@ -1,8 +1,9 @@
-use crate::prelude::{BorrowFromGValue, GremlinError, List, Map};
+use crate::GremlinError;
+use crate::prelude::{List, Map};
 
 pub fn unwrap_map<'a, T>(map: &'a Map, key: &str, index: usize) -> Result<&'a T, GremlinError>
-where
-    T: BorrowFromGValue,
+// where
+//     T: BorrowFrom<GValue>,
 {
     match key {
         "id" | "label" => map[key].get::<T>(),

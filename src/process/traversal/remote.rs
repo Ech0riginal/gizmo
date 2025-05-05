@@ -1,4 +1,3 @@
-use crate::conversion::FromGValue;
 use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
 
 pub fn traversal() -> RemoteTraversalSource {
@@ -35,7 +34,7 @@ impl MockTerminator {
     }
 }
 
-impl<T: FromGValue> Terminator<T> for MockTerminator {
+impl<T: From<GValue>> Terminator<T> for MockTerminator {
     type List = ();
     type Next = ();
     type HasNext = ();
@@ -69,7 +68,7 @@ impl<T: FromGValue> Terminator<T> for MockTerminator {
         unimplemented!()
     }
 }
-pub trait Terminator<T: FromGValue>: Clone {
+pub trait Terminator<T: From<GValue>>: Clone {
     type List;
     type Next;
     type HasNext;
@@ -92,7 +91,7 @@ pub trait Terminator<T: FromGValue>: Clone {
         E: Terminator<T>;
 }
 
-use crate::GremlinResult;
+use crate::{GValue, GremlinResult};
 use crate::client::GremlinClient;
 use crate::io::GremlinIO;
 use crate::process::traversal::RemoteTraversalStream;
@@ -110,7 +109,7 @@ impl<V: GremlinIO> AsyncTerminator<V> {
     }
 }
 
-impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTerminator<V> {
+impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerminator<V> {
     type List = BoxFuture<'static, GremlinResult<Vec<T>>>;
     type Next = BoxFuture<'static, GremlinResult<Option<T>>>;
     type HasNext = BoxFuture<'static, GremlinResult<bool>>;

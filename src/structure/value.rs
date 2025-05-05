@@ -1,5 +1,5 @@
-use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::prelude::{GID, GremlinError, GremlinResult, ToGValue};
+
+use crate::prelude::{GID, GremlinError, GremlinResult};
 use crate::process::traversal::{Bytecode, Order, Scope, TraversalBuilder};
 use crate::structure::traverser::Traverser;
 use crate::structure::*;
@@ -64,14 +64,14 @@ pub enum GValue {
 impl GValue {
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: From<GValue>,
     {
         T::from_gvalue(self)
     }
 
     pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
     where
-        T: BorrowFromGValue,
+        T: BorrowFrom<GValue>,
     {
         T::from_gvalue(self)
     }
@@ -725,7 +725,7 @@ macro_rules! impl_try_from_set {
     ($t:ty) => {
         //Ideally this would be handled in conversion.rs but because the GValue::Set holds a Vec
         //we handle converting it here
-        impl FromGValue for HashSet<$t> {
+        impl From<GValue> for HashSet<$t> {
             fn from_gvalue(value: GValue) -> GremlinResult<Self> {
                 match value {
                     GValue::List(s) => for_list_to_set(&s),

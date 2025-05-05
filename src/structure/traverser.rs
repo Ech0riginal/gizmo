@@ -1,4 +1,4 @@
-use crate::conversion::FromGValue;
+
 use crate::prelude::{GValue, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -17,7 +17,7 @@ impl Traverser {
 
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: From<GValue>,
     {
         T::from_gvalue(*self.value)
     }

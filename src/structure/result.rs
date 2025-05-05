@@ -1,11 +1,10 @@
 use crate::{GremlinError, GremlinResult};
 
-use crate::message::Response;
 use crate::structure::GValue;
 use futures::Stream;
 
 use crate::client::GremlinClient;
-use crate::io::GremlinIO;
+use crate::io::{GremlinIO, Response};
 use core::task::Context;
 use core::task::Poll;
 use futures::channel::mpsc::Receiver;

@@ -1,7 +1,7 @@
 use crate::client::GremlinClient;
 use crate::io::GremlinIO;
 use crate::prelude::{
-    Edge, FromGValue, GIDs, GValue, Labels, ToGValue, Vertex,
+    Edge, GIDs, GValue, Labels, Vertex,
     traversal::remote::{AsyncTerminator, MockTerminator, Terminator},
     traversal::step::*,
     traversal::{Bytecode, GraphTraversal, TraversalBuilder},
@@ -92,7 +92,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
     pub fn with_side_effect<T>(&self, step: (&'static str, T)) -> GraphTraversal<GValue, GValue, A>
     where
-        T: Into<GValue> + FromGValue,
+        T: Into<GValue> + From<GValue>,
         A: Terminator<T>,
     {
         let mut code = Bytecode::new();
@@ -106,7 +106,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
     pub fn inject<T>(&self, injection: T) -> GraphTraversal<GValue, GValue, A>
     where
-        T: Into<GValue> + FromGValue,
+        T: Into<GValue> + From<GValue>,
         A: Terminator<T>,
     {
         let mut code = Bytecode::new();
