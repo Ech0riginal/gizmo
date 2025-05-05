@@ -36,9 +36,7 @@ serde_json          = { version = "1.0.138", features = ["arbitrary_precision"] 
 serde_derive        = { version = "1.0.217" }
 thiserror           = { version = "2.0.12" }
 tungstenite         = { version = "0.26.2", features = ["rustls", "rustls-tls-native-roots"] }
-tokio               = { version = "1.43.0", features = ["full"] }
-tokio-rustls        = { version = "0.26.1" }
-tokio-stream        = { version = "0.1.17" }
+tokio               = { git = "https://github.com/ech0riginal/tokio", features = ["stream", "tracing", "rustls"] }
 uuid                = { version = "1.12.1", features = ["serde", "v4"] }
 webpki-roots        = { version = "0.26.8" }
 tracing             = { version = "0.1.41", features = ["default"] }
