@@ -1,5 +1,9 @@
+use crate::io::{Deserializer, GremlinIO, IOHelpers, Serializer, V3};
+use crate::message::{Message, Request, Response, Status};
+use crate::{GValue, GremlinError, GremlinResult};
 use serde::{Deserialize, Serialize};
-use crate::Gremlin;
+use serde_json::{Value, json};
+use uuid::Uuid;
 
 pub(crate) mod de;
 pub(crate) mod ser;
@@ -10,35 +14,63 @@ mod tests;
 
 crate::io::macros::io!(V2);
 
-impl Gremlin for V2 {
-    fn new() -> Self { V2 }
-
+impl GremlinIO for V2 {
     fn mime() -> &'static str {
         "application/vnd.gremlin-v2.0+json"
     }
-
-    fn deserialize(value: &serde_json::Value) -> crate::GremlinResult<crate::GValue> {
-        de::deserialize::<Self>(value)
-    }
-
-    fn serialize(value: &crate::GValue) -> crate::GremlinResult<serde_json::Value> {
-        ser::serialize::<Self>(value)
-    }
-
-    // fn message<T>(op: String, processor: String, args: T, id: Option<uuid::Uuid>) -> crate::message::Message<T> {
-    //     let request_id = id.unwrap_or_else(uuid::Uuid::new_v4);
-    // 
-    //     crate::message::Message::V2 {
-    //         request_id: crate::message::RequestIdV2 {
-    //             id_type: types::UUID.to_string(),
-    //             value: request_id,
-    //         },
-    //         op,
-    //         processor,
-    //         args,
-    //     }
-    // }
 }
 
-fn des<T: Serialize>(value: T) -> crate::GremlinResult<crate::GValue> {
+impl IOHelpers for V2 {}
+
+impl Deserializer<Response> for V2 {
+    fn deserialize(value: &Value) -> GremlinResult<Response> {
+        let id = {
+            let _id = Self::get(value, "request_id")?.clone();
+            serde_json::from_value::<Uuid>(_id)?
+        };
+        let result = {
+            let data = Self::get(Self::get(value, "result")?, "data")?;
+            <Self as Deserializer<GValue>>::deserialize(data)?
+        };
+        let status = {
+            let status = Self::get(value, "status")?;
+            <Self as Deserializer<Status>>::deserialize(status)?
+        };
+
+        Ok(Response { id, result, status })
+    }
+}
+
+impl Deserializer<GValue> for V2 {
+    fn deserialize(value: &Value) -> GremlinResult<GValue> {
+        de::deserialize::<Self>(value)
+    }
+}
+
+impl Deserializer<Status> for V2 {
+    fn deserialize(value: &Value) -> GremlinResult<Status> {
+        let code = Self::get(value, "code").map(|code| code.as_i64().unwrap() as i16)?;
+        let message = Self::get(value, "message")
+            .ok()
+            .map(|value| value.as_str().unwrap().to_string());
+
+        Ok(Status { code, message })
+    }
+}
+
+impl Serializer<GValue> for V2 {
+    fn serialize(value: &GValue) -> GremlinResult<Value> {
+        ser::serialize::<Self>(value)
+    }
+}
+
+impl Serializer<Request> for V2 {
+    fn serialize(value: &Request) -> GremlinResult<Value> {
+        Ok(json!({
+            "request_id": value.id,
+            "op": value.op,
+            "processor": value.proc,
+            "args": value.args,
+        }))
+    }
 }

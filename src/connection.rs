@@ -1,46 +1,44 @@
-use crate::{Gremlin, GremlinResult, GremlinError};
-use crate::prelude::{ConnectionOptions};
-use crate::message::{Message, Response};
+use crate::io::{Deserializer, GremlinIO, Serializer};
+use crate::message::{Request, Response};
+use crate::options::Credentials;
+use crate::prelude::ConnectionOptions;
 use crate::structure::GValue;
+use crate::{GremlinError, GremlinResult};
 use async_tungstenite::WebSocketStream;
-use async_tungstenite::tokio::{ConnectStream, connect_async_with_config, connect_async_with_tls_connector_and_config, TokioAdapter};
+use async_tungstenite::tokio::{
+    ConnectStream, TokioAdapter, connect_async_with_config,
+    connect_async_with_tls_connector_and_config,
+};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
-use bb8::{ManageConnection};
+use bb8::ManageConnection;
 use bytes::Bytes;
 use futures::stream::{SplitSink, SplitStream};
-use futures::{stream, SinkExt, StreamExt};
+use futures::{SinkExt, StreamExt, stream};
+use serde::Serialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::pin::Pin;
 use std::sync::Arc;
-use tokio::task::{self};
-use tokio::rustls::TlsConnector;
-use tokio::tracing;
-use tungstenite::{
-    Connector,
-    client::{IntoClientRequest, uri_mode},
-    stream::{Mode, NoDelay},
-};
 use std::task::Poll;
-use serde::Serialize;
-use serde_json::Value;
 use tokio::pin;
+use tokio::rustls::TlsConnector;
 use tokio::stream::Stream;
 use tokio::stream::wrappers::UnboundedReceiverStream;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::mpsc::error::TryRecvError;
 use tokio::sync::{RwLock, mpsc};
 use tokio::task::yield_now;
+use tokio::task::{self};
+use tokio::tracing;
+use tungstenite::{
+    Connector, Message,
+    client::{IntoClientRequest, uri_mode},
+    stream::{Mode, NoDelay},
+};
 use uuid::Uuid;
-use crate::options::Credentials;
 
-type WSStream = WebSocketStream<
-    stream::Stream<
-        TokioAdapter<TcpStream>,
-        TokioAdapter<tokio::rustls::client::TlsStream<TcpStream>>,
-    >,
->;
 pub struct Connection {
     outbound: mpsc::UnboundedSender<Message>,
     valid: Arc<RwLock<bool>>,
@@ -55,27 +53,17 @@ pub struct GremlinStream<V> {
     inner: UnboundedReceiverStream<GremlinResult<Response>>,
 }
 
-impl<V: Gremlin> Stream for GremlinStream<V> {
+impl<V: GremlinIO> Stream for GremlinStream<V> {
     type Item = GremlinResult<GValue>;
 
-    fn poll_next(self: Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> Poll<Option<Self::Item>> {
+    fn poll_next(
+        self: Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> Poll<Option<Self::Item>> {
         let this = self.project();
-        
+
         match this.inner.poll_next(cx) {
-            Poll::Ready(Some(Ok(response))) => {
-                match serde_json::to_value(&response.result.data) {
-                    Ok(value) => {
-                        let result = V::deserialize(&value);
-                        Poll::Ready(Some(result))
-                    }
-                    Err(e) => {
-                        Poll::Ready(Some(Err(GremlinError::from(e))))
-                    },
-                }
-            }
-            Poll::Ready(Some(Err(e))) => {
-                Poll::Ready(Some(Err(e)))
-            }
+            Poll::Ready(Some(result)) => Poll::Ready(Some(result.map(|response| response.result))),
             Poll::Ready(None) => Poll::Ready(None),
             Poll::Pending => Poll::Pending,
         }
@@ -86,7 +74,7 @@ impl<V: Gremlin> Stream for GremlinStream<V> {
 // impl<S> GremlinStream for S where S: Stream<Item = GremlinResult<Response>> {}
 
 struct Context {
-    callback: UnboundedSender<Message>,
+    outbound: UnboundedSender<Message>,
     requests: Arc<RwLock<HashMap<Uuid, UnboundedSender<GremlinResult<Response>>>>>,
     validity: Arc<RwLock<bool>>,
     credentials: Option<Credentials>,
@@ -94,7 +82,10 @@ struct Context {
 
 type WSStream = WebSocketStream<ConnectStream>;
 
-impl<SD: Gremlin> ManageConnection for ConnectionOptions<SD> {
+impl<V> ManageConnection for ConnectionOptions<V>
+where
+    V: GremlinIO,
+{
     type Connection = Connection;
     type Error = GremlinError;
 
@@ -168,13 +159,16 @@ impl<SD: Gremlin> ManageConnection for ConnectionOptions<SD> {
 }
 
 impl Connection {
-    fn new<V: Gremlin>(value: WSStream, options: &ConnectionOptions<V>) -> Self {
+    fn new<V>(value: WSStream, options: &ConnectionOptions<V>) -> Self
+    where
+        V: GremlinIO,
+    {
         let (sink, stream) = value.split();
         let (outbound, outbound_rx) = mpsc::unbounded_channel();
         let valid = Arc::new(RwLock::new(true));
         let buffer = Arc::new(RwLock::new(HashMap::with_capacity(32)));
         let ctx = Context {
-            callback: outbound.clone(),
+            outbound: outbound.clone(),
             requests: buffer.clone(),
             validity: valid.clone(),
             credentials: options.credentials.clone(),
@@ -191,7 +185,7 @@ impl Connection {
         }
     }
 
-    fn proxy<V: Gremlin>(
+    fn proxy<V: GremlinIO>(
         mut rx: mpsc::UnboundedReceiver<Message>,
         mut sink: SplitSink<WSStream, Message>,
         validity: Arc<RwLock<bool>>,
@@ -225,7 +219,10 @@ impl Connection {
         });
     }
 
-    fn recv<V: Gremlin>(ctx: Context, stream: SplitStream<WSStream>) {
+    fn recv<V: GremlinIO>(ctx: Context, stream: SplitStream<WSStream>)
+    where
+        V: GremlinIO,
+    {
         tokio::spawn(async move {
             pin!(stream);
 
@@ -249,15 +246,22 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(ctx, message))]
-    async fn message_handler<V: Gremlin>(ctx: &Context, message: Message) {
+    async fn message_handler<V>(ctx: &Context, message: Message)
+    where
+        V: GremlinIO,
+    {
         match message {
             Message::Text(string) => {
                 tracing::warn!("we got a string? {}", string);
             }
-            Message::Binary(blob) => match serde_json::from_slice::<Response>(&blob) {
-                Ok(response) => Self::response_handler::<V>(&ctx, response).await,
-                Err(e) => tracing::warn!("{}", e),
-            },
+            Message::Binary(blob) => {
+                // If the server isn't sending json, we want to panic
+                let json = serde_json::from_slice::<Value>(&blob).unwrap();
+                match V::deserialize(&json) {
+                    Ok(response) => Self::response_handler::<V>(&ctx, response).await,
+                    Err(e) => tracing::warn!("{}", e),
+                }
+            }
             Message::Ping(msg) => ctx.callback(Message::Pong(msg)).await,
             Message::Pong(msg) => ctx.callback(Message::Ping(msg)).await,
             Message::Close(_) => ctx.close().await,
@@ -265,12 +269,15 @@ impl Connection {
         }
     }
 
-    #[tracing::instrument(skip(ctx, response), fields(request = %response.request_id, status = %response.status.code))]
-    async fn response_handler<V: Gremlin>(ctx: &Context, response: Response) {
+    #[tracing::instrument(skip(ctx, response), fields(request = %response.id, status = %response.status.code))]
+    async fn response_handler<V>(ctx: &Context, response: Response)
+    where
+        V: GremlinIO,
+    {
         match response.status.code {
             200 | 206 => ctx.callback(response).await,
             407 => match &ctx.credentials {
-                Some(c) => Self::authenticate::<V>(ctx, c, &response.request_id).await,
+                Some(c) => Self::authenticate::<V>(ctx, c, &response.id).await,
                 None => ctx.callback(response).await,
             },
             n if n > 500 => ctx.remove(response).await,
@@ -279,7 +286,10 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(ctx, credentials, id))]
-    async fn authenticate<V: Gremlin>(ctx: &Context, credentials: &Credentials, id: &Uuid) {
+    async fn authenticate<V>(ctx: &Context, credentials: &Credentials, id: &Uuid)
+    where
+        V: GremlinIO,
+    {
         let mut args = HashMap::new();
 
         args.insert(
@@ -298,12 +308,12 @@ impl Connection {
                 return;
             }
         };
-        let message = V::message(
-            String::from("authentication"),
-            String::from("traversal"),
+        let message = Request {
+            id: id.clone(),
+            op: "authentication",
+            proc: "traversal",
             args,
-            Some(id.clone()),
-        );
+        };
         let blob = serde_json::to_vec(&message).unwrap();
         let bytes = Bytes::from(blob);
 
@@ -313,59 +323,67 @@ impl Connection {
     pub async fn send<I, V>(&self, payload: I) -> GremlinResult<GremlinStream<V>>
     where
         I: Payload,
-        V: Gremlin
+        V: GremlinIO,
     {
         payload.send(self).await
     }
 }
 
 trait Payload {
-    fn send<V: Gremlin>(
+    fn send<V: GremlinIO>(
         self,
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>>;
 }
 
 impl Payload for Message {
-    fn send<V: Gremlin>(
+    fn send<V: GremlinIO>(
         self,
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
         let id = Uuid::new_v4();
-        send(conn, id, self)
+        send::<V>(conn, id, self)
     }
 }
 
-impl<T: Serialize> Payload for crate::message::Message<T> {
-    fn send<V: Gremlin>(self, conn: &Connection) -> impl Future<Output=GremlinResult<GremlinStream<V>>> {
+impl Payload for Request {
+    fn send<V: GremlinIO>(
+        self,
+        conn: &Connection,
+    ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
         async move {
             let blob = serde_json::to_vec(&self)?;
-            blob.send(conn).await
+            send::<V>(conn, self.id, Message::Binary(blob.into())).await
         }
     }
 }
 
-impl Payload for Vec<u8> {
-    fn send<V: Gremlin>(
-        self,
-        conn: &Connection,
-    ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
-        let id = Uuid::new_v4();
-        send(conn, id, Message::binary(self))
-    }
-}
+// impl Payload for Vec<u8> {
+//     fn send<V: GremlinIO>(
+//         self,
+//         conn: &Connection,
+//     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
+//         let id = Uuid::new_v4();
+//         send(conn, id, Message::binary(self))
+//     }
+// }
 
-async fn send<V: Gremlin>(conn: &Connection, id: Uuid, msg: Message) -> Result<GremlinStream<V>, GremlinError>
-{
+async fn send<V: GremlinIO>(
+    conn: &Connection,
+    id: Uuid,
+    msg: Message,
+) -> GremlinResult<GremlinStream<V>> {
     let (tx, rx) = mpsc::unbounded_channel();
     let inner = UnboundedReceiverStream::new(rx);
 
     conn.buffer.write().await.insert(id, tx);
-    conn.outbound.send(Message::binary(msg))?;
+    conn.outbound.send(msg)?;
 
-    Ok(GremlinStream { inner, _v: Default::default() })
+    Ok(GremlinStream {
+        inner,
+        _v: Default::default(),
+    })
 }
-
 
 impl Context {
     async fn callback<I>(&self, message: I)
@@ -380,7 +398,7 @@ impl Context {
     }
 
     async fn remove(&self, response: Response) {
-        self.requests.write().await.remove(&response.request_id);
+        self.requests.write().await.remove(&response.id);
     }
 }
 
@@ -392,7 +410,7 @@ impl Callback for Response {
     fn callback(self, ctx: &Context) -> impl Future<Output = ()> {
         async move {
             let mut guard = ctx.requests.write().await;
-            let id = self.request_id.clone();
+            let id = self.id.clone();
             let item = guard.get_mut(&id);
 
             if let Some(callback) = item {
@@ -410,7 +428,7 @@ impl Callback for Response {
 impl Callback for Message {
     fn callback(self, ctx: &Context) -> impl Future<Output = ()> {
         async move {
-            if let Err(e) = ctx.callback.send(self) {
+            if let Err(e) = ctx.outbound.send(self) {
                 tracing::warn!("{}", e);
                 ctx.close().await;
             }

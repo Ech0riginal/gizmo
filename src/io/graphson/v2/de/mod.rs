@@ -1,15 +1,14 @@
-use crate::io::macros::*;
+use crate::io::graphson::de::validate;
 use crate::io::graphson::v2::types::*;
-use crate::io::{Error, Gremlin};
+use crate::io::macros::*;
+use crate::io::{Deserializer, Error, GremlinIO};
 use crate::structure::*;
+use crate::{GremlinError, GremlinResult};
 use chrono::{TimeZone, Utc};
 use serde_json::Value;
 use std::collections::HashMap;
-use serde::Deserializer;
-use crate::{GremlinError, GremlinResult};
-use crate::io::graphson::de::validate;
 
-pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
+pub fn deserialize<D: Deserializer<GValue>>(value: &Value) -> GremlinResult<GValue> {
     let _debug = format!("{}", value);
 
     match value {
@@ -20,8 +19,8 @@ pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
             match validate(&value) {
                 Ok(blob) => core_deserializer::<D>(blob.tag, blob.value),
                 Err(err) => match err {
-                    Error::Missing(_) => funky_deserializer::<D>(value)
-                }
+                    Error::Missing(_) => funky_deserializer::<D>(value),
+                },
             }
         }
         Value::Array(values) => {
@@ -36,7 +35,7 @@ pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
     }
 }
 
-pub fn core_deserializer<D: Gremlin>(
+pub fn core_deserializer<D: Deserializer<GValue>>(
     type_tag: &Value,
     value: &Value,
 ) -> GremlinResult<GValue> {
@@ -86,7 +85,7 @@ pub fn core_deserializer<D: Gremlin>(
     }
 }
 
-pub fn funky_deserializer<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
+pub fn funky_deserializer<D: Deserializer<GValue>>(value: &Value) -> GremlinResult<GValue> {
     if let Some(_) = value.get("starVertex") {
         star_graph::<D>(value)
     } else {
@@ -95,7 +94,7 @@ pub fn funky_deserializer<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
 }
 
 /// Deserialize a JSON value to a GID
-pub fn id<D: Gremlin>(val: &Value) -> GremlinResult<GID> {
+pub fn id<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GID> {
     match D::deserialize(val) {
         Ok(result) => match result {
             GValue::String(d) => Ok(GID::String(d)),
@@ -111,57 +110,57 @@ pub fn id<D: Gremlin>(val: &Value) -> GremlinResult<GID> {
 }
 
 /// Class deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_class_2)
-pub fn class<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn class<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let class = get_value!(val, Value::String)?;
     Ok(GValue::Class(class.into()))
 }
 
 /// Date deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_date_2)
-pub fn date<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn date<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
     let datetime = Utc.timestamp_millis_opt(val).unwrap();
     Ok(GValue::Date(datetime))
 }
 
 /// Timestamp deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_timestamp_2)
-pub fn timestamp<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn timestamp<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
     let datetime = Utc.timestamp_millis_opt(val).unwrap();
     Ok(GValue::Timestamp(datetime))
 }
 
 /// Integer deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_integer_2)
-pub fn g32<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn g32<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i32!(val);
     Ok(GValue::Int32(val))
 }
 
 /// Long deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_long_2)
-pub fn g64<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn g64<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
     Ok(GValue::Int64(val))
 }
 
 /// UUID deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_uuid_2)
-pub fn uuid<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn uuid<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = get_value!(val, Value::String)?;
     let uuid = uuid::Uuid::parse_str(&val)?;
     Ok(GValue::Uuid(uuid))
 }
 
 /// Float deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_float_2)
-pub fn float32<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn float32<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_float!(val);
     Ok(GValue::Float(val))
 }
 /// Double deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_double_2)
-pub fn float64<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn float64<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_double!(val);
     Ok(GValue::Double(val))
 }
 
 /// List deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_list)
-pub fn list<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn list<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = get_value!(val, Value::Array)?;
     let mut elements = Vec::with_capacity(val.len());
     for item in val {
@@ -173,7 +172,7 @@ pub fn list<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Set deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_set)
-pub fn set<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn set<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     match list::<D>(val)? {
         GValue::List(List(values)) => Ok(GValue::Set(values.into())),
         _ => panic!("Infallible"),
@@ -181,7 +180,7 @@ pub fn set<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Map deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
-pub fn map<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn map<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = get_value!(val, Value::Object)?;
     let mut map = HashMap::new();
     for (k, v) in val {
@@ -209,7 +208,7 @@ pub fn direction(val: &Value) -> GremlinResult<GValue> {
     }
 }
 
-fn tree<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+fn tree<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let array = get_value!(val, Value::Array)?;
     let branches = array
         .into_iter()
@@ -218,7 +217,7 @@ fn tree<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     Ok(GValue::Tree(Tree { branches }))
 }
 
-fn tree_branch<D: Gremlin>(val: &Value) -> GremlinResult<Branch> {
+fn tree_branch<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<Branch> {
     let obj = get_value!(val, Value::Object)?;
 
     let key = if let Some(key) = obj.get("key") {
@@ -240,7 +239,7 @@ fn tree_branch<D: Gremlin>(val: &Value) -> GremlinResult<Branch> {
 }
 
 /// Vertex deserializer [docs](https://tinkerpop.apache.org/docs/current/dev/io/#_stargraph)
-pub fn star_graph<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn star_graph<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let value = val
         .get("starVertex")
         .ok_or(GremlinError::Json("Malformed StarGraph".into()))?;
@@ -250,7 +249,7 @@ pub fn star_graph<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Vertex deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertex_2)
-pub fn vertex<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn vertex<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let label = val
         .get("label")
         .map(|f| get_value!(f, Value::String).map(Clone::clone))
@@ -262,7 +261,7 @@ pub fn vertex<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Edge deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_edge_2)
-pub fn edge<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn edge<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let label = val
         .get("label")
         .map(|f| get_value!(f, Value::String).map(Clone::clone))
@@ -297,7 +296,7 @@ pub fn edge<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Path deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_path_2)
-pub fn path<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn path<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let labels = D::deserialize(&val["labels"])?;
 
     let objects = D::deserialize(&val["objects"])?;
@@ -306,7 +305,7 @@ pub fn path<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Traversal Metrics deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_traversalmetrics)
-pub fn traversal_metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn traversal_metrics<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut metrics = D::deserialize(val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metrics, "dur", TRAVERSAL_METRICS)?.take::<f64>()?;
@@ -323,7 +322,7 @@ pub fn traversal_metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Metrics deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_metrics)
-pub fn metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn metrics<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut metric = D::deserialize(val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metric, "dur", METRICS)?.take::<f64>()?;
@@ -362,7 +361,7 @@ pub fn metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     .into())
 }
 
-pub fn explain<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn explain<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut explain = D::deserialize(val)?.take::<Map>()?;
 
     let original = remove_or_else(&mut explain, "original", TRAVERSAL_EXPLANATION)?
@@ -395,7 +394,7 @@ pub fn explain<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Vertex Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertexproperty_2)
-pub fn vertex_property<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn vertex_property<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut property = VertexProperty {
         id: id::<D>(&val["id"])?,
         value: Box::new(D::deserialize(&val["value"])?),
@@ -426,7 +425,7 @@ pub fn vertex_property<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_property_2)
-pub fn property<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn property<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let key = val
         .get("key")
         .map(|v| get_value!(v, Value::String).map(Clone::clone))
@@ -448,7 +447,7 @@ pub fn property<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
     Ok(GValue::Property(property))
 }
 
-pub fn tinker_graph<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn tinker_graph<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let vertex_values = get_value!(
         val.get("vertices").ok_or(GremlinError::Json(
             "TinkerGraph missing 'vertices' key".into()
@@ -479,13 +478,13 @@ pub fn tinker_graph<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Traverser deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_traverser_2)
-pub fn traverser<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub fn traverser<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let bulk = D::deserialize(&val["bulk"])?.take::<i64>()?;
     let v = D::deserialize(&val["value"])?;
     Ok(Traverser::new(bulk, v).into())
 }
 
-pub fn vertex_properties<D: Gremlin>(
+pub fn vertex_properties<D: Deserializer<GValue>>(
     properties: &Value,
 ) -> GremlinResult<HashMap<String, Vec<VertexProperty>>> {
     match properties {

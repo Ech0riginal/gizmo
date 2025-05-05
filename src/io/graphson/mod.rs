@@ -2,8 +2,8 @@ mod v2;
 mod v3;
 mod v3g;
 
-mod placeholder;
 mod de;
+mod placeholder;
 // #[cfg(test)]
 // pub(self) mod tests;
 
@@ -11,7 +11,7 @@ pub use v2::V2;
 pub use v3::V3;
 pub use v3g::V3g;
 
-use crate::prelude::{GValue, };
+use crate::prelude::GValue;
 
 /// Encompasses GraphSON v2, v3, and our custom types. Our custom types will always be the last in
 /// this list.

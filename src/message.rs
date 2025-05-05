@@ -1,7 +1,32 @@
-use serde::{Deserialize as SerdeDeserialize, Deserializer};
-use serde_derive::{Deserialize, Serialize};
-use serde_json::Value;
+use crate::GValue;
+use derive_builder::Builder;
+use serde::{Deserialize as SerdeDeserialize, Deserializer, Serialize};
+use serde_derive::Deserialize;
+use serde_json::{Error, Value};
 use uuid::Uuid;
+
+#[derive(Debug, Builder, Serialize)]
+#[builder(pattern = "mutable")]
+pub struct Request {
+    pub(crate) id: Uuid,
+    pub(crate) op: &'static str,
+    pub(crate) proc: &'static str,
+    #[builder(setter(custom))]
+    pub(crate) args: Value,
+}
+
+impl RequestBuilder {
+    fn args<T: Serialize>(mut self, value: &T) -> Self {
+        match serde_json::to_value(value) {
+            Ok(value) => {
+                self.args = Some(value);
+            }
+            Err(error) => panic!("Error serializing message arguments ({})", error),
+        }
+
+        self
+    }
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -39,71 +64,15 @@ pub enum Message<T> {
     },
 }
 
-impl<T> Message<T> {
-    #[allow(dead_code)]
-    pub fn id(&self) -> &Uuid {
-        match self {
-            Message::V1 { request_id, .. } => request_id,
-            Message::V2 { request_id, .. } => &request_id.value,
-            Message::V3 { request_id, .. } => request_id,
-        }
-    }
-}
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct Response {
-    pub request_id: Uuid,
-    pub result: ResponseResult,
-    pub status: ReponseStatus,
+    pub id: Uuid,
+    pub result: GValue,
+    pub status: Status,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ResponseResult {
-    pub data: Value,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ReponseStatus {
+#[derive(Debug)]
+pub struct Status {
     pub code: i16,
-    //Sometimes the message is omitted, default to empty string rather than panic
-    #[serde(default, deserialize_with = "map_null_to_default")]
-    pub message: String,
-}
-
-fn map_null_to_default<'de, D, T>(de: D) -> Result<T, D::Error>
-where
-    D: Deserializer<'de>,
-    T: Default + SerdeDeserialize<'de>,
-{
-    Option::<T>::deserialize(de).map(Option::unwrap_or_default)
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::message::ReponseStatus;
-
-    #[test]
-    fn handle_no_response_status_message() {
-        let parsed: ReponseStatus =
-            serde_json::from_str(r#"{"code": 123}"#).expect("Failed to parse test message");
-        assert_eq!(123, parsed.code);
-        assert_eq!("", parsed.message);
-    }
-
-    #[test]
-    fn handle_null_response_status_message() {
-        let parsed: ReponseStatus = serde_json::from_str(r#"{"code": 123, "message": null}"#)
-            .expect("Failed to parse test message");
-        assert_eq!(123, parsed.code);
-        assert_eq!("", parsed.message);
-    }
-
-    #[test]
-    fn handle_response_status_message() {
-        let parsed: ReponseStatus =
-            serde_json::from_str(r#"{"code": 123, "message": "Hello World"}"#)
-                .expect("Failed to parse test message");
-        assert_eq!(123, parsed.code);
-        assert_eq!("Hello World", parsed.message);
-    }
+    pub message: Option<String>,
 }

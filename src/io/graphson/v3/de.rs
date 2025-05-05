@@ -1,15 +1,15 @@
 //! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/)
 
-use crate::io::macros::*;
+use crate::io::Deserializer;
+pub(crate) use crate::io::graphson::v2::de::*;
 use crate::io::graphson::v3::types::*;
-use crate::io::Gremlin;
+use crate::io::macros::*;
 use crate::prelude::*;
+use crate::{GremlinError, GremlinResult};
 use serde_json::Value;
 use std::collections::HashMap;
-use crate::{GremlinError, GremlinResult};
-pub(crate) use crate::io::graphson::v2::de::*;
 
-pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
+pub fn deserialize<D: Deserializer<GValue>>(value: &Value) -> GremlinResult<GValue> {
     match value {
         Value::Bool(_) | Value::String(_) => V2::deserialize(value),
         _ => {
@@ -75,7 +75,7 @@ pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
 }
 
 // /// String deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_string_3)
-// pub fn string<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+// pub fn string<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
 //     let val = match val {
 //         Value::String(str) => str.to_string(),
 //         _ => panic!("Invalid JSON"),
@@ -84,9 +84,8 @@ pub fn deserialize<D: Gremlin>(value: &Value) -> GremlinResult<GValue> {
 //     Ok(GValue::String(val))
 // }
 
-
 /// List deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_list)
-pub(crate) fn list<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn list<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     if val.to_string().contains("[null]") {
         // TODO Speak to the sKG lads about this
         return Ok(GValue::List(List::new(vec![])));
@@ -103,7 +102,7 @@ pub(crate) fn list<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Map deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_map)
-pub(crate) fn map<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn map<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = get_value!(val, Value::Array)?;
     let mut map = HashMap::new();
     if !val.is_empty() {
@@ -122,7 +121,7 @@ pub(crate) fn map<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Bulkset deserializer [docs](https://tinkerpop.apache.org/docs/3.4.1/dev/io/#_bulkset)
-pub(crate) fn bulkset<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn bulkset<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     if val.to_string().contains("[null]") {
         // TODO Gremlin docs!
         return Ok(GValue::List(List::new(vec![])));
@@ -173,7 +172,7 @@ pub(crate) fn bulkset<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
 }
 
 /// Traversal Metrics deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_traversalmetrics)
-pub(crate) fn traversal_metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn traversal_metrics<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut metrics = D::deserialize(&val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metrics, "dur", TRAVERSAL_METRICS)?.take::<f64>()?;
@@ -190,7 +189,7 @@ pub(crate) fn traversal_metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue
 }
 
 /// Metrics deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_metrics)
-pub(crate) fn metrics<D: Gremlin>(val: &Value) -> GremlinResult<GValue> {
+pub(crate) fn metrics<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let mut metric = D::deserialize(&val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metric, "dur", METRICS)?.take::<f64>()?;

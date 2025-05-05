@@ -16,7 +16,8 @@ mod p;
 mod path;
 mod pop;
 mod property;
-// mod result;
+
+mod result;
 mod set;
 mod star;
 mod t;
@@ -46,7 +47,7 @@ pub use p::{IntoPredicate, P};
 pub use path::Path;
 pub use pop::Pop;
 pub use property::Property;
-// pub use result::GResultSet;
+pub use result::GResultSet;
 pub use set::Set;
 pub use star::StarGraph;
 pub use t::T;

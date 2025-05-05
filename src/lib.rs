@@ -1,6 +1,4 @@
 #![feature(never_type)]
-
-
 #![feature(trait_alias)]
 #![feature(type_changing_struct_update)]
 #![feature(try_trait_v2)]
@@ -10,24 +8,22 @@
 extern crate lazy_static;
 
 mod io;
-// mod message;
-// 
-// mod client;
-// 
-// mod connection;
-mod error;
+mod message;
+
+mod client;
+
+mod connection;
 mod conversion;
-// mod options;
+mod error;
+mod options;
 pub mod process;
 pub mod structure;
-// pub mod utils;
-
+pub mod utils;
 
 pub type GremlinResult<T> = Result<T, GremlinError>;
 // pub use client::GremlinClient;
 pub use error::GremlinError;
 pub use structure::GValue;
-pub use io::Gremlin;
 
 pub mod prelude {
     pub use super::*;
@@ -35,9 +31,9 @@ pub mod prelude {
     pub use tokio::stream::StreamExt;
 
     pub use crate::io::{V2, V3, V3g};
-    // pub use crate::options::*;
-    // pub use crate::{edge, vertex};
-    // 
+    pub use crate::options::*;
+    pub use crate::{edge, vertex};
+    //
     pub use crate::process::traversal;
     pub use crate::process::traversal::__;
     pub use crate::process::traversal::AsyncTerminator;
@@ -45,7 +41,7 @@ pub mod prelude {
     pub use crate::process::traversal::traversal;
 
     pub use crate::conversion::{BorrowFromGValue, FromGValue, ToGValue};
-    // pub(crate) use crate::message::Message;
     pub use crate::structure::*;
-}
 
+    pub(crate) use crate::message::Message;
+}

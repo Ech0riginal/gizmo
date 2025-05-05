@@ -1,4 +1,5 @@
-use crate::prelude::{GremlinError};
+use crate::io::GremlinIO;
+use crate::prelude::GremlinError;
 use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
@@ -8,7 +9,6 @@ use std::path::PathBuf;
 use std::time::Duration;
 use tokio::tracing;
 use webpki_roots::TLS_SERVER_ROOTS;
-use crate::Gremlin;
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
@@ -69,32 +69,31 @@ impl TlsOptions {
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
-pub struct ConnectionOptions<SD: Gremlin> {
+pub struct ConnectionOptions<V> {
     #[builder(setter(custom))]
-    #[builder(default = "self.default_version()")]
-    pub(crate) version: SD,
-    #[builder(default = "self.default_host()")]
+    pub(crate) version: V,
+    #[builder(default = "Self::default_host()")]
     pub(crate) host: String,
-    #[builder(default = "self.default_port()")]
+    #[builder(default = "Self::default_port()")]
     pub(crate) port: u16,
-    #[builder(default = "self.default_poolsize()")]
+    #[builder(default = "Self::default_poolsize()")]
     pub(crate) pool_size: u32,
-    #[builder(default = "self.default_idletimeout()")]
+    #[builder(default = "Self::default_idletimeout()")]
     pub(crate) idle_timeout: Duration,
-    #[builder(default = "self.default_timeout()")]
+    #[builder(default = "Self::default_timeout()")]
     pub(crate) connection_timeout: Duration,
-    #[builder(default = "self.default_credentials()")]
+    #[builder(default = "Self::default_credentials()")]
     pub(crate) credentials: Option<Credentials>,
-    #[builder(default = "self.default_ssl()")]
+    #[builder(default = "Self::default_ssl()")]
     pub(crate) ssl: bool,
-    #[builder(default = "self.default_tlsoptions()")]
+    #[builder(default = "Self::default_tlsoptions()")]
     pub(crate) tls_options: Option<TlsOptions>,
-    #[builder(default = "self.default_wsoptions()")]
+    #[builder(default = "Self::default_wsoptions()")]
     pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
-impl<V_: Gremlin> ConnectionOptionsBuilder<V_> {
-    fn version<V: Gremlin>(self, version: V) -> ConnectionOptionsBuilder<V> {
+impl<V_> ConnectionOptionsBuilder<V_> {
+    fn version<V: GremlinIO>(self, version: V) -> ConnectionOptionsBuilder<V> {
         ConnectionOptionsBuilder::<V> {
             version: Some(version),
             ..self
@@ -102,35 +101,32 @@ impl<V_: Gremlin> ConnectionOptionsBuilder<V_> {
     }
 }
 
-impl<SD: Gremlin> ConnectionOptionsBuilder<SD> {
-    fn default_version(&self) -> SD {
-        SD::new()
-    }
-    fn default_host(&self) -> String {
+impl<V> ConnectionOptionsBuilder<V> {
+    fn default_host() -> String {
         "127.0.0.1".into()
     }
-    fn default_port(&self) -> u16 {
+    fn default_port() -> u16 {
         8182
     }
-    fn default_poolsize(&self) -> u32 {
+    fn default_poolsize() -> u32 {
         8
     }
-    fn default_idletimeout(&self) -> Duration {
+    fn default_idletimeout() -> Duration {
         Duration::from_secs(60)
     }
-    fn default_timeout(&self) -> Duration {
+    fn default_timeout() -> Duration {
         Duration::from_secs(30)
     }
-    fn default_credentials(&self) -> Option<Credentials> {
+    fn default_credentials() -> Option<Credentials> {
         None
     }
-    fn default_ssl(&self) -> bool {
+    fn default_ssl() -> bool {
         false
     }
-    fn default_tlsoptions(&self) -> Option<TlsOptions> {
+    fn default_tlsoptions() -> Option<TlsOptions> {
         None
     }
-    fn default_wsoptions(&self) -> Option<WebSocketOptions> {
+    fn default_wsoptions() -> Option<WebSocketOptions> {
         None
     }
 }
@@ -207,7 +203,7 @@ impl ConnectionOptions<()> {
     }
 }
 
-impl<SD: Gremlin> ConnectionOptions<SD> {
+impl<V: GremlinIO> ConnectionOptions<V> {
     pub fn websocket_url(&self) -> String {
         let protocol = if self.ssl { "wss" } else { "ws" };
         format!("{}://{}:{}/gremlin", protocol, self.host, self.port)

@@ -1,26 +1,26 @@
 use crate::connection::Connection;
-use crate::prelude::{
-    ConnectionOptions, GResultSet, GValue, Message, ToGValue,
-    traversal::Bytecode,
-};
+use crate::io::{Deserializer, GremlinIO, Serializer};
+use crate::message::{Request, Response};
+use crate::prelude::{ConnectionOptions, GValue, Message, ToGValue, traversal::Bytecode};
 use crate::structure::GKey;
+use crate::{GremlinError, GremlinResult};
 use base64::prelude::{BASE64_STANDARD, Engine};
 use bb8::{Pool, PooledConnection, RunError};
-use futures::{Stream, StreamExt};
 use futures::future::{BoxFuture, FutureExt};
+use futures::{Stream, StreamExt};
 use serde::Serialize;
+use serde_json::Value;
 use std::collections::{HashMap, VecDeque};
 use tokio::pin;
-use crate::{Gremlin, GremlinError, GremlinResult};
 
-pub struct SessionedClient<'c, SD: Gremlin> {
-    connection: PooledConnection<'c, ConnectionOptions<SD>>,
+pub struct SessionedClient<'c, V: GremlinIO> {
+    connection: PooledConnection<'c, ConnectionOptions<V>>,
     session: Option<String>,
     alias: Option<String>,
 }
 
-// impl<'c, SD: Gremlin> SessionedClient<'c, SD> {
-//     pub async fn close_session(mut self) -> GremlinResult<GResultSet<SD>> {
+// impl<'c, V: GremlinIO> SessionedClient<'c, SD> {
+//     pub async fn close_session(mut self) -> GremlinResult<GResultSet<V>> {
 //         if let Some(session_name) = self.session.take() {
 //             let mut args = HashMap::new();
 //             args.insert(String::from("session"), GValue::from(session_name.clone()));
@@ -38,11 +38,11 @@ pub struct SessionedClient<'c, SD: Gremlin> {
 // }
 
 #[derive(Clone)]
-pub struct GremlinClient<SD: Gremlin> {
-    pool: bb8::Pool<ConnectionOptions<SD>>,
+pub struct GremlinClient<V: GremlinIO> {
+    pool: bb8::Pool<ConnectionOptions<V>>,
     session: Option<String>,
     alias: Option<String>,
-    // pub(crate) options: ConnectionOptions<SD>,
+    // pub(crate) options: ConnectionOptions<V>,
 }
 
 const G: &'static str = "g";
@@ -54,8 +54,11 @@ const BINDINGS: &'static str = "bindings";
 const SESSION: &'static str = "session";
 const EVAL: &'static str = "eval";
 
-impl<SD: Gremlin> GremlinClient<SD> {
-    pub async fn connect(options: ConnectionOptions<SD>) -> GremlinResult<GremlinClient<SD>> {
+impl<V> GremlinClient<V>
+where
+    V: GremlinIO,
+{
+    pub async fn connect(options: ConnectionOptions<V>) -> GremlinResult<GremlinClient<V>> {
         let pool = Pool::builder()
             .min_idle(3)
             .max_size(options.pool_size)
@@ -71,11 +74,8 @@ impl<SD: Gremlin> GremlinClient<SD> {
         })
     }
 
-    pub async fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient<SD>> {
-        let connection = self
-            .pool
-            .get()
-            .await?;
+    pub async fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient<V>> {
+        let connection = self.pool.get().await?;
 
         Ok(SessionedClient {
             connection,
@@ -85,7 +85,7 @@ impl<SD: Gremlin> GremlinClient<SD> {
     }
 
     /// Return a cloned client with the provided alias
-    pub fn alias<T>(&mut self, alias: T) -> GremlinClient<SD>
+    pub fn alias<T>(&mut self, alias: T) -> GremlinClient<V>
     where
         T: Into<String>,
     {
@@ -94,7 +94,7 @@ impl<SD: Gremlin> GremlinClient<SD> {
         cloned
     }
 
-    pub async fn execute<T>(
+    pub async fn execute_raw<T>(
         &self,
         script: T,
         params: &[(&str, &dyn ToGValue)],
@@ -102,7 +102,6 @@ impl<SD: Gremlin> GremlinClient<SD> {
     where
         T: Into<String>,
     {
-        todo!();
         let args = {
             let mut tmp = HashMap::new();
 
@@ -130,23 +129,27 @@ impl<SD: Gremlin> GremlinClient<SD> {
                 tmp.insert(SESSION, GValue::from(session_name.clone()));
             }
 
-            todo!()
-            // SD::serialize(&GValue::from(tmp))
+            V::serialize(&GValue::from(tmp))
         }?;
         let processor = if self.session.is_some() {
-            SESSION.into()
+            SESSION
         } else {
-            String::default()
+            "traversal" // TODO ?
         };
-        
-        todo!()
-        // let message = SD::message(EVAL.into(), processor, args, None);
-        // let conn = self.pool.get().await?;
-        // let stream = conn.send::<_, SD>(message).await?;
-        // Ok(stream)
+
+        let request = Request {
+            id: uuid::Uuid::new_v4(),
+            op: EVAL.into(),
+            proc: processor,
+            args,
+        };
+
+        let conn = self.pool.get().await?;
+        let stream = conn.send::<_, V>(request).await?;
+        Ok(stream)
     }
 
-    // pub async fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet<SD>> {
+    // pub async fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet<V>> {
     //     tracing::trace!("{:?}", bytecode);
     //
     //     let mut args = HashMap::new();

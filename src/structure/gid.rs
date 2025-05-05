@@ -1,5 +1,5 @@
-use crate::{GremlinResult, GremlinError};
-use crate::prelude::{GKey};
+use crate::prelude::GKey;
+use crate::{GremlinError, GremlinResult};
 use std::convert::TryFrom;
 use uuid::Uuid;
 

@@ -1,5 +1,5 @@
-pub(self) use crate::io::macros::*;
 pub(self) use crate::io::graphson::v2::types::*;
+pub(self) use crate::io::macros::*;
 pub(self) use std::collections::HashMap;
 
 mod core {
@@ -86,7 +86,8 @@ mod core {
                     "name".into(),
                     GValue::List(vec![String::from("marko").into()].into()),
                 ),
-            ].into())),
+            ]
+            .into())),
         }
     );
     test!(

@@ -1,5 +1,5 @@
-use bb8::RunError;
 use crate::structure::GValue;
+use bb8::RunError;
 
 use thiserror::Error;
 
@@ -60,7 +60,7 @@ impl From<bb8::RunError<Self>> for GremlinError {
     fn from(value: RunError<Self>) -> Self {
         match value {
             RunError::User(e) => e,
-            RunError::TimedOut => Self::ConnectionTimeout
+            RunError::TimedOut => Self::ConnectionTimeout,
         }
     }
 }
