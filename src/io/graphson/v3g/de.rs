@@ -1,5 +1,4 @@
-use crate::prelude::*;
-use crate::{GremlinError, GremlinResult};
+use crate::{GValue, GremlinError, GremlinResult};
 use geo_types::{Coord, Geometry, LineString, Point, Polygon};
 use serde_json::{Value, from_value};
 

@@ -1,7 +1,7 @@
+use crate::conversion::ToGValue;
 pub use crate::io::graphson::v2::ser::*;
 use crate::io::{Serializer, get_value};
-use crate::prelude::{GValue};
-use crate::{GremlinError, GremlinResult};
+use crate::{GValue, GremlinError, GremlinResult};
 use serde_json::{Map, Value, json};
 
 pub fn serialize<S: Serializer<GValue>>(value: &GValue) -> GremlinResult<Value> {

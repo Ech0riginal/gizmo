@@ -16,7 +16,7 @@ use crate::{GValue, GremlinError, GremlinResult};
 
 pub use error::Error;
 pub use graphson::{V2, V3, V3g};
-pub use request::{Request, Args};
+pub use request::{Args, Request};
 pub use response::{Response, Status};
 
 #[allow(private_bounds)]

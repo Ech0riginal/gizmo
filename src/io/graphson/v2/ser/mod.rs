@@ -1,12 +1,9 @@
-use crate::GremlinResult;
+use crate::conversion::ToGValue;
+use crate::io::Serializer;
 use crate::io::graphson::types::v2::*;
 use crate::io::macros::*;
-use crate::io::Serializer;
-use crate::prelude::{
-    Cardinality, Direction, GValue, Merge, T,
-    traversal::{Order, Scope},
-};
-use crate::structure::Branch;
+use crate::structure::*;
+use crate::{GValue, GremlinResult};
 use serde_json::{Value, json};
 use std::collections::HashMap;
 
@@ -14,8 +11,8 @@ pub fn serialize<S: Serializer<GValue>>(value: &GValue) -> GremlinResult<Value> 
     match value {
         // Core
         GValue::Class(_) => class(value),
-        GValue::Int32(_) => int32(value),
-        GValue::Int64(_) => int64(value),
+        GValue::Integer(_) => int32(value),
+        GValue::Long(_) => int64(value),
         GValue::Float(_) => float(value),
         GValue::Double(_) => double(value),
         GValue::String(_) => string(value),
@@ -84,12 +81,12 @@ pub fn class(value: &GValue) -> GremlinResult<Value> {
     let class = get_value!(value, GValue::Class)?;
     Ok(json!({
         "@type" : CLASS,
-        "@value" : class,
+        "@value" : **class,
     }))
 }
 
 pub fn int32(value: &GValue) -> GremlinResult<Value> {
-    let int32 = get_value!(value, GValue::Int32)?;
+    let int32 = get_value!(value, GValue::Integer)?;
     Ok(json!({
         "@type" : INT,
         "@value" : int32,
@@ -97,7 +94,7 @@ pub fn int32(value: &GValue) -> GremlinResult<Value> {
 }
 
 pub fn int64(value: &GValue) -> GremlinResult<Value> {
-    let int64 = get_value!(value, GValue::Int64)?;
+    let int64 = get_value!(value, GValue::Long)?;
     Ok(json!({
         "@type" : LONG,
         "@value" : int64,
@@ -132,11 +129,10 @@ pub fn date(value: &GValue) -> GremlinResult<Value> {
 }
 
 pub fn timestamp(value: &GValue) -> GremlinResult<Value> {
-    let date = get_value!(value, GValue::Timestamp)?;
-    let millis = date.timestamp_millis();
+    let ms_since_epoch = get_value!(value, GValue::Timestamp)?.0;
     Ok(json!({
         "@type" : TIMESTAMP,
-        "@value" : millis
+        "@value" : ms_since_epoch
     }))
 }
 

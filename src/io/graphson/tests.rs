@@ -6,7 +6,7 @@ pub struct Test {
 macro_rules! test_prelude {
     () => {
         use crate::io::graphson::tests::{Test, test};
-        use crate::prelude::*;
+        use crate::structure::*;
         use chrono::TimeZone;
         use serde_json::json;
     };
@@ -23,7 +23,7 @@ macro_rules! test {
 
             mod deserialize {
                 pub(self) use super::*;
-                use crate::prelude::GraphSONDeserializer;
+                use crate::structure::*;
 
                 #[test]
                 fn ok() {
@@ -50,7 +50,7 @@ macro_rules! test {
 
             mod serialize {
                 pub(self) use super::*;
-                use crate::prelude::GraphSONSerializer;
+                use crate::structure::*;
 
                 #[test]
                 fn ok() {
@@ -83,7 +83,7 @@ pub(crate) use {test, test_prelude};
 /*
 
 use super::*;
-use crate::prelude::{edge, vertex};
+use crate::structure::*;
 use serde_json::json;
 
 use crate::io::serde::tests::cases::TestCase;
@@ -94,7 +94,7 @@ use crate::structure::{
 use std::collections::HashMap;
 
 mod cases {
-    use crate::prelude::{GValue, GraphSON, GID};
+    use crate::structure::*;
     use crate::structure::{Edge, Property, Vertex, VertexProperty};
     use chrono::{TimeZone, Utc};
     use serde_json::{json, Value};

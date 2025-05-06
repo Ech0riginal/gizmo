@@ -11,8 +11,6 @@ pub use v2::V2;
 pub use v3::V3;
 pub use v3g::V3g;
 
-use crate::prelude::GValue;
-
 /// Encompasses GraphSON v2, v3, and our custom types. Our custom types will always be the last in
 /// this list.
 #[allow(unused)]

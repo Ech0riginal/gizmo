@@ -1,13 +1,9 @@
-use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer};
-use crate::options::Credentials;
-use crate::prelude::ConnectionOptions;
+use crate::io::{Args, Deserializer, GremlinIO, Request, Response, Serializer};
+use crate::options::{ConnectionOptions, Credentials};
 use crate::structure::GValue;
+use crate::structure::*;
+use crate::ws::WSStream;
 use crate::{GremlinError, GremlinResult};
-use async_tungstenite::WebSocketStream;
-use async_tungstenite::tokio::{
-    ConnectStream, TokioAdapter, connect_async_with_config,
-    connect_async_with_tls_connector_and_config,
-};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bb8::ManageConnection;
@@ -21,6 +17,7 @@ use std::marker::PhantomData;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::Poll;
+use tokio::net::TcpStream;
 use tokio::pin;
 use tokio::rustls::TlsConnector;
 use tokio::stream::Stream;
@@ -31,8 +28,9 @@ use tokio::sync::{RwLock, mpsc};
 use tokio::task::yield_now;
 use tokio::task::{self};
 use tokio::tracing;
+use tokio_tungstenite::{Connector, MaybeTlsStream, WebSocketStream, connect_async_with_config};
 use tungstenite::{
-    Connector, Message,
+    Message,
     client::{IntoClientRequest, uri_mode},
     stream::{Mode, NoDelay},
 };
@@ -79,8 +77,6 @@ struct Context {
     credentials: Option<Credentials>,
 }
 
-type WSStream = WebSocketStream<ConnectStream>;
-
 impl<V> ManageConnection for ConnectionOptions<V>
 where
     V: GremlinIO,
@@ -120,19 +116,18 @@ where
 
             let websocket_config = self.websocket_options.clone().map(Into::into);
 
-            let (client, _) = match connector {
-                Connector::Plain => connect_async_with_config(url, websocket_config).await,
-                Connector::Rustls(config) => {
-                    let connector = TlsConnector::from(config);
-                    connect_async_with_tls_connector_and_config(
+            let (client, _) = match &connector {
+                Connector::Plain => connect_async_with_config(url, websocket_config, false).await,
+                Connector::Rustls(_) => {
+                    tokio_tungstenite::connect_async_tls_with_config(
                         url,
-                        Some(connector),
                         websocket_config,
+                        false,
+                        Some(connector),
                     )
                     .await
                 }
-
-                _ => panic!(),
+                _ => panic!("NativeTls isn't supported :D"),
             }?;
 
             Ok(Connection::new(client, &self))
@@ -289,34 +284,27 @@ impl Connection {
     where
         V: GremlinIO,
     {
-        let mut args = HashMap::new();
+        let request = Request::builder()
+            .id(id.clone())
+            .op("authentication")
+            .proc("traversal")
+            .args(Args::new().arg(
+                "sasl",
+                GValue::String(BASE64_STANDARD.encode(&format!(
+                    "\0{}\0{}",
+                    credentials.username, credentials.password
+                ))),
+            ))
+            .build()
+            .unwrap();
 
-        args.insert(
-            String::from("sasl"),
-            GValue::String(BASE64_STANDARD.encode(&format!(
-                "\0{}\0{}",
-                credentials.username, credentials.password
-            ))),
-        );
-
-        let args = match V::serialize(&GValue::from(args)) {
-            Ok(value) => value,
-            Err(e) => {
-                tracing::error!("{}", e);
-                *ctx.validity.write().await = false;
-                return;
+        match V::serialize(&request) {
+            Ok(blob) => {
+                let bytes = Bytes::from(blob.to_string().into_bytes());
+                ctx.callback(Message::Binary(bytes)).await;
             }
-        };
-        let message = Request {
-            id: id.clone(),
-            op: "authentication",
-            proc: "traversal",
-            args,
-        };
-        let blob = serde_json::to_vec(&message).unwrap();
-        let bytes = Bytes::from(blob);
-
-        ctx.callback(Message::Binary(bytes)).await;
+            Err(error) => tracing::warn!("Error serializing request ({})", error),
+        }
     }
 
     pub async fn send<I, V>(&self, payload: I) -> GremlinResult<GremlinStream<V>>
@@ -351,8 +339,9 @@ impl Payload for Request {
         conn: &Connection,
     ) -> impl Future<Output = GremlinResult<GremlinStream<V>>> {
         async move {
-            let blob = serde_json::to_vec(&self)?;
-            send::<V>(conn, self.id, Message::Binary(blob.into())).await
+            let blob = V::serialize(&self)?.to_string().into_bytes();
+            let bytes = Bytes::from(blob);
+            send::<V>(conn, self.id, Message::Binary(bytes)).await
         }
     }
 }

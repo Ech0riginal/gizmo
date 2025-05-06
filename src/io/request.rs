@@ -1,13 +1,12 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use std::collections::HashMap;
-use derive_builder::Builder;
-use serde::{Serialize, Serializer};
-use uuid::Uuid;
 use crate::GValue;
+use crate::structure::GKey;
+use derive_builder::Builder;
+use std::collections::HashMap;
+use uuid::Uuid;
 
-#[derive(Debug, Builder, Serialize)]
-// #[builder(pattern = "mutable")]
+#[derive(Clone, Debug, Builder)]
 pub struct Request {
     #[builder(default = "uuid::Uuid::new_v4()")]
     pub(crate) id: Uuid,
@@ -21,7 +20,7 @@ impl Request {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Args(HashMap<&'static str, GValue>);
 
 impl Args {
@@ -30,97 +29,53 @@ impl Args {
     }
     pub fn arg<V>(mut self, key: &'static str, value: V) -> Self
     where
-        V: Argd
+        Self: Insert<V>,
     {
-        V::Handler::insert(&mut self.0, key, value);
+        Self::insert(&mut self.0, key, value);
         self
     }
 }
 
-trait Argd: Sized {
-    type Handler: Insert<Self>;
-}
-
-trait Insert<I> {
-    fn insert(
-        map: &mut HashMap<&'static str, GValue>,
-        key: &'static str,
-        item: I,
-    );
-}
-
-struct ArgHandler;
-struct IntoHandler;
-struct OptionHandler;
-
-// impl Argd for GValue {
-//     type Handler = ArgHandler;
-// }
-impl<I: Into<GValue>> Argd for I {
-    type Handler = IntoHandler;
-}
-
-impl<I: Into<GValue>> Argd for Option<I> {
-    type Handler = OptionHandler;
-}
-
-
-impl Insert<GValue> for ArgHandler
-{
-    fn insert(
-        map: &mut HashMap<&'static str, GValue>,
-        key: &'static str,
-        item: GValue,
-    ) {
-        map.insert(key, item);
+impl Insert<GValue> for Args {
+    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: GValue) {
+        map.insert(key, value);
     }
 }
 
-impl<I> Insert<I> for IntoHandler
-where I:
-    Into<GValue>
+impl<I> Insert<Option<I>> for Args
+where
+    Args: Insert<I>,
 {
-    fn insert(
-        map: &mut HashMap<&'static str, GValue>,
-        key: &'static str,
-        item: I,
-    ) {
-        map.insert(key, item.into());
-    }
-}
-
-impl<I> Insert<Option<I>> for OptionHandler
-where I:
-    Into<GValue>
-{
-    fn insert(
-        map: &mut HashMap<&'static str, GValue>,
-        key: &'static str,
-        item: Option<I>,
-    ) {
-        if let Some(thing) = item {
-            map.insert(key, thing.into());
+    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: Option<I>) {
+        if let Some(inner_value) = value {
+            Args::insert(map, key, inner_value);
         }
     }
 }
 
-
-impl Serialize for Args {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.0.serialize(serializer)
+macro_rules! insert {
+    ($ty:path) => {
+       impl Insert<$ty> for Args {
+            fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: $ty) {
+                Args::insert(map, key, GValue::from(value));
+            }
+        }
+    };
+    (&$lt:lifetime $ty:path) => {
+        impl<$lt> Insert<&$lt $ty> for Args {
+            fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: &$lt $ty) {
+                Args::insert(map, key, GValue::from(value));
+            }
+        }
     }
 }
 
-#[cfg(test)]
-#[tokio::test]
-async fn test_request() {
-    let req = Request::builder()
-        .op("EVAL")
-        .proc("EVAL")
+insert!(String);
+insert!(&'a String);
+insert!(&'a str);
+insert!(HashMap<&str, GValue>);
+insert!(HashMap<GKey, GValue>);
 
-
-    ;
+pub(crate) trait Insert<I> {
+    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: I);
 }

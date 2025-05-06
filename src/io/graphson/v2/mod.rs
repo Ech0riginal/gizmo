@@ -1,6 +1,5 @@
-use crate::io::{Deserializer, GremlinIO, IOHelpers, Request, Response, Serializer, Status, V3};
+use crate::io::{Args, Deserializer, GremlinIO, IOHelpers, Request, Response, Serializer, Status};
 use crate::{GValue, GremlinResult};
-use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -23,17 +22,18 @@ impl IOHelpers for V2 {}
 
 impl Deserializer<Response> for V2 {
     fn deserialize(value: &Value) -> GremlinResult<Response> {
-        let id = {
+        let id: Uuid = {
             let _id = Self::get(value, "request_id")?.clone();
-            serde_json::from_value::<Uuid>(_id)?
+            serde_json::from_value(_id)?
         };
-        let result = {
-            let data = Self::get(Self::get(value, "result")?, "data")?;
-            <Self as Deserializer<GValue>>::deserialize(data)?
+        let result: GValue = {
+            let result = Self::get(value, "result")?;
+            let data = Self::get(result, "data")?;
+            Self::deserialize(data)?
         };
-        let status = {
+        let status: Status = {
             let status = Self::get(value, "status")?;
-            <Self as Deserializer<Status>>::deserialize(status)?
+            Self::deserialize(status)?
         };
 
         Ok(Response { id, result, status })
@@ -57,19 +57,29 @@ impl Deserializer<Status> for V2 {
     }
 }
 
-impl Serializer<GValue> for V2 {
-    fn serialize(value: &GValue) -> GremlinResult<Value> {
-        ser::serialize::<Self>(value)
-    }
-}
-
 impl Serializer<Request> for V2 {
     fn serialize(value: &Request) -> GremlinResult<Value> {
         Ok(json!({
             "request_id": value.id,
             "op": value.op,
             "processor": value.proc,
-            "args": value.args,
+            "args": Self::serialize(&value.args)?,
         }))
     }
+}
+
+impl Serializer<Args> for V2 {
+    fn serialize(value: &Args) -> GremlinResult<Value> {
+        todo!()
+    }
+}
+
+impl Serializer<GValue> for V2 {
+    fn serialize(value: &GValue) -> GremlinResult<Value> {
+        ser::serialize::<Self>(value)
+    }
+}
+
+fn a() {
+    let y = 1481750076295;
 }

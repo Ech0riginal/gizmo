@@ -1,4 +1,5 @@
-use crate::prelude::GValue;
+use std::fmt::Formatter;
+use crate::structure::*;
 
 #[derive(PartialEq, Clone)]
 pub struct Bytecode {
@@ -14,6 +15,19 @@ impl Default for Bytecode {
         }
     }
 }
+
+impl std::fmt::Debug for Bytecode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", &self.step_instructions[0])?;
+
+        for step in self.step_instructions.iter().skip(1) {
+            write!(f, ".{:?}", &step)?;
+        }
+
+        Ok(())
+    }
+}
+
 impl Bytecode {
     pub fn new() -> Bytecode {
         Default::default()
@@ -48,6 +62,40 @@ pub struct Instruction {
     pub(crate) operator: String,
     pub(crate) args: Vec<GValue>,
 }
+
+
+impl std::fmt::Debug for Instruction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if !self.args.is_empty() {
+            match &self.args[0] {
+                GValue::P(_) => write!(f, "P{:?}", &self.args[0])?,
+                GValue::T(_) => write!(f, "T{:?}", &self.args[0])?,
+                _ => {
+                    write!(f, "{}", &self.operator)?;
+                    write!(f, "(")?;
+                    write!(f, "{:?}", &self.args[0])?
+                }
+            }
+
+            for arg in self.args.iter().skip(1) {
+                write!(f, ", {:?}", arg)?;
+            }
+        }
+
+        if !self.args.is_empty() {
+            match &self.args[0] {
+                GValue::P(_) | GValue::T(_) => Ok(()),
+                _ => {
+                    write!(f, ")")
+                }
+            }
+        } else {
+            Ok(())
+        }
+    }
+}
+
+
 
 impl Instruction {
     pub fn new(operator: String, args: Vec<GValue>) -> Instruction {

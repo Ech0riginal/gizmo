@@ -1,11 +1,11 @@
 //! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/)
 
-use crate::io::Deserializer;
 pub(crate) use crate::io::graphson::v2::de::*;
 use crate::io::graphson::v3::types::*;
 use crate::io::macros::*;
-use crate::prelude::*;
-use crate::{GremlinError, GremlinResult};
+use crate::io::{Deserializer, V2};
+use crate::structure::*;
+use crate::{GValue, GremlinError, GremlinResult};
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -117,7 +117,7 @@ pub(crate) fn map<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue>
             x += 2;
         }
     }
-    Ok(map.into())
+    Ok(Map(map).into())
 }
 
 /// Bulkset deserializer [docs](https://tinkerpop.apache.org/docs/3.4.1/dev/io/#_bulkset)
@@ -152,8 +152,8 @@ pub(crate) fn bulkset<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GVa
         .flat_map(|val| {
             let key_opt = match val {
                 GValue::Map(ref map) => match map.get("id") {
-                    Some(GValue::Int64(i)) => Some(GKey::String(i.to_string())),
-                    Some(GValue::Int32(i)) => Some(GKey::String(i.to_string())),
+                    Some(GValue::Long(i)) => Some(GKey::String(i.to_string())),
+                    Some(GValue::Integer(i)) => Some(GKey::String(i.to_string())),
                     Some(GValue::String(s)) => Some(GKey::String(s.to_string())),
                     _ => None,
                 },
@@ -168,7 +168,8 @@ pub(crate) fn bulkset<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GVa
         })
         .collect::<HashMap<GKey, GValue>>();
 
-    Ok(GValue::BulkSet(Map::from(hashmap)))
+    // Ok(GValue::BulkSet(BulkSet::from(hashmap)))
+    todo!()
 }
 
 /// Traversal Metrics deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_traversalmetrics)

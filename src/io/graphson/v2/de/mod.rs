@@ -98,8 +98,8 @@ pub fn id<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GID> {
     match D::deserialize(val) {
         Ok(result) => match result {
             GValue::String(d) => Ok(GID::String(d)),
-            GValue::Int32(d) => Ok(GID::Int32(d)),
-            GValue::Int64(d) => Ok(GID::Int64(d)),
+            GValue::Integer(d) => Ok(GID::Int32(d)),
+            GValue::Long(d) => Ok(GID::Int64(d)),
             _ => Err(GremlinError::Json(format!("{} cannot be an id", val))),
         },
         Err(e) => match e {
@@ -119,26 +119,27 @@ pub fn class<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
 pub fn date<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
     let datetime = Utc.timestamp_millis_opt(val).unwrap();
-    Ok(GValue::Date(datetime))
+    let date = Date(datetime);
+    Ok(date.into())
 }
 
 /// Timestamp deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_timestamp_2)
 pub fn timestamp<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
-    let datetime = Utc.timestamp_millis_opt(val).unwrap();
-    Ok(GValue::Timestamp(datetime))
+    let ms_since_epoch = Timestamp(val);
+    Ok(GValue::Timestamp(ms_since_epoch))
 }
 
 /// Integer deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_integer_2)
 pub fn g32<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i32!(val);
-    Ok(GValue::Int32(val))
+    Ok(GValue::Integer(val))
 }
 
 /// Long deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_long_2)
 pub fn g64<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     let val = expect_i64!(val);
-    Ok(GValue::Int64(val))
+    Ok(GValue::Long(val))
 }
 
 /// UUID deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_uuid_2)
@@ -186,7 +187,7 @@ pub fn map<D: Deserializer<GValue>>(val: &Value) -> GremlinResult<GValue> {
     for (k, v) in val {
         map.insert(GKey::String(k.to_string()), D::deserialize(v)?);
     }
-    Ok(map.into())
+    Ok(Map::from(map).into())
 }
 
 /// Token deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_t_2)
