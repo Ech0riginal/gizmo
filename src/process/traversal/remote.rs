@@ -1,3 +1,5 @@
+use crate::GremlinResult;
+use crate::conversion::FromGValue;
 use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
 
 pub fn traversal() -> RemoteTraversalSource {
@@ -34,7 +36,7 @@ impl MockTerminator {
     }
 }
 
-impl<T: From<GValue>> Terminator<T> for MockTerminator {
+impl<T: FromGValue> Terminator<T> for MockTerminator {
     type List = ();
     type Next = ();
     type HasNext = ();
@@ -68,7 +70,7 @@ impl<T: From<GValue>> Terminator<T> for MockTerminator {
         unimplemented!()
     }
 }
-pub trait Terminator<T: From<GValue>>: Clone {
+pub trait Terminator<T: FromGValue>: Clone {
     type List;
     type Next;
     type HasNext;
@@ -91,7 +93,56 @@ pub trait Terminator<T: From<GValue>>: Clone {
         E: Terminator<T>;
 }
 
-use crate::{GValue, GremlinResult};
+// #[derive(Clone)]
+// pub struct SyncTerminator<V: GremlinIO> {
+//     strategies: TraversalStrategies<SD>,
+// }
+
+// impl<V: GremlinIO> SyncTerminator<SD> {
+//     pub fn new(strategies: TraversalStrategies<SD>) -> SyncTerminator<SD> {
+//         SyncTerminator { strategies }
+//     }
+// }
+
+// impl<V: GremlinIO, T: FromGValue> Terminator<T> for SyncTerminator<SD> {
+//     type List = GremlinResult<Vec<T>>;
+//     type Next = GremlinResult<Option<T>>;
+//     type HasNext = GremlinResult<bool>;
+//     type Iter = GremlinResult<RemoteTraversalIterator<SD, T>>;
+//
+//     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
+//     where
+//         E: Terminator<T>,
+//     {
+//         self.strategies.apply(traversal)?.collect()
+//     }
+//
+//     fn next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Next
+//     where
+//         E: Terminator<T>,
+//     {
+//         let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
+//
+//         Ok(results?.into_iter().next())
+//     }
+//
+//     fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
+//     where
+//         E: Terminator<T>,
+//     {
+//         let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
+//
+//         Ok(results?.iter().next().is_some())
+//     }
+//
+//     fn iter<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Iter
+//     where
+//         E: Terminator<T>,
+//     {
+//         self.strategies.apply(traversal)
+//     }
+// }
+
 use crate::client::GremlinClient;
 use crate::io::GremlinIO;
 use crate::process::traversal::RemoteTraversalStream;
@@ -109,7 +160,7 @@ impl<V: GremlinIO> AsyncTerminator<V> {
     }
 }
 
-impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerminator<V> {
+impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTerminator<V> {
     type List = BoxFuture<'static, GremlinResult<Vec<T>>>;
     type Next = BoxFuture<'static, GremlinResult<Option<T>>>;
     type HasNext = BoxFuture<'static, GremlinResult<bool>>;
@@ -182,10 +233,9 @@ impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerm
         let bytecode = traversal.bytecode().clone();
 
         async move {
-            // let stream = client.submit_traversal(&bytecode).await?;
-            //
-            // Ok(RemoteTraversalStream::new(stream))
-            todo!()
+            let stream = client.submit_traversal(&bytecode).await?;
+
+            Ok(RemoteTraversalStream::new(stream))
         }
         .boxed()
     }

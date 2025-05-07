@@ -9,7 +9,7 @@ use super::step::RepeatStep;
 use super::step::SelectStep;
 use super::step::UntilStep;
 use super::step::WhereStep;
-use crate::prelude::GValue;
+use crate::structure::*;
 use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
 
 pub struct AnonymousTraversalSource {

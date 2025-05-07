@@ -1,73 +1,67 @@
-use crate::{GValue, GremlinResult};
-// use crate::prelude::{GResultSet};
-use crate::structure::{GResultSet, Traverser};
-use futures::FutureExt;
+use crate::GremlinResult;
+use crate::conversion::FromGValue;
+use crate::structure::{Bytecode, GResultSet, Traverser};
 use std::marker::PhantomData;
 
 mod anonymous_traversal_source;
 mod builder;
-pub(crate) mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
-mod order;
 pub(crate) mod remote;
-mod scope;
 pub mod step;
 pub mod strategies;
 pub use builder::TraversalBuilder;
-pub use bytecode::{Bytecode, WRITE_OPERATORS};
 pub use graph_traversal::GraphTraversal;
 pub use graph_traversal_source::GraphTraversalSource;
-pub use order::Order;
 pub use remote::{AsyncTerminator, Terminator, traversal};
-pub use scope::Scope;
 
 pub use anonymous_traversal_source::AnonymousTraversalSource;
 
-use lazy_static::lazy_static;
-
-// use step::*;
+lazy_static! {
+    pub static ref WRITE_OPERATORS: Vec<&'static str> = vec![
+        "addV", "property", "addE", "from", "to", "drop", "mergeV", "mergeE"
+    ];
+}
 
 pub trait Traversal<S, E> {
     fn bytecode(&self) -> &Bytecode;
 }
 
-pub struct RemoteTraversalIterator<V: GremlinIO, T: From<GValue>> {
-    data: PhantomData<T>,
-    result: GResultSet<V>,
-}
+// pub struct RemoteTraversalIterator<V: GremlinIO, T: FromGValue> {
+//     data: PhantomData<T>,
+//     result: GResultSet<SD>,
+// }
 
-impl<V: GremlinIO, T: From<GValue>> RemoteTraversalIterator<V, T> {
-    pub fn new(result: GResultSet<V>) -> RemoteTraversalIterator<V, T> {
-        RemoteTraversalIterator {
-            result,
-            data: PhantomData,
-        }
-    }
-}
+// impl<V: GremlinIO, T: FromGValue> RemoteTraversalIterator<SD, T> {
+//     pub fn new(result: GResultSet<SD>) -> RemoteTraversalIterator<SD, T> {
+//         RemoteTraversalIterator {
+//             result,
+//             data: PhantomData,
+//         }
+//     }
+// }
 
-impl<V: GremlinIO> RemoteTraversalIterator<V, crate::structure::Null> {
-    pub fn iterate(&mut self) -> GremlinResult<()> {
-        while let Some(response) = self.next() {
-            //consume the entire iterator, returning any errors
-            response?;
-        }
-        Ok(())
-    }
-}
+// impl<V: GremlinIO> RemoteTraversalIterator<SD, crate::structure::Null> {
+//     pub fn iterate(&mut self) -> GremlinResult<()> {
+//         while let Some(response) = self.next() {
+//             //consume the entire iterator, returning any errors
+//             response?;
+//         }
+//         Ok(())
+//     }
+// }
 
-impl<V: GremlinIO, T: From<GValue>> Iterator for RemoteTraversalIterator<V, T> {
-    type Item = GremlinResult<T>;
-
-    // todo remove unwrap
-    fn next(&mut self) -> Option<Self::Item> {
-        // self.result
-        //     .next()
-        //     .map(|e| e.take::<Traverser>())
-        //     .map(|t| t.unwrap().take::<T>())
-        todo!()
-    }
-}
+// impl<V: GremlinIO, T: FromGValue> Iterator for RemoteTraversalIterator<SD, T> {
+//     type Item = GremlinResult<T>;
+//
+//     // todo remove unwrap
+//     fn next(&mut self) -> Option<Self::Item> {
+//         self.result
+//             .next()
+//             .map(|e| e.unwrap().take::<Traverser>())
+//             .map(|t| t.unwrap().take::<T>())
+//     }
+// }
 
 lazy_static! {
     pub static ref __: AnonymousTraversalSource = AnonymousTraversalSource::new();
@@ -109,7 +103,7 @@ impl<V: GremlinIO> RemoteTraversalStream<V, crate::structure::Null> {
     }
 }
 
-impl<V: GremlinIO, T: From<GValue>> Stream for RemoteTraversalStream<V, T> {
+impl<V: GremlinIO, T: FromGValue> Stream for RemoteTraversalStream<V, T> {
     type Item = GremlinResult<T>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {

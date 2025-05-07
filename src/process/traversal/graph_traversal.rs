@@ -1,20 +1,19 @@
-use crate::prelude::{
-    Cardinality, Edge, GIDs, GProperty, GValue, IntoPredicate, Labels, List, Map, Null,
-    Path, Vertex,
-    traversal::{Bytecode, Scope, TraversalBuilder, remote::Terminator, step::*},
-};
-use crate::process::traversal::WRITE_OPERATORS;
+use crate::GValue;
+use crate::conversion::FromGValue;
+use crate::process::traversal::step::*;
+use crate::process::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
+use crate::structure::*;
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct GraphTraversal<S, E: From<GValue>, T: Terminator<E>> {
+pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
     start: PhantomData<S>,
     end: PhantomData<E>,
     pub(crate) builder: TraversalBuilder,
     terminator: T,
 }
 
-impl<S, E: From<GValue>, T: Terminator<E>> GraphTraversal<S, E, T> {
+impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     pub fn new(terminator: T, builder: TraversalBuilder) -> GraphTraversal<S, E, T> {
         GraphTraversal {
             start: PhantomData,
@@ -153,7 +152,7 @@ impl<S, E: From<GValue>, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn with_side_effect<A>(mut self, step: (&'static str, A)) -> Self
     where
-        A: Into<GValue> + From<GValue>,
+        A: Into<GValue> + FromGValue,
     {
         self.builder = self.builder.with_side_effect(step);
 
@@ -656,7 +655,7 @@ impl<S, E: From<GValue>, T: Terminator<E>> GraphTraversal<S, E, T> {
     pub fn coalesce<B, A>(mut self, colaesce: A) -> GraphTraversal<S, B, T>
     where
         A: Into<CoalesceStep>,
-        B: From<GValue>,
+        B: FromGValue,
         T: Terminator<B>,
     {
         self.builder = self.builder.coalesce(colaesce);

@@ -1,8 +1,5 @@
-use crate::prelude::{
-    Cardinality, GID, GIDs, GValue, IntoPredicate, Labels,
-    traversal::step::*,
-    traversal::{Bytecode, Scope},
-};
+use crate::process::traversal::step::*;
+use crate::structure::*;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {

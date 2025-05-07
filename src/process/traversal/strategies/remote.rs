@@ -16,7 +16,7 @@ use crate::prelude::{
 //         RemoteStrategy { client }
 //     }
 //
-//     pub(crate) fn apply<S, E: From<GValue>, A>(
+//     pub(crate) fn apply<S, E: FromGValue, A>(
 //         &self,
 //         traversal: &GraphTraversal<S, E, A>,
 //     ) -> GremlinResult<RemoteTraversalIterator<SD, E>>
