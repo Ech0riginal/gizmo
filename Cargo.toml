@@ -16,8 +16,9 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 bb8                 = "0.9.0"
-async-tungstenite   = { version = "0.29.1", features = ["tokio", "tokio-rustls-native-certs", "tokio-rustls-webpki-roots"] }
-base64              = { version = "0.21.7" }
+tokio-tungstenite = { version = "0.26.2", features = ["connect", "rustls", "rustls-native-certs", "rustls-tls-webpki-roots", "__rustls-tls"] }
+#async-tungstenite   = { version = "0.29.1", features = ["tokio", "tokio-rustls-native-certs", "tokio-rustls-webpki-roots"] }
+base64              = { version = "0.22.1" }
 bytes               = "1.10.1"
 #Avoids bringing in time crate (https://github.com/time-rs/time/issues/293)
 chrono              = { version = "0.4.39", default-features = false, features = ["serde"] }
