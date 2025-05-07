@@ -9,6 +9,9 @@ pub enum GremlinError {
     #[error("data store disconnected: {0}")]
     Generic(String),
 
+    #[error("The channel or socket has closed.")]
+    Closed,
+
     #[error(transparent)]
     Websocket(#[from] tungstenite::Error),
 
