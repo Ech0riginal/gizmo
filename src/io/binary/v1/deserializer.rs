@@ -1,4 +1,4 @@
-use crate::prelude::GremlinResult;
+use crate::structure::*;
 use crate::structure::GValue;
 use std::convert::Infallible;
 use std::ops::{ControlFlow, FromResidual, Try};

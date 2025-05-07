@@ -1,8 +1,5 @@
-use crate::prelude::{
-    Cardinality, FromGValue, GID, GIDs, GValue, IntoPredicate, Labels, ToGValue,
-    traversal::step::*,
-    traversal::{Bytecode, Scope},
-};
+use crate::process::traversal::step::*;
+use crate::structure::*;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -138,7 +135,7 @@ impl TraversalBuilder {
 
     pub fn with_side_effect<A>(mut self, step: (&'static str, A)) -> Self
     where
-        A: Into<GValue> + FromGValue,
+        A: Into<GValue> + From<GValue>,
     {
         self.bytecode.add_source(
             String::from("withSideEffect"),

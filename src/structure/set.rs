@@ -1,4 +1,4 @@
-use crate::prelude::GValue;
+use crate::structure::*;
 use std::vec::IntoIter;
 
 // pub type Set = Vec<GValue>;

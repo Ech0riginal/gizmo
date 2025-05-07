@@ -1,8 +1,8 @@
-use crate::prelude::{
-    Cardinality, Edge, FromGValue, GIDs, GProperty, GValue, IntoPredicate, Labels, List, Map, Null,
-    Path, Vertex,
-    traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS, remote::Terminator, step::*},
-};
+use crate::GValue;
+use crate::conversion::FromGValue;
+use crate::process::traversal::step::*;
+use crate::process::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
+use crate::structure::*;
 use std::marker::PhantomData;
 
 #[derive(Clone)]

@@ -1,5 +1,5 @@
+pub(self) use crate::io::graphson::v2::{V2, types::*};
 pub(self) use crate::io::macros::*;
-pub(self) use crate::io::graphson::v2::types::*;
 pub(self) use std::collections::HashMap;
 
 mod core {
@@ -23,7 +23,9 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : DATE, "@value" : 1481750076295i64 }),
-            object: GValue::Date(chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()),
+            object: GValue::Date(Date(
+                chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()
+            )),
         }
     );
     test!(
@@ -31,7 +33,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : TIMESTAMP, "@value" : 1481750076295i64 }),
-            object: GValue::Timestamp(chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()),
+            object: GValue::Timestamp(Timestamp(1481750076295i64)),
         }
     );
     test!(
@@ -55,7 +57,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : INT, "@value" : 100i32 }),
-            object: GValue::Int32(100),
+            object: GValue::Integer(100),
         }
     );
     test!(
@@ -63,7 +65,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : LONG, "@value" : 100u64 }),
-            object: GValue::Int64(100),
+            object: GValue::Long(100),
         }
     );
     test!(
@@ -107,8 +109,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(1997));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2001));
+                                    tmp2.insert("startTime".into(), GValue::Integer(1997));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2001));
                                     tmp2
                                 }),
                             },
@@ -119,8 +121,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2001));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2004));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2001));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2004));
                                     tmp2
                                 }),
                             },
@@ -131,8 +133,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2004));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2004));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2005));
                                     tmp2
                                 }),
                             },
@@ -143,7 +145,7 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2005));
                                     tmp2
                                 }),
                             },
@@ -173,7 +175,7 @@ mod structure {
                     label: "person".into(),
                     properties: Default::default(),
                 },
-                properties: [("since".into(), Box::new(GValue::Int32(2009))),].into(),
+                properties: [("since".into(), Box::new(GValue::Integer(2009))),].into(),
             }),
         }
     );
@@ -238,7 +240,7 @@ mod structure {
             serial: json!({ "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2009 }, "element" : { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "outV" : { "@type" : "g:Int32", "@value" : 1 }, "inV" : { "@type" : "g:Int32", "@value" : 10 } } } }}),
             object: GValue::Property(Property {
                 key: "since".into(),
-                value: Box::new(GValue::Int32(2009)),
+                value: Box::new(GValue::Integer(2009)),
                 element: Box::new(GValue::Edge(Edge {
                     id: GID::Int32(13),
                     label: "develops".to_string(),
@@ -287,8 +289,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(1997));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2001));
+                                    tmp2.insert("startTime".into(), GValue::Integer(1997));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2001));
                                     tmp2
                                 }),
                             },
@@ -299,8 +301,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2001));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2004));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2001));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2004));
                                     tmp2
                                 }),
                             },
@@ -311,8 +313,8 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2004));
-                                    tmp2.insert("endTime".into(), GValue::Int32(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2004));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2005));
                                     tmp2
                                 }),
                             },
@@ -323,7 +325,7 @@ mod structure {
                                 vertex: Some(GID::Int32(1)),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Int32(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2005));
                                     tmp2
                                 }),
                             },
@@ -367,8 +369,8 @@ mod structure {
                                         vertex: Some(GID::Int32(1)),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Int32(1997));
-                                            tmp2.insert("endTime".into(), GValue::Int32(2001));
+                                            tmp2.insert("startTime".into(), GValue::Integer(1997));
+                                            tmp2.insert("endTime".into(), GValue::Integer(2001));
                                             tmp2
                                         }),
                                     },
@@ -379,8 +381,8 @@ mod structure {
                                         vertex: Some(GID::Int32(1)),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Int32(2001));
-                                            tmp2.insert("endTime".into(), GValue::Int32(2004));
+                                            tmp2.insert("startTime".into(), GValue::Integer(2001));
+                                            tmp2.insert("endTime".into(), GValue::Integer(2004));
                                             tmp2
                                         }),
                                     },
@@ -391,8 +393,8 @@ mod structure {
                                         vertex: Some(GID::Int32(1)),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Int32(2004));
-                                            tmp2.insert("endTime".into(), GValue::Int32(2005));
+                                            tmp2.insert("startTime".into(), GValue::Integer(2004));
+                                            tmp2.insert("endTime".into(), GValue::Integer(2005));
                                             tmp2
                                         }),
                                     },
@@ -403,7 +405,7 @@ mod structure {
                                         vertex: Some(GID::Int32(1)),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Int32(2005));
+                                            tmp2.insert("startTime".into(), GValue::Integer(2005));
                                             tmp2
                                         }),
                                     },
@@ -437,8 +439,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(1990));
-                                            tmp.insert("endTime".into(), GValue::Int32(2000));
+                                            tmp.insert("startTime".into(), GValue::Integer(1990));
+                                            tmp.insert("endTime".into(), GValue::Integer(2000));
                                             tmp
                                         }),
                                     },
@@ -449,8 +451,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2000));
-                                            tmp.insert("endTime".into(), GValue::Int32(2006));
+                                            tmp.insert("startTime".into(), GValue::Integer(2000));
+                                            tmp.insert("endTime".into(), GValue::Integer(2006));
                                             tmp
                                         }),
                                     },
@@ -461,7 +463,7 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2006));
+                                            tmp.insert("startTime".into(), GValue::Integer(2006));
                                             tmp
                                         }),
                                     },
@@ -495,8 +497,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2004));
-                                            tmp.insert("endTime".into(), GValue::Int32(2007));
+                                            tmp.insert("startTime".into(), GValue::Integer(2004));
+                                            tmp.insert("endTime".into(), GValue::Integer(2007));
                                             tmp
                                         }),
                                     },
@@ -507,8 +509,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2007));
-                                            tmp.insert("endTime".into(), GValue::Int32(2011));
+                                            tmp.insert("startTime".into(), GValue::Integer(2007));
+                                            tmp.insert("endTime".into(), GValue::Integer(2011));
                                             tmp
                                         }),
                                     },
@@ -519,8 +521,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2011));
-                                            tmp.insert("endTime".into(), GValue::Int32(2014));
+                                            tmp.insert("startTime".into(), GValue::Integer(2011));
+                                            tmp.insert("endTime".into(), GValue::Integer(2014));
                                             tmp
                                         }),
                                     },
@@ -531,7 +533,7 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2014));
+                                            tmp.insert("startTime".into(), GValue::Integer(2014));
                                             tmp
                                         }),
                                     },
@@ -565,8 +567,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(1982));
-                                            tmp.insert("endTime".into(), GValue::Int32(2005));
+                                            tmp.insert("startTime".into(), GValue::Integer(1982));
+                                            tmp.insert("endTime".into(), GValue::Integer(2005));
                                             tmp
                                         }),
                                     },
@@ -577,8 +579,8 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2005));
-                                            tmp.insert("endTime".into(), GValue::Int32(2009));
+                                            tmp.insert("startTime".into(), GValue::Integer(2005));
+                                            tmp.insert("endTime".into(), GValue::Integer(2009));
                                             tmp
                                         }),
                                     },
@@ -589,7 +591,7 @@ mod structure {
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Int32(2009));
+                                            tmp.insert("startTime".into(), GValue::Integer(2009));
                                             tmp
                                         }),
                                     },
@@ -649,7 +651,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Int32(2009))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2009))),].into(),
                     },
                     Edge {
                         id: GID::Int32(14),
@@ -664,7 +666,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Int32(2010))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2010))),].into(),
                     },
                     Edge {
                         id: GID::Int32(15),
@@ -679,7 +681,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(4))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(4))),].into(),
                     },
                     Edge {
                         id: GID::Int32(16),
@@ -694,7 +696,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
                     },
                     Edge {
                         id: GID::Int32(17),
@@ -709,7 +711,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Int32(2010))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2010))),].into(),
                     },
                     Edge {
                         id: GID::Int32(18),
@@ -724,7 +726,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Int32(2011))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2011))),].into(),
                     },
                     Edge {
                         id: GID::Int32(19),
@@ -739,7 +741,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
                     },
                     Edge {
                         id: GID::Int32(20),
@@ -754,7 +756,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(4))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(4))),].into(),
                     },
                     Edge {
                         id: GID::Int32(21),
@@ -769,7 +771,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Int32(2012))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2012))),].into(),
                     },
                     Edge {
                         id: GID::Int32(22),
@@ -784,7 +786,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
                     },
                     Edge {
                         id: GID::Int32(23),
@@ -799,7 +801,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
                     },
                     Edge {
                         id: GID::Int32(24),
@@ -814,7 +816,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
                     },
                     Edge {
                         id: GID::Int32(25),
@@ -829,7 +831,7 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Int32(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
                     },
                     Edge {
                         id: GID::Int32(26),

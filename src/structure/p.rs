@@ -1,6 +1,6 @@
-use crate::prelude::{GValue, ToGValue};
 use crate::structure::either::Either2;
 use crate::structure::text_p::TextP;
+use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct P {
@@ -28,44 +28,44 @@ impl P {
     }
     pub fn eq<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("eq", value.to_gvalue())
+        P::new("eq", value.into())
     }
 
     pub fn neq<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("neq", value.to_gvalue())
+        P::new("neq", value.into())
     }
 
     pub fn gt<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("gt", value.to_gvalue())
+        P::new("gt", value.into())
     }
 
     pub fn gte<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("gte", value.to_gvalue())
+        P::new("gte", value.into())
     }
 
     pub fn lt<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("lt", value.to_gvalue())
+        P::new("lt", value.into())
     }
 
     pub fn lte<V>(value: V) -> P
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
-        P::new("lte", value.to_gvalue())
+        P::new("lte", value.into())
     }
 
     pub fn within<V>(value: V) -> P
@@ -80,9 +80,9 @@ pub trait IntoPredicate {
     fn into_predicate(self) -> Either2<P, TextP>;
 }
 
-impl<T: ToGValue> IntoPredicate for T {
+impl<T: Into<GValue>> IntoPredicate for T {
     fn into_predicate(self) -> Either2<P, TextP> {
-        let val = self.to_gvalue();
+        let val = self.into();
         match val {
             GValue::P(ref p) => Either2::A(p.clone()),
             GValue::TextP(ref p) => Either2::B(p.clone()),
@@ -101,11 +101,11 @@ pub trait IntoRange {
 
 impl<T> IntoRange for (T, T)
 where
-    T: ToGValue,
+    T: Into<GValue>,
 {
     fn into_range(self) -> Range {
-        let v1 = self.0.to_gvalue();
-        let v2 = self.1.to_gvalue();
+        let v1 = self.0.into();
+        let v2 = self.1.into();
 
         Range {
             values: vec![v1, v2],
@@ -115,11 +115,11 @@ where
 
 impl<T> IntoRange for Vec<T>
 where
-    T: ToGValue,
+    T: Into<GValue>,
 {
     fn into_range(self) -> Range {
         Range {
-            values: self.into_iter().map(|e| e.to_gvalue()).collect(),
+            values: self.into_iter().map(|e| e.into()).collect(),
         }
     }
 }

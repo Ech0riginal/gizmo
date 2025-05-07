@@ -3,7 +3,7 @@ use mobc::Manager;
 
 use crate::connection::Conn;
 use crate::options::ConnectionOptions;
-use crate::prelude::{GValue};
+use crate::structure::*;
 use base64::prelude::{BASE64_STANDARD, Engine};
 use std::collections::HashMap;
 
@@ -120,7 +120,7 @@ impl<SD: Gremlin> Manager for GremlinConnectionManager<SD> {
 mod tests {
 
     use super::GremlinConnectionManager;
-    use crate::prelude::ConnectionOptions;
+    use crate::structure::*;
 
     use mobc::Pool;
     use std::time::Duration;

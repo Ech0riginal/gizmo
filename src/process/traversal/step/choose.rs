@@ -1,5 +1,4 @@
-use crate::process::traversal::TraversalBuilder;
-use crate::structure::GValue;
+use super::prelude::*;
 
 pub trait IntoChooseStep {
     fn into_step(self) -> Vec<GValue>;

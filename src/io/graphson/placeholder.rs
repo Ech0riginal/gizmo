@@ -1,24 +1,35 @@
 //! A virtual placeholder for when we initialize the client.
 
+use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer};
+use crate::{GValue, GremlinResult};
 use serde_json::Value;
-use uuid::Uuid;
-use crate::{GValue, Gremlin, GremlinResult};
-use crate::message::Message;
 
-impl Gremlin for () {
+impl GremlinIO for () {
     fn mime() -> &'static str {
+        "none"
+    }
+}
+
+impl Deserializer<Response> for () {
+    fn deserialize(value: &Value) -> GremlinResult<Response> {
         todo!()
     }
+}
 
+impl Deserializer<GValue> for () {
     fn deserialize(value: &Value) -> GremlinResult<GValue> {
         todo!()
     }
+}
 
-    fn serialize(value: &GValue) -> GremlinResult<Value> {
+impl Serializer<Request> for () {
+    fn serialize(value: &Request) -> GremlinResult<Value> {
         todo!()
     }
+}
 
-    fn message<T>(op: String, processor: String, args: T, id: Option<Uuid>) -> Message<T> {
+impl Serializer<GValue> for () {
+    fn serialize(value: &GValue) -> GremlinResult<Value> {
         todo!()
     }
 }

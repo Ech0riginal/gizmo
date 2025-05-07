@@ -1,4 +1,4 @@
-use crate::structure::GValue;
+use super::prelude::*;
 
 pub struct LoopsStep {
     params: Vec<GValue>,

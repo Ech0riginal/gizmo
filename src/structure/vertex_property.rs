@@ -1,8 +1,8 @@
 use crate::structure::{GID, GValue, Property};
 use std::collections::HashMap;
 
+use crate::GremlinResult;
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::{GremlinError, GremlinResult};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum GProperty {
@@ -45,18 +45,16 @@ impl GProperty {
         }
     }
 }
-
 impl FromGValue for GProperty {
     fn from_gvalue(v: GValue) -> GremlinResult<Self> {
         match v {
             GValue::VertexProperty(p) => Ok(GProperty::VertexProperty(p)),
             GValue::Property(p) => Ok(GProperty::Property(p)),
-            _ => Err(GremlinError::Cast(String::from(
-                "Value not allowed for a property",
-            ))),
+            gvalue => panic!("Value not allowed for a property ({:?})", gvalue),
         }
     }
 }
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct VertexProperty {
     pub(crate) id: GID,
@@ -103,6 +101,7 @@ impl VertexProperty {
     {
         T::from_gvalue(&self.value)
     }
+
     pub fn label(&self) -> &String {
         &self.label
     }

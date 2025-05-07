@@ -1,6 +1,5 @@
+pub(self) use crate::io::graphson::v3::{V3, types::*};
 pub(self) use crate::io::macros::*;
-pub(self) use crate::io::graphson::v2::types::*;
-pub(self) use std::collections::HashMap;
 
 mod core {
     pub(self) use super::*;
@@ -11,7 +10,7 @@ mod core {
 
     test!(
         class,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : CLASS, "@value" : "java.io.File"}),
             object: GValue::Class("java.io.File".into()),
@@ -19,15 +18,17 @@ mod core {
     );
     test!(
         date,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : DATE, "@value" : 1481750076295i64 }),
-            object: GValue::Date(chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()),
+            object: GValue::Date(Date(
+                chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()
+            )),
         }
     );
     test!(
         double,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : DOUBLE, "@value" : 100.0f64 }),
             object: GValue::Double(100.0),
@@ -35,7 +36,7 @@ mod core {
     );
     test!(
         float,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : FLOAT, "@value" : 100.0f32 }),
             object: GValue::Float(100.0),
@@ -43,10 +44,10 @@ mod core {
     );
     test!(
         integer,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : INT, "@value" : 100i32 }),
-            object: GValue::Int32(100),
+            object: GValue::Integer(100),
         }
     );
     test!(
@@ -59,10 +60,10 @@ mod core {
     );
     test!(
         long,
-        V2,
+        V3,
         Test {
             serial: json!({ "@type" : LONG, "@value" : 100u64 }),
-            object: GValue::Int64(100),
+            object: GValue::Long(100),
         }
     );
     test!(
@@ -86,7 +87,8 @@ mod core {
                     "name".into(),
                     GValue::List(vec![String::from("marko").into()].into()),
                 ),
-            ].into())),
+            ]
+            .into())),
         }
     );
     test!(
@@ -95,7 +97,7 @@ mod core {
         Test {
             serial: json!({ "@type" : "g:Set", "@value" : [ { "@type" : "g:Int32", "@value" : 1 }, "person", true ]}),
             object: GValue::Set(Set(vec![
-                GValue::Int32(1),
+                GValue::Integer(1),
                 GValue::String("person".into()),
                 GValue::Bool(true),
             ])),
@@ -106,7 +108,7 @@ mod core {
         V3,
         Test {
             serial: json!({ "@type" : "g:Timestamp", "@value" : 1481750076295i64 }),
-            object: GValue::Timestamp(chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()),
+            object: GValue::Timestamp(Timestamp(1481750076295i64)),
         }
     );
     test!(
@@ -120,6 +122,7 @@ mod core {
 }
 mod structure {
     pub(self) use super::*;
+    use std::collections::HashMap;
 
     test_prelude!();
 

@@ -1,13 +1,13 @@
-use crate::prelude::{GKey, GValue, Map};
+use crate::structure::{GKey, GValue, Map};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Bulk {
+pub struct BulkSet {
     pub map: HashMap<GKey, GValue>,
     pub occurrences: usize,
 }
 
-impl Into<HashMap<GKey, GValue>> for crate::prelude::Bulk {
+impl Into<HashMap<GKey, GValue>> for BulkSet {
     fn into(self) -> HashMap<GKey, GValue> {
         let mut map = HashMap::new();
         map.insert(
@@ -16,13 +16,13 @@ impl Into<HashMap<GKey, GValue>> for crate::prelude::Bulk {
         );
         map.insert(
             GKey::String("occurrences".to_string()),
-            GValue::Int64(self.occurrences as i64),
+            GValue::Long(self.occurrences as i64),
         );
         map
     }
 }
 
-impl Into<Map> for crate::prelude::Bulk {
+impl Into<Map> for BulkSet {
     fn into(self) -> Map {
         let map: HashMap<GKey, GValue> = self.into();
         Map::from(map)

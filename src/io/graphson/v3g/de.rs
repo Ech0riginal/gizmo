@@ -1,7 +1,6 @@
-use crate::prelude::*;
+use crate::{GValue, GremlinError, GremlinResult};
 use geo_types::{Coord, Geometry, LineString, Point, Polygon};
 use serde_json::{Value, from_value};
-use crate::{GremlinError, GremlinResult};
 
 // No custom types huh? TODO Speak with James re: Geojson
 type Position = Vec<f64>;

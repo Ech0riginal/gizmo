@@ -1,6 +1,5 @@
-use crate::{Gremlin, GremlinResult};
+use crate::GremlinResult;
 use crate::conversion::FromGValue;
-use crate::prelude::GremlinClient;
 use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
 
 pub fn traversal() -> RemoteTraversalSource {
@@ -10,10 +9,10 @@ pub fn traversal() -> RemoteTraversalSource {
 pub struct RemoteTraversalSource {}
 
 impl RemoteTraversalSource {
-    pub fn with_remote<SD: Gremlin>(
+    pub fn with_remote<V: GremlinIO>(
         &self,
-        client: GremlinClient<SD>,
-    ) -> GraphTraversalSource<AsyncTerminator<SD>> {
+        client: GremlinClient<V>,
+    ) -> GraphTraversalSource<AsyncTerminator<V>> {
         GraphTraversalSource::<MockTerminator>::new(MockTerminator {}).with_remote(client)
     }
 
@@ -95,17 +94,17 @@ pub trait Terminator<T: FromGValue>: Clone {
 }
 
 // #[derive(Clone)]
-// pub struct SyncTerminator<SD: Gremlin> {
+// pub struct SyncTerminator<V: GremlinIO> {
 //     strategies: TraversalStrategies<SD>,
 // }
 
-// impl<SD: Gremlin> SyncTerminator<SD> {
+// impl<V: GremlinIO> SyncTerminator<SD> {
 //     pub fn new(strategies: TraversalStrategies<SD>) -> SyncTerminator<SD> {
 //         SyncTerminator { strategies }
 //     }
 // }
 
-// impl<SD: Gremlin, T: FromGValue> Terminator<T> for SyncTerminator<SD> {
+// impl<V: GremlinIO, T: FromGValue> Terminator<T> for SyncTerminator<SD> {
 //     type List = GremlinResult<Vec<T>>;
 //     type Next = GremlinResult<Option<T>>;
 //     type HasNext = GremlinResult<bool>;
@@ -144,26 +143,28 @@ pub trait Terminator<T: FromGValue>: Clone {
 //     }
 // }
 
+use crate::client::GremlinClient;
+use crate::io::GremlinIO;
 use crate::process::traversal::RemoteTraversalStream;
 use futures::StreamExt;
 use futures::future::{BoxFuture, FutureExt};
 
 #[derive(Clone)]
-pub struct AsyncTerminator<SD: Gremlin> {
-    client: GremlinClient<SD>,
+pub struct AsyncTerminator<V: GremlinIO> {
+    client: GremlinClient<V>,
 }
 
-impl<SD: Gremlin> AsyncTerminator<SD> {
-    pub fn new(client: GremlinClient<SD>) -> AsyncTerminator<SD> {
+impl<V: GremlinIO> AsyncTerminator<V> {
+    pub fn new(client: GremlinClient<V>) -> AsyncTerminator<V> {
         AsyncTerminator { client }
     }
 }
 
-impl<SD: Gremlin, T: FromGValue + Send + 'static> Terminator<T> for AsyncTerminator<SD> {
+impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTerminator<V> {
     type List = BoxFuture<'static, GremlinResult<Vec<T>>>;
     type Next = BoxFuture<'static, GremlinResult<Option<T>>>;
     type HasNext = BoxFuture<'static, GremlinResult<bool>>;
-    type Iter = BoxFuture<'static, GremlinResult<RemoteTraversalStream<SD, T>>>;
+    type Iter = BoxFuture<'static, GremlinResult<RemoteTraversalStream<V, T>>>;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where

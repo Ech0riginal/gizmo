@@ -5,26 +5,43 @@ mod graphson;
 mod error;
 
 mod macros;
+mod request;
+mod response;
 
-pub(crate) use macros::{get_value, expect_i32, expect_i64, expect_float, expect_double};
+pub(crate) use macros::{expect_double, expect_float, expect_i32, expect_i64, get_value};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+use crate::{GValue, GremlinError, GremlinResult};
 
 pub use error::Error;
 pub use graphson::{V2, V3, V3g};
+pub use request::{Args, Request};
+pub use response::{Response, Status};
 
-pub trait Gremlin:
-    Send
-    + Sync
-    + Clone
-    + std::fmt::Debug
-    + Default
-    + 'static
+#[allow(private_bounds)]
+pub trait GremlinIO
+where
+    Self: 'static,
+    Self: Send + Sync + Clone,
+    Self: Deserializer<Response> + Serializer<Request>,
+    Self: Deserializer<GValue> + Serializer<GValue>,
 {
     fn mime() -> &'static str;
-
-    fn deserialize(value: &serde_json::Value) -> crate::GremlinResult<crate::GValue>;
-
-    fn serialize(value: &crate::GValue) -> crate::GremlinResult<serde_json::Value>;
-
-    fn message<T>(op: String, processor: String, args: T, id: Option<uuid::Uuid>) -> crate::message::Message<T>;
 }
 
+pub trait Deserializer<T> {
+    fn deserialize(value: &serde_json::Value) -> crate::GremlinResult<T>;
+}
+
+pub trait Serializer<T> {
+    fn serialize(value: &T) -> crate::GremlinResult<serde_json::Value>;
+}
+
+trait IOHelpers {
+    fn get<'a>(value: &'a Value, key: &'static str) -> Result<&'a Value, GremlinError> {
+        value
+            .get(key)
+            .ok_or(GremlinError::Json(format!("Key '{}' is missing", key)))
+    }
+}

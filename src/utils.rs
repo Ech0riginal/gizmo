@@ -1,4 +1,6 @@
-use crate::prelude::{BorrowFromGValue, GremlinError, List, Map};
+use crate::GremlinError;
+use crate::conversion::BorrowFromGValue;
+use crate::structure::*;
 
 pub fn unwrap_map<'a, T>(map: &'a Map, key: &str, index: usize) -> Result<&'a T, GremlinError>
 where

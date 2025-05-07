@@ -1,4 +1,4 @@
-use crate::prelude::{GValue, ToGValue};
+use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TextP {
@@ -26,42 +26,42 @@ impl TextP {
     }
     pub fn containing<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("containing", value.to_gvalue())
     }
 
     pub fn starting_with<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("startingWith", value.to_gvalue())
     }
 
     pub fn ending_with<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("endingWith", value.to_gvalue())
     }
 
     pub fn not_starting_with<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("notStartingWith", value.to_gvalue())
     }
 
     pub fn not_ending_with<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("notEndingWith", value.to_gvalue())
     }
 
     pub fn not_containing<V>(value: V) -> TextP
     where
-        V: ToGValue,
+        V: Into<GValue>,
     {
         TextP::new("notContaining", value.to_gvalue())
     }

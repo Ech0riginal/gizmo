@@ -52,16 +52,16 @@ impl IntoIterator for Vertex {
     }
 }
 
-impl std::cmp::Eq for Vertex {}
-
-impl std::hash::Hash for Vertex {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
+impl Eq for Vertex {}
 
 impl PartialEq for Vertex {
     fn eq(&self, other: &Vertex) -> bool {
         &self.id == other.id()
+    }
+}
+
+impl std::hash::Hash for Vertex {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }

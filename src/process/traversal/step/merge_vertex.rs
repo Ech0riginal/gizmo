@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use crate::prelude::{GKey, GValue, traversal::TraversalBuilder};
+use super::prelude::*;
 
 pub struct MergeVertexStep {
     params: Vec<GValue>,

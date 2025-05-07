@@ -1,6 +1,4 @@
-use crate::process::traversal::TraversalBuilder;
-use crate::structure::GValue;
-use crate::structure::IntoPredicate;
+use super::prelude::*;
 
 pub struct WhereStep {
     params: Vec<GValue>,
@@ -15,12 +13,6 @@ impl WhereStep {
 impl From<WhereStep> for Vec<GValue> {
     fn from(step: WhereStep) -> Self {
         step.params
-    }
-}
-
-impl From<TraversalBuilder> for WhereStep {
-    fn from(param: TraversalBuilder) -> WhereStep {
-        WhereStep::new(vec![param.bytecode.into()])
     }
 }
 
