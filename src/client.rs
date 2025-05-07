@@ -1,11 +1,10 @@
 use crate::io::{Args, GremlinIO, Request};
-use crate::prelude::{ConnectionOptions, GValue};
-use crate::structure::GKey;
+use crate::options::ConnectionOptions;
+use crate::structure::*;
 use crate::{GremlinError, GremlinResult};
 use bb8::{Pool, PooledConnection};
-use futures::Stream;
-use serde::Serialize;
 use std::collections::HashMap;
+use crate::network::{GremlinStream};
 
 pub struct SessionedClient<'c, V: GremlinIO> {
     connection: PooledConnection<'c, ConnectionOptions<V>>,
@@ -13,23 +12,20 @@ pub struct SessionedClient<'c, V: GremlinIO> {
     alias: Option<String>,
 }
 
-// impl<'c, V: GremlinIO> SessionedClient<'c, SD> {
-//     pub async fn close_session(mut self) -> GremlinResult<GResultSet<V>> {
-//         if let Some(session_name) = self.session.take() {
-//             let mut args = HashMap::new();
-//             args.insert(String::from("session"), GValue::from(session_name.clone()));
-//             let args = SD::serialize(&GValue::from(args))?;
-//
-//             let processor = "session".to_string();
-//
-//             let message = SD::message(String::from("close"), processor, args, None);
-//
-//             GremlinClient::send_message_new(self.connection, message).await
-//         } else {
-//             Err(GremlinError::Generic("No session to close".to_string()))
-//         }
-//     }
-// }
+impl<'a, V: GremlinIO> SessionedClient<'a, V> {
+    pub async fn close(mut self) -> GremlinResult<impl GremlinStream + 'a> {
+        if let Some(session_name) = self.session.take() {
+            let request = Request::builder()
+                .op(CLOSE)
+                .proc(SESSION)
+                .args(Args::new().arg(SESSION, &session_name))
+                .build().unwrap();
+            self.connection.send(request).await
+        } else {
+            Err(GremlinError::Generic("No session to close".to_string()))
+        }
+    }
+}
 
 #[derive(Clone)]
 pub struct GremlinClient<V: GremlinIO> {
@@ -45,6 +41,7 @@ const LANGUAGE: &'static str = "language";
 const GREMLIN_GROOVY: &'static str = "gremlin-grovy";
 const ALIASES: &'static str = "aliases";
 const BINDINGS: &'static str = "bindings";
+const CLOSE: &'static str = "close";
 const SESSION: &'static str = "session";
 const EVAL: &'static str = "eval";
 
@@ -88,61 +85,36 @@ where
         cloned
     }
 
-    pub async fn execute_raw<T>(
-        &self,
-        script: T,
-        params: &[(&str, &dyn Into<GValue>)],
-    ) -> GremlinResult<impl Stream<Item = GremlinResult<GValue>>>
+    pub async fn execute_raw<'a, S>(
+        &'a self,
+        script: S,
+        params: &'a [(&'a str, impl Into<GValue> + Clone)],
+    ) -> GremlinResult<impl GremlinStream + 'a>
     where
-        T: Into<String>,
+        S: AsRef<str>,
     {
-        let args2 = Args::new()
-            .arg(GREMLIN, script)
+        let args = Args::new()
+            .arg(GREMLIN, script.as_ref())
             .arg(LANGUAGE, GREMLIN_GROOVY)
             .arg(
                 ALIASES,
-                 self.alias
-                     .iter()
-                     .map(|string| (GKey::String(G.into()), GValue::String(string.clone())))
-                     .collect::<HashMap<_, _>>(),
+                [()].iter().map(|_| (
+                    G,
+                    self.alias
+                        .clone()
+                        .map(|str| GValue::String(str.into()))
+                        .unwrap_or(GValue::String(G.into()))
+                )).collect::<HashMap<_, GValue>>()
             )
             .arg(
                 BINDINGS,
                 params
-                    .iter()
-                    .map(|(k, v)| ((*k).into(), v.to_gvalue()))
-                    .collect::<HashMap<GKey, _>>(),
+                    .into_iter()
+                    .map(|(k, v)| (*k, v.clone().into()))
+                    .collect::<HashMap<_, GValue>>(),
             )
-        ;
-        let args = {
-            let mut tmp = HashMap::new();
+            .arg(SESSION, self.session.clone());
 
-            tmp.insert(GREMLIN, GValue::String(script.into()));
-            tmp.insert(LANGUAGE, GValue::String(GREMLIN_GROOVY.into()));
-            tmp.insert(
-                ALIASES,
-                GValue::from(
-                    self.alias
-                        .iter()
-                        .map(|string| (GKey::String(G.into()), GValue::String(string.clone())))
-                        .collect::<HashMap<_, _>>(),
-                ),
-            );
-            tmp.insert(
-                BINDINGS,
-                GValue::from(
-                    params
-                        .iter()
-                        .map(|(k, v)| ((*k).into(), v.to_gvalue()))
-                        .collect::<HashMap<GKey, _>>(),
-                ),
-            );
-            if let Some(session_name) = &self.session {
-                tmp.insert(SESSION, GValue::from(session_name.clone()));
-            }
-
-            V::serialize(&GValue::from(tmp))
-        }?;
         let processor = if self.session.is_some() {
             SESSION
         } else {
@@ -152,51 +124,40 @@ where
         let request = Request::builder()
             .op(EVAL)
             .proc(processor)
-            .args(args2)
+            .args(args)
             .build()
             .unwrap();
-
         let conn = self.pool.get().await?;
-        let stream = conn.send::<_, V>(request).await?;
-
+        let stream = conn.send(request).await?;
+        
         Ok(stream)
     }
 
-    // pub async fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet<V>> {
-    //     tracing::trace!("{:?}", bytecode);
-    //
-    //     let mut args = HashMap::new();
-    //
-    //     args.insert(String::from("gremlin"), GValue::Bytecode(bytecode.clone()));
-    //
-    //     let aliases = self
-    //         .alias
-    //         .clone()
-    //         .or_else(|| Some(String::from("g")))
-    //         .map(|s| {
-    //             let mut map = HashMap::new();
-    //             map.insert(String::from("g"), GValue::String(s));
-    //             map
-    //         })
-    //         .unwrap_or_else(HashMap::new);
-    //
-    //     args.insert(String::from("aliases"), GValue::from(aliases));
-    //
-    //     let args = SD::serialize(&GValue::from(args))?;
-    //
-    //     let message = SD::message(
-    //         String::from("bytecode"),
-    //         String::from("traversal"),
-    //         args,
-    //         None,
-    //     );
-    //
-    //     let conn = self.pool.get().await?;
-    //
-    //     // self.send_message_new(conn, message).await
-    // }
-}
+    pub async fn execute(
+        &self,
+        bytecode: Bytecode,
+    ) -> GremlinResult<impl GremlinStream + '_> {
+        let bytecode = GValue::Bytecode(bytecode);
+        let request = Request::builder()
+            .op("bytecode")
+            .proc("traversal")
+            .args(Args::new()
+                .arg(GREMLIN, bytecode)
+                .arg(
+                    ALIASES,
+                    [()].iter().map(|_| (
+                        G,
+                            self.alias
+                            .clone()
+                            .map(|str| GValue::String(str.into()))
+                            .unwrap_or(GValue::String(G.into()))
+                    )).collect::<HashMap<_, GValue>>()
+              ))
+            .build()
+            .unwrap();
+        let conn = self.pool.get().await?;
+        let stream = conn.send(request).await?;
 
-// fn build_message<T: Serialize>(msg: Message<T>) -> GremlinResult<String> {
-//     serde_json::to_string(&msg).map_err(GremlinError::from)
-// }
+        Ok(stream)
+    }
+}
