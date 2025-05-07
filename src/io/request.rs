@@ -1,10 +1,10 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
 use crate::GValue;
+use crate::structure::GKey;
 use derive_builder::Builder;
 use std::collections::HashMap;
 use uuid::Uuid;
-use crate::structure::GKey;
 
 #[derive(Clone, Debug, Builder)]
 pub struct Request {

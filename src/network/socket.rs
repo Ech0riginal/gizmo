@@ -1,14 +1,14 @@
-use std::marker::PhantomData;
-use std::sync::Arc;
+use super::*;
+use crate::io::{GremlinIO, Request, Response};
+use crate::{GremlinError, GremlinResult};
 use bytes::Bytes;
 use futures::StreamExt;
 use serde_json::Value;
-use tokio::sync::{mpsc, RwLock};
+use std::marker::PhantomData;
+use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::{RwLock, mpsc};
 use tungstenite::Message;
-use crate::{GremlinError, GremlinResult};
-use crate::io::{GremlinIO, Request, Response};
-use super::*;
 
 /// Handles underlying WebSocket messaging, exposing data relevant only to Gremlin
 #[derive(Clone)]

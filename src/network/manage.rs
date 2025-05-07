@@ -1,6 +1,6 @@
+use crate::GremlinError;
 use crate::io::GremlinIO;
-use crate::options::{ConnectionOptions, };
-use crate::{GremlinError, };
+use crate::options::ConnectionOptions;
 use bb8::ManageConnection;
 use std::sync::Arc;
 use tokio_tungstenite::{Connector, connect_async_with_config};
@@ -8,7 +8,6 @@ use tungstenite::{
     client::{IntoClientRequest, uri_mode},
     stream::{Mode, NoDelay},
 };
-
 
 impl<V> ManageConnection for ConnectionOptions<V>
 where
@@ -58,7 +57,7 @@ where
                         false,
                         Some(connector),
                     )
-                        .await
+                    .await
                 }
                 _ => panic!("NativeTls isn't supported :D"),
             }?;

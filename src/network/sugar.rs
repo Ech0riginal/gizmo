@@ -1,10 +1,10 @@
+use super::WSStream;
 use futures::SinkExt;
 use tokio::stream::StreamExt;
 use tokio::sync::mpsc;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::sync::mpsc::error::SendError;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tungstenite::Message;
-use super::WSStream;
 
 pub struct Stream(UnboundedReceiver<Message>);
 

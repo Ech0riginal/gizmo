@@ -12,11 +12,11 @@ mod client;
 mod conversion;
 mod error;
 mod io;
+mod network;
 mod options;
 pub mod process;
 pub mod structure;
 pub mod utils;
-mod network;
 
 pub type GremlinResult<T> = Result<T, GremlinError>;
 // pub use client::GremlinClient;

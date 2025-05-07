@@ -1,10 +1,10 @@
 use crate::io::{Args, GremlinIO, Request};
+use crate::network::GremlinStream;
 use crate::options::ConnectionOptions;
 use crate::structure::*;
 use crate::{GremlinError, GremlinResult};
 use bb8::{Pool, PooledConnection};
 use std::collections::HashMap;
-use crate::network::{GremlinStream};
 
 pub struct SessionedClient<'c, V: GremlinIO> {
     connection: PooledConnection<'c, ConnectionOptions<V>>,
@@ -19,7 +19,8 @@ impl<'a, V: GremlinIO> SessionedClient<'a, V> {
                 .op(CLOSE)
                 .proc(SESSION)
                 .args(Args::new().arg(SESSION, &session_name))
-                .build().unwrap();
+                .build()
+                .unwrap();
             self.connection.send(request).await
         } else {
             Err(GremlinError::Generic("No session to close".to_string()))
@@ -98,13 +99,17 @@ where
             .arg(LANGUAGE, GREMLIN_GROOVY)
             .arg(
                 ALIASES,
-                [()].iter().map(|_| (
-                    G,
-                    self.alias
-                        .clone()
-                        .map(|str| GValue::String(str.into()))
-                        .unwrap_or(GValue::String(G.into()))
-                )).collect::<HashMap<_, GValue>>()
+                [()].iter()
+                    .map(|_| {
+                        (
+                            G,
+                            self.alias
+                                .clone()
+                                .map(|str| GValue::String(str.into()))
+                                .unwrap_or(GValue::String(G.into())),
+                        )
+                    })
+                    .collect::<HashMap<_, GValue>>(),
             )
             .arg(
                 BINDINGS,
@@ -129,30 +134,31 @@ where
             .unwrap();
         let conn = self.pool.get().await?;
         let stream = conn.send(request).await?;
-        
+
         Ok(stream)
     }
 
-    pub async fn execute(
-        &self,
-        bytecode: Bytecode,
-    ) -> GremlinResult<impl GremlinStream + '_> {
+    pub async fn execute(&self, bytecode: Bytecode) -> GremlinResult<impl GremlinStream + '_> {
         let bytecode = GValue::Bytecode(bytecode);
         let request = Request::builder()
             .op("bytecode")
             .proc("traversal")
-            .args(Args::new()
-                .arg(GREMLIN, bytecode)
-                .arg(
+            .args(
+                Args::new().arg(GREMLIN, bytecode).arg(
                     ALIASES,
-                    [()].iter().map(|_| (
-                        G,
-                            self.alias
-                            .clone()
-                            .map(|str| GValue::String(str.into()))
-                            .unwrap_or(GValue::String(G.into()))
-                    )).collect::<HashMap<_, GValue>>()
-              ))
+                    [()].iter()
+                        .map(|_| {
+                            (
+                                G,
+                                self.alias
+                                    .clone()
+                                    .map(|str| GValue::String(str.into()))
+                                    .unwrap_or(GValue::String(G.into())),
+                            )
+                        })
+                        .collect::<HashMap<_, GValue>>(),
+                ),
+            )
             .build()
             .unwrap();
         let conn = self.pool.get().await?;

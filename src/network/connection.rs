@@ -1,20 +1,19 @@
 use super::*;
-use crate::{GValue, GremlinError, GremlinResult};
 use crate::io::{Args, GremlinIO, Request};
 use crate::options::{ConnectionOptions, Credentials};
-use std::collections::HashMap;
-use std::sync::Arc;
+use crate::{GValue, GremlinError, GremlinResult};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bb8::PooledConnection;
 use futures::SinkExt;
+use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::stream::wrappers::UnboundedReceiverStream;
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::{RwLock, mpsc};
 use tokio::task::JoinHandle;
 use tokio::time::Instant;
 
 type RequestMap = HashMap<uuid::Uuid, mpsc::UnboundedSender<Option<GremlinResult<GValue>>>>;
-
 
 /// Provides a stream interface for requests' response data
 pub struct Connection<V> {
@@ -37,7 +36,7 @@ impl<V: GremlinIO> Connection<V> {
     pub fn healthcheck(&self) -> bool {
         self.socket.blocking_read().valid_blocking()
     }
-    
+
     pub async fn send<'a>(
         self: PooledConnection<'a, ConnectionOptions<V>>,
         request: Request,
@@ -48,13 +47,12 @@ impl<V: GremlinIO> Connection<V> {
         self.pending.write().await.insert(request.id, tx);
 
         let stream = UnboundedReceiverStream::new(rx);
-        
+
         drop(self);
 
         Ok(stream)
     }
 }
-
 
 impl<V: GremlinIO> Connection<V> {
     pub fn new(ws_stream: WSStream, options: ConnectionOptions<V>) -> Self {
@@ -98,10 +96,8 @@ impl<V: GremlinIO> Connection<V> {
                                     callback
                                         .send(Some(Ok(response.result)))
                                         .map_err(|_| GremlinError::Closed)?;
-                                    callback
-                                        .send(None)
-                                        .map_err(|_| GremlinError::Closed)?;
-                                },
+                                    callback.send(None).map_err(|_| GremlinError::Closed)?;
+                                }
                                 _ => {}
                             }
                         }
