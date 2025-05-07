@@ -1,5 +1,6 @@
+use crate::GremlinError;
 use crate::io::GremlinIO;
-use crate::prelude::GremlinError;
+use crate::structure::*;
 use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
