@@ -1,4 +1,4 @@
-use crate::prelude::GValue;
+use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct List(pub(crate) Vec<GValue>);
@@ -51,4 +51,14 @@ impl std::ops::Index<usize> for List {
     fn index(&self, key: usize) -> &GValue {
         self.0.get(key).expect("no entry found for key")
     }
+}
+
+macro_rules! from {
+    ($ty:ty) => {
+        impl From<$ty> for List {
+            fn from(m: $ty) -> Self {
+                Timestamp(m as i64)
+            }
+        }
+    };
 }

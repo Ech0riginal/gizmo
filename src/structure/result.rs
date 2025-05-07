@@ -1,4 +1,4 @@
-use crate::{GremlinError, GremlinResult};
+use crate::GremlinResult;
 
 use crate::structure::GValue;
 use futures::Stream;

@@ -1,4 +1,4 @@
-use crate::prelude::GValue;
+use crate::structure::*;
 use crate::structure::{GID, Property, Vertex};
 use std::collections::HashMap;
 use std::collections::hash_map::{IntoIter, Iter};

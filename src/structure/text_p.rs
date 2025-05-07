@@ -1,4 +1,4 @@
-use crate::prelude::{GValue};
+use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TextP {

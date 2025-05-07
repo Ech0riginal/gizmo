@@ -1,5 +1,5 @@
-use std::fmt::Formatter;
 use crate::structure::*;
+use std::fmt::Formatter;
 
 #[derive(PartialEq, Clone)]
 pub struct Bytecode {
@@ -51,18 +51,11 @@ impl Bytecode {
     }
 }
 
-lazy_static! {
-    pub static ref WRITE_OPERATORS: Vec<&'static str> = vec![
-        "addV", "property", "addE", "from", "to", "drop", "mergeV", "mergeE"
-    ];
-}
-
 #[derive(PartialEq, Clone)]
 pub struct Instruction {
     pub(crate) operator: String,
     pub(crate) args: Vec<GValue>,
 }
-
 
 impl std::fmt::Debug for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -94,8 +87,6 @@ impl std::fmt::Debug for Instruction {
         }
     }
 }
-
-
 
 impl Instruction {
     pub fn new(operator: String, args: Vec<GValue>) -> Instruction {
