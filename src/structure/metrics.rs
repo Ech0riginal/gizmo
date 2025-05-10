@@ -1,3 +1,5 @@
+use crate::structure::{Double, Long};
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraversalExplanation {
     final_t: Vec<String>,
@@ -49,38 +51,38 @@ impl TraversalExplanation {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraversalMetrics {
-    duration: f64,
-    metrics: Vec<Metric>,
+    duration: Double,
+    metrics: Vec<Metrics>,
 }
 
 impl TraversalMetrics {
     pub fn duration(&self) -> &f64 {
-        &self.duration
+        &self.duration.0
     }
 
-    pub fn metrics(&self) -> &Vec<Metric> {
+    pub fn metrics(&self) -> &Vec<Metrics> {
         &self.metrics
     }
 }
 
 impl TraversalMetrics {
-    pub fn new(duration: f64, metrics: Vec<Metric>) -> Self {
+    pub fn new(duration: Double, metrics: Vec<Metrics>) -> Self {
         TraversalMetrics { duration, metrics }
     }
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Metric {
+pub struct Metrics {
     id: String,
-    duration: f64,
+    duration: Double,
     name: String,
-    count: i64,
-    traversers: i64,
-    perc_duration: f64,
-    nested: Vec<Metric>,
+    count: Long,
+    traversers: Long,
+    perc_duration: Double,
+    nested: Vec<Metrics>,
 }
 
-impl Metric {
+impl Metrics {
     pub fn id(&self) -> &String {
         &self.id
     }
@@ -102,21 +104,21 @@ impl Metric {
     }
 }
 
-impl Metric {
+impl Metrics {
     pub fn new<T, V>(
         id: T,
         name: V,
-        duration: f64,
-        count: i64,
-        traversers: i64,
-        perc_duration: f64,
-        nested: Vec<Metric>,
+        duration: Double,
+        count: Long,
+        traversers: Long,
+        perc_duration: Double,
+        nested: Vec<Metrics>,
     ) -> Self
     where
         T: Into<String>,
         V: Into<String>,
     {
-        Metric {
+        Metrics {
             id: id.into(),
             name: name.into(),
             duration,

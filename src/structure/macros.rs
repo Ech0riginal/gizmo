@@ -1,39 +1,57 @@
-#[doc(hidden)]
-#[macro_export]
-macro_rules! vertex {
-    ({ id => $id:expr,label => $label:expr, properties => {$($key:expr => [$({ id => $p_id:expr, value => $p_value:expr}),*]),*}}) => {{
+macro_rules! primitive {
+    ($variant:ident, $primitive:ty) => {
+        pub struct $variant($primitive);
 
-        #[allow(unused_mut)]
-        let mut properties  = ::std::collections::HashMap::<String,Vec<$crate::prelude::VertexProperty>>::new();
-            $(
-                let mut sub_props = vec![];
-                $(
-                    let p = $crate::prelude::VertexProperty::new($p_id,$key,$p_value);
-                    sub_props.push(p);
-                )*
-                properties.insert($key.into(),sub_props);
-            )*
-        let v = $crate::prelude::Vertex::new($id.into(), $label,properties);
-        v
-    }};
+        debug!($variant);
+        display!($variant);
+        deref!($variant, $primitive);
+    };
 }
+macro_rules! deref {
+    ($variant:ident, $primitive:ty) => {
+        impl ops::Deref for $variant {
+            type Target = $primitive;
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+    };
+}
+macro_rules! debug {
+    ($variant:ident) => {
+        impl fmt::Debug for $variant {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "{:?}", self.0)
+            }
+        }
+    };
+}
+macro_rules! display {
+    ($variant:ident) => {
+        impl fmt::Display for $variant {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, stringify!($variant))
+            }
+        }
+    };
+}
+macro_rules! hash {
+    ($variant:ident) => {
+        impl std::hash::Hash for $variant {
+            fn hash<H: Hasher>(&self, state: &mut H) {
+                self.0.hash(state);
+            }
+        }
+    };
+}
+macro_rules! eq {
+    ($variant:ident) => {
+        impl Eq for $variant {}
 
-#[doc(hidden)]
-#[macro_export]
-macro_rules! edge {
-    ({
-       id => $id:expr,
-       label => $label:expr,
-       inV => {  id => $inVId:expr, label => $inVLabel:expr},
-       outV => {  id => $outVId:expr, label => $outVLabel:expr} ,
-       properties => {$($key:expr => $value:expr),*}}) => {{
-
-           #[allow(unused_mut)]
-        let mut properties  = ::std::collections::HashMap::<String,$crate::prelude::Property>::new();
-            $(
-                let p = Property::new($key.into(),$value.into());
-                properties.insert($key.into(),p);
-            )*
-        $crate::prelude::Edge::new($id.into(), $label, $inVId.into(),$inVLabel,$outVId.into(),$outVLabel,properties)
-    }};
+        impl PartialEq<Self> for $variant {
+            fn eq(&self, other: &Self) -> bool {
+                self.0.eq(&other.0)
+            }
+        }
+    };
 }

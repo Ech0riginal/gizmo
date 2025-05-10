@@ -1,9 +1,6 @@
 use crate::structure::{GID, GValue, Property};
 use std::collections::HashMap;
 
-use crate::GremlinResult;
-use crate::conversion::{BorrowFromGValue, FromGValue};
-
 #[derive(Debug, PartialEq, Clone)]
 pub enum GProperty {
     VertexProperty(VertexProperty),
@@ -18,26 +15,6 @@ impl GProperty {
         }
     }
 
-    pub fn take<T>(self) -> GremlinResult<T>
-    where
-        T: FromGValue,
-    {
-        match self {
-            GProperty::Property(p) => p.take(),
-            GProperty::VertexProperty(p) => p.take(),
-        }
-    }
-
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
-    where
-        T: BorrowFromGValue,
-    {
-        match self {
-            GProperty::Property(p) => p.get(),
-            GProperty::VertexProperty(p) => p.get(),
-        }
-    }
-
     pub fn label(&self) -> &String {
         match self {
             GProperty::Property(p) => p.label(),
@@ -45,12 +22,27 @@ impl GProperty {
         }
     }
 }
-impl FromGValue for GProperty {
-    fn from_gvalue(v: GValue) -> GremlinResult<Self> {
-        match v {
-            GValue::VertexProperty(p) => Ok(GProperty::VertexProperty(p)),
-            GValue::Property(p) => Ok(GProperty::Property(p)),
-            gvalue => panic!("Value not allowed for a property ({:?})", gvalue),
+// impl TryFrom<GValue> for GProperty {
+//     type Error = GremlinError;
+//
+//     fn try_from(v: GValue) -> GremlinResult<Self> {
+//         match v {
+//             GValue::VertexProperty(p) => Ok(GProperty::VertexProperty(p)),
+//             GValue::Property(p) => Ok(GProperty::Property(p)),
+//             gvalue => Err(GremlinError::Cast(
+//                 gvalue.to_string(),
+//                 "GProperty".to_string()
+//             )),
+//         }
+//     }
+// }
+
+impl From<GValue> for GProperty {
+    fn from(value: GValue) -> Self {
+        match value {
+            GValue::VertexProperty(p) => GProperty::VertexProperty(p),
+            GValue::Property(p) => GProperty::Property(p),
+            _ => panic!("Unexpected value casting to GProperty!"),
         }
     }
 }
@@ -86,20 +78,6 @@ impl VertexProperty {
 
     pub fn value(&self) -> &GValue {
         &self.value
-    }
-
-    pub fn take<T>(self) -> GremlinResult<T>
-    where
-        T: FromGValue,
-    {
-        T::from_gvalue(*self.value)
-    }
-
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
-    where
-        T: BorrowFromGValue,
-    {
-        T::from_gvalue(&self.value)
     }
 
     pub fn label(&self) -> &String {

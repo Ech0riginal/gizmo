@@ -1,5 +1,7 @@
 crate::primitive_prelude!();
 crate::primitive!(Class, String);
+crate::partial_eq!(Class);
+crate::eq!(Class);
 
 impl From<&String> for Class {
     fn from(value: &String) -> Self {

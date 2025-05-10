@@ -1,6 +1,10 @@
 crate::primitive_prelude!();
 crate::primitive!(Date, chrono::DateTime<chrono::Utc>);
+crate::partial_eq!(Date);
+crate::eq!(Date);
 crate::primitive!(Timestamp, i64);
+crate::partial_eq!(Timestamp);
+crate::eq!(Timestamp);
 macro_rules! from {
     ($ty:ty) => {
         impl From<$ty> for Timestamp {

@@ -1,19 +1,10 @@
 use crate::structure::*;
 use std::fmt::Formatter;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Default)]
 pub struct Bytecode {
     source_instructions: Vec<Instruction>,
-    pub(crate) step_instructions: Vec<Instruction>,
-}
-
-impl Default for Bytecode {
-    fn default() -> Bytecode {
-        Bytecode {
-            source_instructions: vec![],
-            step_instructions: vec![],
-        }
-    }
+    step_instructions: Vec<Instruction>,
 }
 
 impl std::fmt::Debug for Bytecode {
@@ -33,21 +24,27 @@ impl Bytecode {
         Default::default()
     }
 
-    pub fn add_source(&mut self, source_name: String, args: Vec<GValue>) {
+    pub fn add_source<S>(&mut self, source_name: S, args: Vec<GValue>)
+    where
+        S: AsRef<str>,
+    {
         self.source_instructions
-            .push(Instruction::new(source_name, args));
+            .push(Instruction::new(source_name.as_ref().to_string(), args));
     }
-    pub fn add_step(&mut self, step_name: String, args: Vec<GValue>) {
+    pub fn add_step<S>(&mut self, step_name: S, args: Vec<GValue>)
+    where
+        S: AsRef<str>,
+    {
         self.step_instructions
-            .push(Instruction::new(step_name, args));
-    }
-
-    pub fn steps(&self) -> &Vec<Instruction> {
-        &self.step_instructions
+            .push(Instruction::new(step_name.as_ref().to_string(), args));
     }
 
     pub fn sources(&self) -> &Vec<Instruction> {
         &self.source_instructions
+    }
+
+    pub fn steps(&self) -> &Vec<Instruction> {
+        &self.step_instructions
     }
 }
 
@@ -91,13 +88,5 @@ impl std::fmt::Debug for Instruction {
 impl Instruction {
     pub fn new(operator: String, args: Vec<GValue>) -> Instruction {
         Instruction { operator, args }
-    }
-
-    pub fn operator(&self) -> &String {
-        &self.operator
-    }
-
-    pub fn args(&self) -> &Vec<GValue> {
-        &self.args
     }
 }

@@ -1,4 +1,4 @@
-use crate::process::traversal::step::OptionStep;
+// use crate::process::traversal::step::OptionStep;
 use crate::structure::{GKey, GValue};
 use std::collections::HashMap;
 
@@ -103,8 +103,8 @@ impl<V: Into<GValue>> Insert<Option<V>> for OptionHandler {
     }
 }
 
-impl Into<OptionStep> for MergeBuilder {
-    fn into(self) -> OptionStep {
-        OptionStep::from((self.inner, self.map))
-    }
-}
+// impl Into<OptionStep> for MergeBuilder {
+//     fn into(self) -> OptionStep {
+//         OptionStep::from((self.inner, self.map))
+//     }
+// }

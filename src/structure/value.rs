@@ -1,10 +1,12 @@
 use super::{Column, Direction, Merge};
-use crate::GremlinResult;
-use crate::conversion::{BorrowFromGValue, FromGValue};
+use crate::process::traversal::TraversalBuilder;
+use crate::structure::label::LabelType;
 use crate::structure::traverser::Traverser;
 use crate::structure::tree::Tree;
 use crate::structure::*;
+use crate::{GremlinError, GremlinResult};
 use std::collections::HashMap;
+use std::convert::Infallible;
 use std::fmt::Formatter;
 
 macro_rules! from_primitive {
@@ -35,10 +37,29 @@ macro_rules! from_gvalue {
         }
     };
 }
+#[allow(unused)]
+macro_rules! try_from_gvalue {
+    ($variant:ident, $primitive:ty) => {
+        impl TryFrom<GValue> for $primitive {
+            type Error = GremlinError;
+
+            fn try_from(v: GValue) -> Result<Self, Self::Error> {
+                match v {
+                    GValue::$variant(v) => Ok(v),
+                    gvalue => Err(GremlinError::Cast(
+                        stringify!($variant).to_string(),
+                        stringify!($primitive).to_string(),
+                    )),
+                }
+            }
+        }
+    };
+}
 macro_rules! primitive_interop {
     ($variant:ident, $primitive:ty) => {
         from_primitive!($variant, $primitive);
         from_gvalue!($variant, $primitive);
+        // try_from_gvalue!($variant, $primitive);
     };
 
     ($variant:ident, &$ly:lifetime $primitive:ty) => {
@@ -79,14 +100,14 @@ macro_rules! enom {
 
 enom!(
     // Core
-    Bool(bool),
+    Bool(Bool),
     Class(Class),
     Date(Date),
-    Double(f64),
-    Float(f32),
-    Integer(i32),
+    Double(Double),
+    Float(Float),
+    Integer(Integer),
     List(List),
-    Long(i64),
+    Long(Long),
     Map(Map),
     Set(Set),
     String(String),
@@ -122,7 +143,7 @@ enom!(
     // Request
     Int128(i128),
     Token(Token),
-    Metric(Metric),
+    Metric(Metrics),
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
     TextP(TextP),
@@ -134,16 +155,18 @@ enom!(
 impl GValue {
     pub fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: TryFrom<GValue>,
+        GremlinError: From<T::Error>,
     {
-        T::from_gvalue(self)
+        Ok(T::try_from(self)?)
     }
 
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
+    pub fn get<'a, T>(&'a self) -> GremlinResult<T>
     where
-        T: BorrowFromGValue,
+        T: TryFrom<&'a GValue>,
+        GremlinError: From<T::Error>,
     {
-        T::from_gvalue(self)
+        Ok(T::try_from(self)?)
     }
 }
 
@@ -175,12 +198,6 @@ where
     }
 }
 
-impl From<Vec<GValue>> for GValue {
-    fn from(value: Vec<GValue>) -> Self {
-        GValue::List(value.into())
-    }
-}
-
 impl From<GKey> for GValue {
     fn from(value: GKey) -> Self {
         match value {
@@ -191,5 +208,63 @@ impl From<GKey> for GValue {
             GKey::Edge(v) => GValue::Edge(v),
             GKey::Direction(v) => GValue::Direction(v),
         }
+    }
+}
+
+impl From<GID> for GValue {
+    fn from(value: GID) -> Self {
+        match value {
+            GID::String(s) => Self::String(s),
+            GID::Integer(i) => Self::Integer(i),
+            GID::Long(l) => Self::Long(l),
+        }
+    }
+}
+
+impl From<LabelType> for GValue {
+    fn from(value: LabelType) -> Self {
+        match value {
+            LabelType::Str(val) => GValue::String(val),
+            LabelType::Bool(val) => GValue::Bool(Bool(val)),
+            LabelType::T(val) => GValue::T(val),
+        }
+    }
+}
+
+impl<T> From<Vec<T>> for GValue
+where
+    GValue: From<T>,
+{
+    fn from(value: Vec<T>) -> Self {
+        let vec = value.into_iter().map(GValue::from).collect::<Vec<_>>();
+        GValue::List(List(vec))
+    }
+}
+// impl From<Vec<GValue>> for GValue {
+//     fn from(value: Vec<GValue>) -> Self {
+//         GValue::List(value.into())
+//     }
+// }
+//
+//
+// // impl Into<GValue> for Vec<GValue> {
+// //     fn into(self) -> GValue {
+//         GValue::List(List(self))
+//     }
+// }
+
+impl From<Infallible> for GremlinError {
+    fn from(value: Infallible) -> Self {
+        GremlinError::Generic("Inconceivable".into())
+    }
+}
+impl From<GValue> for Vec<String> {
+    fn from(value: GValue) -> Self {
+        todo!()
+    }
+}
+impl From<TraversalBuilder> for GValue {
+    fn from(value: TraversalBuilder) -> Self {
+        value.bytecode.into()
     }
 }
