@@ -1,11 +1,9 @@
 use crate::GremlinError;
 use crate::io::GremlinIO;
-use crate::structure::*;
 use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
 use rustls_pki_types::{CertificateDer, PrivateKeyDer};
 use std::io::BufReader;
-use std::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::Duration;
 use tokio::tracing;
@@ -71,6 +69,7 @@ impl TlsOptions {
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
 pub struct ConnectionOptions<V> {
+    #[allow(unused)]
     #[builder(setter(custom))]
     pub(crate) version: V,
     #[builder(default = "Self::default_host()")]
