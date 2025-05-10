@@ -1,4 +1,4 @@
-use crate::conversion::ToGValue;
+// use crate::conversion::ToGValue;
 pub use crate::io::graphson::v2::ser::*;
 use crate::io::{Serializer, get_value};
 use crate::{GValue, GremlinError, GremlinResult};

@@ -41,7 +41,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : DOUBLE, "@value" : 100.0f64 }),
-            object: GValue::Double(100.0),
+            object: GValue::Double(100.0.into()),
         }
     );
     test!(
@@ -49,7 +49,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : FLOAT, "@value" : 100.0f32 }),
-            object: GValue::Float(100.0),
+            object: GValue::Float(100.0.into()),
         }
     );
     test!(
@@ -57,7 +57,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : INT, "@value" : 100i32 }),
-            object: GValue::Integer(100),
+            object: GValue::Integer(100.into()),
         }
     );
     test!(
@@ -65,7 +65,7 @@ mod core {
         V2,
         Test {
             serial: json!({ "@type" : LONG, "@value" : 100u64 }),
-            object: GValue::Long(100),
+            object: GValue::Long(100.into()),
         }
     );
     test!(
@@ -85,17 +85,17 @@ mod structure {
     macro_rules! marko {
         () => {
             GValue::Vertex(Vertex {
-                id: GID::Int32(1),
+                id: GID::Integer(1.into()),
                 label: "person".into(),
                 properties: {
                     let mut tmp = HashMap::new();
                     tmp.insert(
                         "name".into(),
                         vec![VertexProperty {
-                            id: GID::Int64(0),
+                            id: GID::Long(0.into()),
                             label: "name".into(),
                             value: Box::new(GValue::String("marko".into())),
-                            vertex: Some(GID::Int32(1)),
+                            vertex: Some(GID::Integer(1.into())),
                             properties: Default::default(),
                         }],
                     );
@@ -103,49 +103,49 @@ mod structure {
                         "location".into(),
                         vec![
                             VertexProperty {
-                                id: GID::Int64(6),
+                                id: GID::Long(6.into()),
                                 value: Box::new(GValue::String("san diego".into())),
                                 label: "location".into(),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(1997));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2001));
+                                    tmp2.insert("startTime".into(), GValue::Integer(1997.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(7),
+                                id: GID::Long(7.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("santa cruz".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2001));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2004));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2001.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(8),
+                                id: GID::Long(8.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("brussels".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2004));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2004.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(9),
+                                id: GID::Long(9.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("santa fe".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2005.into()));
                                     tmp2
                                 }),
                             },
@@ -163,19 +163,19 @@ mod structure {
         Test {
             serial: json!({ "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2009 } } }}),
             object: GValue::Edge(Edge {
-                id: GID::Int32(13),
+                id: GID::Integer(13.into()),
                 label: "develops".to_string(),
                 in_v: Vertex {
-                    id: GID::Int32(10),
+                    id: GID::Integer(10.into()),
                     label: "software".into(),
                     properties: Default::default(),
                 },
                 out_v: Vertex {
-                    id: GID::Int32(1),
+                    id: GID::Integer(1.into()),
                     label: "person".into(),
                     properties: Default::default(),
                 },
-                properties: [("since".into(), Box::new(GValue::Integer(2009))),].into(),
+                properties: [("since".into(), Box::new(GValue::Integer(2009.into()))),].into(),
             }),
         }
     );
@@ -185,7 +185,12 @@ mod structure {
         Test {
             serial: json!({ "@type" : "g:Path", "@value" : { "labels" : [ [ ], [ ], [ ] ], "objects" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person" } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "software", "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 4 }, "value" : "gremlin", "vertex" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "name" } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 5 }, "value" : "tinkergraph", "vertex" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "name" } } ] } } } ] }}),
             object: GValue::Path(Path::new(
-                vec![vec![].into(), vec![].into(), vec![].into()].into(),
+                vec![
+                    GValue::List(List(vec![])),
+                    GValue::List(List(vec![])),
+                    GValue::List(List(vec![]))
+                ]
+                .into(),
                 GValue::List(List(vec![
                     GValue::Vertex(Vertex {
                         id: 1i32.into(),
@@ -203,7 +208,7 @@ mod structure {
                                     label: "name".to_string(),
                                     id: 4i64.into(),
                                     value: Box::new(GValue::String("gremlin".into())),
-                                    vertex: Some(GID::Int32(10)),
+                                    vertex: Some(GID::Integer(10.into())),
                                     properties: Default::default(),
                                 }],
                             );
@@ -220,7 +225,7 @@ mod structure {
                                 vec![VertexProperty {
                                     id: 5i64.into(),
                                     value: Box::new(GValue::String("tinkergraph".into())),
-                                    vertex: Some(GID::Int32(11)),
+                                    vertex: Some(GID::Integer(11.into())),
                                     label: "name".to_string(),
                                     properties: Default::default(),
                                 }],
@@ -240,17 +245,17 @@ mod structure {
             serial: json!({ "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2009 }, "element" : { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "outV" : { "@type" : "g:Int32", "@value" : 1 }, "inV" : { "@type" : "g:Int32", "@value" : 10 } } } }}),
             object: GValue::Property(Property {
                 key: "since".into(),
-                value: Box::new(GValue::Integer(2009)),
+                value: Box::new(GValue::Integer(2009.into())),
                 element: Box::new(GValue::Edge(Edge {
-                    id: GID::Int32(13),
+                    id: GID::Integer(13.into()),
                     label: "develops".to_string(),
                     in_v: Vertex {
-                        id: GID::Int32(10),
+                        id: GID::Integer(10.into()),
                         label: "software".into(),
                         properties: Default::default(),
                     },
                     out_v: Vertex {
-                        id: GID::Int32(1),
+                        id: GID::Integer(1.into()),
                         label: "person".into(),
                         properties: Default::default(),
                     },
@@ -265,17 +270,17 @@ mod structure {
         Test {
             serial: json!({ "starVertex" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } }}),
             object: GValue::StarGraph(StarGraph {
-                id: GID::Int32(1),
+                id: GID::Integer(1.into()),
                 label: "person".into(),
                 properties: {
                     let mut tmp = HashMap::new();
                     tmp.insert(
                         "name".into(),
                         vec![VertexProperty {
-                            id: GID::Int64(0),
+                            id: GID::Long(0.into()),
                             label: "name".into(),
                             value: Box::new(GValue::String("marko".into())),
-                            vertex: Some(GID::Int32(1)),
+                            vertex: Some(GID::Integer(1.into())),
                             properties: Default::default(),
                         }],
                     );
@@ -283,49 +288,49 @@ mod structure {
                         "location".into(),
                         vec![
                             VertexProperty {
-                                id: GID::Int64(6),
+                                id: GID::Long(6.into()),
                                 value: Box::new(GValue::String("san diego".into())),
                                 label: "location".into(),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(1997));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2001));
+                                    tmp2.insert("startTime".into(), GValue::Integer(1997.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(7),
+                                id: GID::Long(7.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("santa cruz".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2001));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2004));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2001.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(8),
+                                id: GID::Long(8.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("brussels".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2004));
-                                    tmp2.insert("endTime".into(), GValue::Integer(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2004.into()));
+                                    tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
                                     tmp2
                                 }),
                             },
                             VertexProperty {
-                                id: GID::Int64(9),
+                                id: GID::Long(9.into()),
                                 label: "location".into(),
                                 value: Box::new(GValue::String("santa fe".into())),
-                                vertex: Some(GID::Int32(1)),
+                                vertex: Some(GID::Integer(1.into())),
                                 properties: Some({
                                     let mut tmp2 = HashMap::new();
-                                    tmp2.insert("startTime".into(), GValue::Integer(2005));
+                                    tmp2.insert("startTime".into(), GValue::Integer(2005.into()));
                                     tmp2
                                 }),
                             },
@@ -345,17 +350,17 @@ mod structure {
             object: GValue::TinkerGraph(TinkerGraph {
                 vertices: vec![
                     Vertex {
-                        id: GID::Int32(1),
+                        id: GID::Integer(1.into()),
                         label: "person".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(0),
+                                    id: GID::Long(0.into()),
                                     label: "name".into(),
                                     value: Box::new(GValue::String("marko".into())),
-                                    vertex: Some(GID::Int32(1)),
+                                    vertex: Some(GID::Integer(1.into())),
                                     properties: Default::default(),
                                 }],
                             );
@@ -363,49 +368,70 @@ mod structure {
                                 "location".into(),
                                 vec![
                                     VertexProperty {
-                                        id: GID::Int64(6),
+                                        id: GID::Long(6.into()),
                                         value: Box::new(GValue::String("san diego".into())),
                                         label: "location".into(),
-                                        vertex: Some(GID::Int32(1)),
+                                        vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Integer(1997));
-                                            tmp2.insert("endTime".into(), GValue::Integer(2001));
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(1997.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2001.into()),
+                                            );
                                             tmp2
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(7),
+                                        id: GID::Long(7.into()),
                                         label: "location".into(),
                                         value: Box::new(GValue::String("santa cruz".into())),
-                                        vertex: Some(GID::Int32(1)),
+                                        vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Integer(2001));
-                                            tmp2.insert("endTime".into(), GValue::Integer(2004));
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2001.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2004.into()),
+                                            );
                                             tmp2
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(8),
+                                        id: GID::Long(8.into()),
                                         label: "location".into(),
                                         value: Box::new(GValue::String("brussels".into())),
-                                        vertex: Some(GID::Int32(1)),
+                                        vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Integer(2004));
-                                            tmp2.insert("endTime".into(), GValue::Integer(2005));
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2004.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
                                             tmp2
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(9),
+                                        id: GID::Long(9.into()),
                                         label: "location".into(),
                                         value: Box::new(GValue::String("santa fe".into())),
-                                        vertex: Some(GID::Int32(1)),
+                                        vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
                                             let mut tmp2 = HashMap::new();
-                                            tmp2.insert("startTime".into(), GValue::Integer(2005));
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
                                             tmp2
                                         }),
                                     },
@@ -415,16 +441,16 @@ mod structure {
                         },
                     },
                     Vertex {
-                        id: GID::Int32(7),
+                        id: GID::Integer(7.into()),
                         label: "person".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(1),
+                                    id: GID::Long(1.into()),
                                     value: Box::new(GValue::String("stephen".into())),
-                                    vertex: Some(GID::Int32(7)),
+                                    vertex: Some(GID::Integer(7.into())),
                                     label: "name".into(),
                                     properties: None,
                                 }],
@@ -433,37 +459,52 @@ mod structure {
                                 "location".into(),
                                 vec![
                                     VertexProperty {
-                                        id: GID::Int64(10),
+                                        id: GID::Long(10.into()),
                                         value: Box::new(GValue::String("centreville".into())),
-                                        vertex: Some(GID::Int32(7)),
+                                        vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(1990));
-                                            tmp.insert("endTime".into(), GValue::Integer(2000));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(1990.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2000.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(11),
+                                        id: GID::Long(11.into()),
                                         value: Box::new(GValue::String("dulles".into())),
-                                        vertex: Some(GID::Int32(7)),
+                                        vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2000));
-                                            tmp.insert("endTime".into(), GValue::Integer(2006));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2000.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2006.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(12),
+                                        id: GID::Long(12.into()),
                                         value: Box::new(GValue::String("purcellville".into())),
-                                        vertex: Some(GID::Int32(7)),
+                                        vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2006));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2006.into()),
+                                            );
                                             tmp
                                         }),
                                     },
@@ -473,16 +514,16 @@ mod structure {
                         },
                     },
                     Vertex {
-                        id: GID::Int32(8),
+                        id: GID::Integer(8.into()),
                         label: "person".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(2),
+                                    id: GID::Long(2.into()),
                                     value: Box::new(GValue::String("matthias".into())),
-                                    vertex: Some(GID::Int32(8)),
+                                    vertex: Some(GID::Integer(8.into())),
                                     label: "name".into(),
                                     properties: None,
                                 }],
@@ -491,49 +532,70 @@ mod structure {
                                 "location".into(),
                                 vec![
                                     VertexProperty {
-                                        id: GID::Int64(13),
+                                        id: GID::Long(13.into()),
                                         value: Box::new(GValue::String("bremen".into())),
-                                        vertex: Some(GID::Int32(8)),
+                                        vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2004));
-                                            tmp.insert("endTime".into(), GValue::Integer(2007));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2004.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2007.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(14),
+                                        id: GID::Long(14.into()),
                                         value: Box::new(GValue::String("baltimore".into())),
-                                        vertex: Some(GID::Int32(8)),
+                                        vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2007));
-                                            tmp.insert("endTime".into(), GValue::Integer(2011));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2007.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2011.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(15),
+                                        id: GID::Long(15.into()),
                                         value: Box::new(GValue::String("oakland".into())),
-                                        vertex: Some(GID::Int32(8)),
+                                        vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2011));
-                                            tmp.insert("endTime".into(), GValue::Integer(2014));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2011.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2014.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(16),
+                                        id: GID::Long(16.into()),
                                         value: Box::new(GValue::String("seattle".into())),
-                                        vertex: Some(GID::Int32(8)),
+                                        vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2014));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2014.into()),
+                                            );
                                             tmp
                                         }),
                                     },
@@ -543,16 +605,16 @@ mod structure {
                         },
                     },
                     Vertex {
-                        id: GID::Int32(9),
+                        id: GID::Integer(9.into()),
                         label: "person".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(3),
+                                    id: GID::Long(3.into()),
                                     value: Box::new(GValue::String("daniel".into())),
-                                    vertex: Some(GID::Int32(9)),
+                                    vertex: Some(GID::Integer(9.into())),
                                     label: "name".into(),
                                     properties: None,
                                 }],
@@ -561,37 +623,52 @@ mod structure {
                                 "location".into(),
                                 vec![
                                     VertexProperty {
-                                        id: GID::Int64(17),
+                                        id: GID::Long(17.into()),
                                         value: Box::new(GValue::String("spremberg".into())),
-                                        vertex: Some(GID::Int32(9)),
+                                        vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(1982));
-                                            tmp.insert("endTime".into(), GValue::Integer(2005));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(1982.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(18),
+                                        id: GID::Long(18.into()),
                                         value: Box::new(GValue::String("kaiserslautern".into())),
-                                        vertex: Some(GID::Int32(9)),
+                                        vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2005));
-                                            tmp.insert("endTime".into(), GValue::Integer(2009));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
+                                            tmp.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2009.into()),
+                                            );
                                             tmp
                                         }),
                                     },
                                     VertexProperty {
-                                        id: GID::Int64(19),
+                                        id: GID::Long(19.into()),
                                         value: Box::new(GValue::String("aachen".into())),
-                                        vertex: Some(GID::Int32(9)),
+                                        vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
                                             let mut tmp = HashMap::new();
-                                            tmp.insert("startTime".into(), GValue::Integer(2009));
+                                            tmp.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2009.into()),
+                                            );
                                             tmp
                                         }),
                                     },
@@ -601,16 +678,16 @@ mod structure {
                         },
                     },
                     Vertex {
-                        id: GID::Int32(10),
+                        id: GID::Integer(10.into()),
                         label: "software".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(4),
+                                    id: GID::Long(4.into()),
                                     value: Box::new(GValue::String("gremlin".into())),
-                                    vertex: Some(GID::Int32(10)),
+                                    vertex: Some(GID::Integer(10.into())),
                                     label: "name".into(),
                                     properties: None,
                                 }],
@@ -619,16 +696,16 @@ mod structure {
                         },
                     },
                     Vertex {
-                        id: GID::Int32(11),
+                        id: GID::Integer(11.into()),
                         label: "software".into(),
                         properties: {
                             let mut tmp = HashMap::new();
                             tmp.insert(
                                 "name".into(),
                                 vec![VertexProperty {
-                                    id: GID::Int64(5),
+                                    id: GID::Long(5.into()),
                                     value: Box::new(GValue::String("tinkergraph".into())),
-                                    vertex: Some(GID::Int32(11)),
+                                    vertex: Some(GID::Integer(11.into())),
                                     label: "name".into(),
                                     properties: None,
                                 }],
@@ -639,210 +716,215 @@ mod structure {
                 ],
                 edges: vec![
                     Edge {
-                        id: GID::Int32(13),
+                        id: GID::Integer(13.into()),
                         label: "develops".to_string(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(1),
+                            id: GID::Integer(1.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2009))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2009.into()))),]
+                            .into(),
                     },
                     Edge {
-                        id: GID::Int32(14),
+                        id: GID::Integer(14.into()),
                         label: "develops".to_string(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(1),
+                            id: GID::Integer(1.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2010))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2010.into()))),]
+                            .into(),
                     },
                     Edge {
-                        id: GID::Int32(15),
+                        id: GID::Integer(15.into()),
                         label: "uses".to_string(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(1),
+                            id: GID::Integer(1.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(4))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(4.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(16),
+                        id: GID::Integer(16.into()),
                         label: "uses".to_string(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(1),
+                            id: GID::Integer(1.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(17),
+                        id: GID::Integer(17.into()),
                         label: "develops".into(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(7),
+                            id: GID::Integer(7.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2010))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2010.into()))),]
+                            .into(),
                     },
                     Edge {
-                        id: GID::Int32(18),
+                        id: GID::Integer(18.into()),
                         label: "develops".into(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(7),
+                            id: GID::Integer(7.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2011))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2011.into()))),]
+                            .into(),
                     },
                     Edge {
-                        id: GID::Int32(19),
+                        id: GID::Integer(19.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(7),
+                            id: GID::Integer(7.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(20),
+                        id: GID::Integer(20.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(7),
+                            id: GID::Integer(7.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(4))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(4.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(21),
+                        id: GID::Integer(21.into()),
                         label: "develops".into(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(8),
+                            id: GID::Integer(8.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2012))),].into(),
+                        properties: [("since".into(), Box::new(GValue::Integer(2012.into()))),]
+                            .into(),
                     },
                     Edge {
-                        id: GID::Int32(22),
+                        id: GID::Integer(22.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(8),
+                            id: GID::Integer(8.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(23),
+                        id: GID::Integer(23.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(8),
+                            id: GID::Integer(8.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(24),
+                        id: GID::Integer(24.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(9),
+                            id: GID::Integer(9.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(25),
+                        id: GID::Integer(25.into()),
                         label: "uses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(9),
+                            id: GID::Integer(9.into()),
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3))),].into(),
+                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
                     },
                     Edge {
-                        id: GID::Int32(26),
+                        id: GID::Integer(26.into()),
                         label: "traverses".into(),
                         in_v: Vertex {
-                            id: GID::Int32(11),
+                            id: GID::Integer(11.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
                         out_v: Vertex {
-                            id: GID::Int32(10),
+                            id: GID::Integer(10.into()),
                             label: "software".into(),
                             properties: Default::default(),
                         },
@@ -863,16 +945,16 @@ mod structure {
                     value: Box::new(GValue::Tree(Tree {
                         branches: vec![Branch {
                             key: Box::new(GValue::Vertex(Vertex {
-                                id: GID::Int32(10),
+                                id: GID::Integer(10.into()),
                                 label: "software".into(),
                                 properties: {
                                     let mut tmp = HashMap::new();
                                     tmp.insert(
                                         "name".into(),
                                         vec![VertexProperty {
-                                            id: GID::Int64(4),
+                                            id: GID::Long(4.into()),
                                             value: Box::new(GValue::String("gremlin".into())),
-                                            vertex: Some(GID::Int32(10)),
+                                            vertex: Some(GID::Integer(10.into())),
                                             label: "name".into(),
                                             properties: None,
                                         }],
@@ -894,7 +976,7 @@ mod structure {
                                                     value: Box::new(GValue::String(
                                                         "tinkergraph".into(),
                                                     )),
-                                                    vertex: Some(GID::Int32(11)),
+                                                    vertex: Some(GID::Integer(11.into())),
                                                     label: "name".to_string(),
                                                     properties: Default::default(),
                                                 }],
@@ -925,9 +1007,9 @@ mod structure {
         Test {
             serial: json!({ "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" }}),
             object: GValue::VertexProperty(VertexProperty {
-                id: GID::Int64(0),
+                id: GID::Long(0.into()),
                 value: Box::new(GValue::String("marko".to_string())),
-                vertex: Some(GID::Int32(1)),
+                vertex: Some(GID::Integer(1.into())),
                 label: "name".into(),
                 properties: None,
             }),

@@ -10,8 +10,12 @@ pub(crate) struct Blob<'a> {
 }
 
 /// Validates a type against the expected { `@type`: ..., `@value`: ... } format
-pub fn validate(value: &Value) -> Result<Blob, Error> {
-    let tag = value.get(TYPE_TAG).ok_or(Error::Missing(TYPE_TAG))?;
-    let value = value.get(VALUE_TAG).ok_or(Error::Missing(VALUE_TAG))?;
-    Ok(Blob { tag, value })
+impl<'a> TryFrom<&'a Value> for Blob<'a> {
+    type Error = Error;
+
+    fn try_from(value: &'a Value) -> Result<Self, Self::Error> {
+        let tag = value.get(TYPE_TAG).ok_or(Error::Missing(TYPE_TAG))?;
+        let value = value.get(VALUE_TAG).ok_or(Error::Missing(VALUE_TAG))?;
+        Ok(Blob { tag, value })
+    }
 }

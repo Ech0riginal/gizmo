@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 crate::io::macros::types! {
     core,
     CLASS, "g:Class",

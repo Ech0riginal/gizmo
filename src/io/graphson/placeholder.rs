@@ -1,35 +1,50 @@
 //! A virtual placeholder for when we initialize the client.
 
-use crate::io::{Deserializer, GremlinIO, Request, Response, Serializer};
-use crate::{GValue, GremlinResult};
+use crate::GValue;
+use crate::io::{Deserializer, Error, GremlinIO, Request, Response, Serializer};
+use crate::structure::GID;
 use serde_json::Value;
 
 impl GremlinIO for () {
+    const version: &'static str = "n/a";
+
     fn mime() -> &'static str {
         "none"
     }
 }
 
 impl Deserializer<Response> for () {
-    fn deserialize(value: &Value) -> GremlinResult<Response> {
-        todo!()
+    fn deserialize(_: &Value) -> Result<Response, Error> {
+        Err(Error::Unsupported("()".into()))
     }
 }
 
 impl Deserializer<GValue> for () {
-    fn deserialize(value: &Value) -> GremlinResult<GValue> {
-        todo!()
+    fn deserialize(_: &Value) -> Result<GValue, Error> {
+        Err(Error::Unsupported("()".into()))
+    }
+}
+
+impl Deserializer<GID> for () {
+    fn deserialize(_: &Value) -> Result<GID, Error> {
+        Err(Error::Unsupported("()".into()))
     }
 }
 
 impl Serializer<Request> for () {
-    fn serialize(value: &Request) -> GremlinResult<Value> {
-        todo!()
+    fn serialize(_: &Request) -> Result<Value, Error> {
+        Err(Error::Unsupported("()".into()))
     }
 }
 
 impl Serializer<GValue> for () {
-    fn serialize(value: &GValue) -> GremlinResult<Value> {
-        todo!()
+    fn serialize(_: &GValue) -> Result<Value, Error> {
+        Err(Error::Unsupported("()".into()))
+    }
+}
+
+impl Serializer<GID> for () {
+    fn serialize(_: &GID) -> Result<Value, Error> {
+        Err(Error::Unsupported("()".into()))
     }
 }
