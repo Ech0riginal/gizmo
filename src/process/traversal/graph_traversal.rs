@@ -1,19 +1,22 @@
 use crate::GValue;
-use crate::conversion::FromGValue;
 use crate::process::traversal::step::*;
 use crate::process::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
 use crate::structure::*;
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
+pub struct GraphTraversal<S, E, T> {
     start: PhantomData<S>,
     end: PhantomData<E>,
     pub(crate) builder: TraversalBuilder,
     terminator: T,
 }
 
-impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
+impl<S, E, T> GraphTraversal<S, E, T>
+where
+    E: From<GValue>,
+    T: Terminator<E>,
+{
     pub fn new(terminator: T, builder: TraversalBuilder) -> GraphTraversal<S, E, T> {
         GraphTraversal {
             start: PhantomData,
@@ -27,7 +30,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.bytecode()
             .steps()
             .iter()
-            .any(|instruction| WRITE_OPERATORS.contains(&&*instruction.operator().as_ref()))
+            .any(|instruction| WRITE_OPERATORS.contains(&&*instruction.operator.as_ref()))
     }
 
     pub fn bytecode(&self) -> &Bytecode {
@@ -152,7 +155,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn with_side_effect<A>(mut self, step: (&'static str, A)) -> Self
     where
-        A: Into<GValue> + FromGValue,
+        A: Into<GValue> + From<GValue>,
     {
         self.builder = self.builder.with_side_effect(step);
 
@@ -370,9 +373,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn count(mut self) -> GraphTraversal<S, i64, T>
+    pub fn count(mut self) -> GraphTraversal<S, Long, T>
     where
-        T: Terminator<i64>,
+        T: Terminator<Long>,
     {
         self.builder = self.builder.count();
         GraphTraversal::new(self.terminator, self.builder)
@@ -655,7 +658,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     pub fn coalesce<B, A>(mut self, colaesce: A) -> GraphTraversal<S, B, T>
     where
         A: Into<CoalesceStep>,
-        B: FromGValue,
+        B: From<GValue>,
         T: Terminator<B>,
     {
         self.builder = self.builder.coalesce(colaesce);

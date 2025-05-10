@@ -1,6 +1,5 @@
-use crate::GremlinResult;
-use crate::conversion::FromGValue;
 use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
+use crate::{GValue, GremlinResult};
 
 pub fn traversal() -> RemoteTraversalSource {
     RemoteTraversalSource {}
@@ -36,7 +35,7 @@ impl MockTerminator {
     }
 }
 
-impl<T: FromGValue> Terminator<T> for MockTerminator {
+impl<T: From<GValue>> Terminator<T> for MockTerminator {
     type List = ();
     type Next = ();
     type HasNext = ();
@@ -70,7 +69,7 @@ impl<T: FromGValue> Terminator<T> for MockTerminator {
         unimplemented!()
     }
 }
-pub trait Terminator<T: FromGValue>: Clone {
+pub trait Terminator<T>: Clone {
     type List;
     type Next;
     type HasNext;
@@ -145,7 +144,7 @@ pub trait Terminator<T: FromGValue>: Clone {
 
 use crate::client::GremlinClient;
 use crate::io::GremlinIO;
-use crate::process::traversal::RemoteTraversalStream;
+use crate::network::GremlinStream;
 use futures::StreamExt;
 use futures::future::{BoxFuture, FutureExt};
 
@@ -160,11 +159,11 @@ impl<V: GremlinIO> AsyncTerminator<V> {
     }
 }
 
-impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTerminator<V> {
+impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerminator<V> {
     type List = BoxFuture<'static, GremlinResult<Vec<T>>>;
     type Next = BoxFuture<'static, GremlinResult<Option<T>>>;
     type HasNext = BoxFuture<'static, GremlinResult<bool>>;
-    type Iter = BoxFuture<'static, GremlinResult<RemoteTraversalStream<V, T>>>;
+    type Iter = BoxFuture<'static, GremlinResult<impl GremlinStream>>;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
@@ -177,12 +176,8 @@ impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTermin
 
             let mut vec = vec![];
             #[allow(irrefutable_let_patterns)]
-            while let option = stream.next().await {
-                if let Some(item) = option {
-                    vec.push(item?);
-                } else {
-                    break;
-                }
+            while let Some(Some(result)) = stream.next().await {
+                vec.push(result?.into());
             }
             Ok(vec)
         }
@@ -199,8 +194,8 @@ impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTermin
             let mut stream = iter.await?;
 
             let mut vec = vec![];
-            while let Some(item) = stream.next().await {
-                vec.push(item?);
+            while let Some(Some(item)) = stream.next().await {
+                vec.push(item?.into());
             }
             Ok(vec.pop())
         }
@@ -217,7 +212,7 @@ impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTermin
             let mut stream = iter.await?;
 
             let mut vec = vec![];
-            while let Some(item) = stream.next().await {
+            while let Some(Some(item)) = stream.next().await {
                 vec.push(item?);
             }
             Ok(vec.len() > 0)
@@ -231,12 +226,9 @@ impl<V: GremlinIO, T: FromGValue + Send + 'static> Terminator<T> for AsyncTermin
     {
         let client = self.client.clone();
         let bytecode = traversal.bytecode().clone();
-
-        async move {
-            let stream = client.submit_traversal(&bytecode).await?;
-
-            Ok(RemoteTraversalStream::new(stream))
-        }
-        .boxed()
+        Box::pin(async move {
+            let stream = client.execute(bytecode).await?;
+            Ok(stream)
+        })
     }
 }

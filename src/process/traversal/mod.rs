@@ -1,6 +1,5 @@
-use crate::GremlinResult;
-use crate::conversion::FromGValue;
-use crate::structure::{Bytecode, GResultSet, Traverser};
+use crate::structure::{Bytecode, GResultSet};
+use crate::{GValue, GremlinResult};
 use std::marker::PhantomData;
 
 mod anonymous_traversal_source;
@@ -95,7 +94,7 @@ impl<V: GremlinIO, T> RemoteTraversalStream<V, T> {
 
 impl<V: GremlinIO> RemoteTraversalStream<V, crate::structure::Null> {
     pub async fn iterate(&mut self) -> GremlinResult<()> {
-        while let Some(response) = self.next().await {
+        while let Some(response) = self.stream.next().await {
             //consume the entire stream, returning any errors
             response?;
         }
@@ -103,7 +102,7 @@ impl<V: GremlinIO> RemoteTraversalStream<V, crate::structure::Null> {
     }
 }
 
-impl<V: GremlinIO, T: FromGValue> Stream for RemoteTraversalStream<V, T> {
+impl<V: GremlinIO, T: From<GValue>> Stream for RemoteTraversalStream<V, T> {
     type Item = GremlinResult<T>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
@@ -113,9 +112,9 @@ impl<V: GremlinIO, T: FromGValue> Stream for RemoteTraversalStream<V, T> {
 
         Poll::Ready(item.map(|e| {
             e.expect("Failed to take an item from the result set")
-                .take::<Traverser>()
-                .expect("Failed to convert the item to a Traverser")
                 .take::<T>()
+            // .expect("Failed to convert the item to a Traverser")
+            // .take::<T>()
         }))
     }
 }
