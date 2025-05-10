@@ -4,24 +4,24 @@
 #![feature(type_changing_struct_update)]
 #![feature(try_trait_v2)]
 #![feature(type_alias_impl_trait)]
+#![feature(impl_trait_in_assoc_type)]
 
 #[macro_use]
 extern crate lazy_static;
 
 mod client;
-mod conversion;
+// mod conversion;
 mod error;
 mod io;
 mod network;
 mod options;
 pub mod process;
 pub mod structure;
-pub mod utils;
 
 pub type GremlinResult<T> = Result<T, GremlinError>;
 // pub use client::GremlinClient;
 pub use error::GremlinError;
-pub use structure::GValue;
+pub use structure::{GValue, Primitive};
 
 // pub mod prelude {
 //     pub use super::*;

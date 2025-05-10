@@ -28,6 +28,12 @@ impl From<LimitStep> for Vec<GValue> {
 
 impl From<i64> for LimitStep {
     fn from(param: i64) -> LimitStep {
+        Self::from(Long(param))
+    }
+}
+
+impl From<Long> for LimitStep {
+    fn from(param: Long) -> LimitStep {
         LimitStep::new(param.into(), None)
     }
 }

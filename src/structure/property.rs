@@ -1,5 +1,5 @@
-use crate::GremlinResult;
-use crate::conversion::{BorrowFromGValue, FromGValue};
+use crate::{GremlinError, GremlinResult};
+// use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -27,20 +27,6 @@ impl Property {
         &self.value
     }
 
-    pub fn take<T>(self) -> GremlinResult<T>
-    where
-        T: FromGValue,
-    {
-        T::from_gvalue(*self.value)
-    }
-
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
-    where
-        T: BorrowFromGValue,
-    {
-        T::from_gvalue(&self.value)
-    }
-
     pub fn label(&self) -> &String {
         &self.key
     }
@@ -52,15 +38,15 @@ trait GRefs: Sized {
 
     fn take<T>(self) -> GremlinResult<T>
     where
-        T: FromGValue,
+        T: TryFrom<GValue, Error = GremlinError>,
     {
-        T::from_gvalue(self.value())
+        T::try_from(self.value())
     }
 
-    fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
+    fn get<'a, T>(&'a self) -> GremlinResult<T>
     where
-        T: BorrowFromGValue,
+        T: TryFrom<&'a GValue, Error = GremlinError>,
     {
-        T::from_gvalue(self.value_ref())
+        T::try_from(self.value_ref())
     }
 }

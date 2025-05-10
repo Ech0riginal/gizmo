@@ -1,3 +1,5 @@
+#![allow(unused_macros)]
+
 macro_rules! io {
     ($id:ident) => {
         #[derive(Clone, Debug, Default)]
@@ -19,7 +21,7 @@ macro_rules! types {
         }
     };
 }
-
+#[cfg(test)]
 pub struct Test {
     pub serial: serde_json::Value,
     pub object: crate::structure::GValue,
@@ -104,12 +106,23 @@ macro_rules! test {
 }
 
 macro_rules! get_value {
-    ($value:expr,$v:path) => {
+    ($value:expr,Value::$v:ident) => {
         match $value {
-            $v(e) => Ok(e),
-            _ => Err($crate::error::GremlinError::Json(String::from(stringify!(
-                $v
-            )))),
+            Value::$v(e) => Ok(e),
+            _ => Err($crate::io::error::Error::UnexpectedJson {
+                msg: format!("Expected {}", stringify!($v)),
+                value: $value.clone(),
+            }),
+        }
+    };
+
+    ($value:expr,GValue::$v:ident) => {
+        match $value {
+            GValue::$v(e) => Ok(e),
+            v => Err($crate::io::error::Error::UnexpectedGValue {
+                msg: format!("Expected {}", stringify!($v)),
+                value: v.clone(),
+            }),
         }
     };
 }
@@ -118,9 +131,10 @@ macro_rules! expect_i32 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v as i32),
-            None => Err($crate::error::GremlinError::Json(String::from(
-                "Expected i32",
-            ))),
+            None => Err($crate::io::error::Error::UnexpectedJson {
+                msg: "Expected i32".into(),
+                value: $value.clone(),
+            }),
         }? as i32
     };
 }
@@ -129,9 +143,10 @@ macro_rules! expect_i64 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v),
-            None => Err($crate::error::GremlinError::Json(String::from(
-                "Expected i64",
-            ))),
+            None => Err($crate::io::error::Error::UnexpectedJson {
+                msg: "Expected i64".into(),
+                value: $value.clone(),
+            }),
         }?
     };
 }
@@ -140,9 +155,10 @@ macro_rules! expect_i128 {
     ($value:expr) => {
         match $value.as_i128() {
             Some(v) => Ok(v),
-            None => Err($crate::error::GremlinError::Json(String::from(
-                "Expected i64",
-            ))),
+            None => Err($crate::io::error::Error::UnexpectedJson {
+                msg: "Expected i128".into(),
+                value: $value.clone(),
+            }),
         }?
     };
 }
@@ -151,9 +167,10 @@ macro_rules! expect_float {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v as f32),
-            None => Err($crate::error::GremlinError::Json(String::from(
-                "Expected float",
-            ))),
+            None => Err($crate::io::error::Error::UnexpectedJson {
+                msg: "Expected f32".into(),
+                value: $value.clone(),
+            }),
         }? as f32
     };
 }
@@ -162,13 +179,15 @@ macro_rules! expect_double {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v),
-            None => Err($crate::error::GremlinError::Json(String::from(
-                "Expected double",
-            ))),
+            None => Err($crate::io::error::Error::UnexpectedJson {
+                msg: "Expected f64".into(),
+                value: $value.clone(),
+            }),
         }?
     };
 }
 
-use crate::io::GremlinIO;
+#[allow(unused_imports)]
 pub(crate) use {expect_double, expect_float, expect_i32, expect_i64, expect_i128, get_value};
+#[allow(unused_imports)]
 pub(crate) use {io, test, test_prelude, types};

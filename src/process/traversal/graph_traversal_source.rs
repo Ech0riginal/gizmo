@@ -1,6 +1,5 @@
 use crate::GValue;
 use crate::client::GremlinClient;
-use crate::conversion::{FromGValue, ToGValue};
 use crate::io::GremlinIO;
 use crate::process::traversal::remote::MockTerminator;
 use crate::process::traversal::step::*;
@@ -39,7 +38,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
         code.add_step(
             String::from("V"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+            ids.into().0.iter().map(|id| id.into()).collect(),
         );
 
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
@@ -84,7 +83,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
         code.add_step(
             String::from("E"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+            ids.into().0.iter().map(|id| id.into()).collect(),
         );
 
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
@@ -92,7 +91,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
     pub fn with_side_effect<T>(&self, step: (&'static str, T)) -> GraphTraversal<GValue, GValue, A>
     where
-        T: Into<GValue> + FromGValue,
+        T: Into<GValue> + From<GValue>,
         A: Terminator<T>,
     {
         let mut code = Bytecode::new();
@@ -106,140 +105,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
     pub fn inject<T>(&self, injection: T) -> GraphTraversal<GValue, GValue, A>
     where
-        T: Into<GValue> + FromGValue,
-        A: Terminator<T>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(String::from("inject"), vec![injection.into()]);
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn merge_v<V>(&self, merge_v: V) -> GraphTraversal<Vertex, Vertex, A>
-    where
-        V: Into<MergeVertexStep>,
-        A: Terminator<Vertex>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(String::from("mergeV"), merge_v.into().into());
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn merge_e<V>(&self, merge_e: V) -> GraphTraversal<Edge, Edge, A>
-    where
-        V: Into<MergeEdgeStep>,
-        A: Terminator<Edge>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(String::from("mergeE"), merge_e.into().into());
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-}
-
-#[derive(Clone)]
-pub struct GraphTraversalSourc3<A: Terminator<GValue>> {
-    term: A,
-}
-
-impl<A: Terminator<GValue>> GraphTraversalSourc3<A> {
-    pub fn new(terminator: A) -> GraphTraversalSourc3<A> {
-        GraphTraversalSource { term: terminator }
-    }
-
-    pub fn empty() -> GraphTraversalSourc3<MockTerminator> {
-        GraphTraversalSource::new(MockTerminator {})
-    }
-
-    pub fn with_remote<V: GremlinIO>(
-        &self,
-        client: GremlinClient<V>,
-    ) -> GraphTraversalSourc3<AsyncTerminator<V>> {
-        GraphTraversalSourc3 {
-            term: AsyncTerminator::new(client),
-        }
-    }
-
-    pub fn v<T>(&self, ids: T) -> GraphTraversal<Vertex, Vertex, A>
-    where
-        T: Into<GIDs>,
-        A: Terminator<Vertex>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(
-            String::from("V"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
-        );
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn add_v<T>(&self, label: T) -> GraphTraversal<Vertex, Vertex, A>
-    where
-        T: Into<Labels>,
-        A: Terminator<Vertex>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(
-            String::from("addV"),
-            label.into().0.into_iter().map(GValue::from).collect(),
-        );
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge, A>
-    where
-        T: Into<Labels>,
-        A: Terminator<Edge>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(
-            String::from("addE"),
-            label.into().0.into_iter().map(GValue::from).collect(),
-        );
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn e<T>(&self, ids: T) -> GraphTraversal<Edge, Edge, A>
-    where
-        T: Into<GIDs>,
-        A: Terminator<Edge>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_step(
-            String::from("E"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
-        );
-
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn with_side_effect<T>(&self, step: (&'static str, T)) -> GraphTraversal<GValue, GValue, A>
-    where
-        T: Into<GValue> + FromGValue,
-        A: Terminator<T>,
-    {
-        let mut code = Bytecode::new();
-
-        code.add_source(
-            String::from("withSideEffect"),
-            vec![step.0.into(), step.1.into()],
-        );
-        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
-    }
-
-    pub fn inject<T>(&self, injection: T) -> GraphTraversal<GValue, GValue, A>
-    where
-        T: Into<GValue> + FromGValue,
+        T: Into<GValue>,
         A: Terminator<T>,
     {
         let mut code = Bytecode::new();
@@ -928,7 +794,7 @@ mod tests {
         let mut code = Bytecode::new();
 
         code.add_step(String::from("V"), vec![]);
-        code.add_step(String::from("limit"), vec![GValue::Long(1)]);
+        code.add_step(String::from("limit"), vec![GValue::Long(1.into())]);
 
         assert_eq!(&code, g.v(()).limit(1).bytecode());
     }
@@ -1145,7 +1011,7 @@ mod tests {
 
         assert_eq!(
             &code,
-            g.inject(vec!["foo".into(), "bar".into()])
+            g.inject(vec!["foo".to_string(), "bar".to_string()])
                 .unfold()
                 .bytecode()
         );

@@ -28,7 +28,7 @@ impl TraversalBuilder {
     {
         self.bytecode.add_step(
             String::from("V"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+            ids.into().0.iter().map(|id| id.into()).collect(),
         );
         self
     }
@@ -39,7 +39,7 @@ impl TraversalBuilder {
     {
         self.bytecode.add_step(
             String::from("E"),
-            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+            ids.into().0.iter().map(|id| id.into()).collect(),
         );
         self
     }
@@ -120,7 +120,7 @@ impl TraversalBuilder {
 
     pub fn has_id(mut self, id: &GID) -> Self {
         self.bytecode
-            .add_step(String::from("hasId"), vec![id.to_gvalue()]);
+            .add_step(String::from("hasId"), vec![id.into()]);
         self
     }
 
@@ -590,8 +590,9 @@ impl TraversalBuilder {
     }
 
     pub fn sample(mut self, step: i32) -> Self {
+        let repr = Integer(step);
         self.bytecode
-            .add_step(String::from("sample"), vec![step.into()]);
+            .add_step(String::from("sample"), vec![repr.into()]);
         self
     }
 
@@ -682,8 +683,12 @@ impl TraversalBuilder {
     }
 
     pub fn range(mut self, step: i64, step2: i64) -> Self {
-        self.bytecode
-            .add_step(String::from("range"), vec![step.into(), step2.into()]);
+        let step1_repr = Long(step);
+        let step2_repr = Long(step2);
+        self.bytecode.add_step(
+            String::from("range"),
+            vec![step1_repr.into(), step2_repr.into()],
+        );
         self
     }
 

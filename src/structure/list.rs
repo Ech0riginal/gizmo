@@ -52,13 +52,3 @@ impl std::ops::Index<usize> for List {
         self.0.get(key).expect("no entry found for key")
     }
 }
-
-macro_rules! from {
-    ($ty:ty) => {
-        impl From<$ty> for List {
-            fn from(m: $ty) -> Self {
-                Timestamp(m as i64)
-            }
-        }
-    };
-}

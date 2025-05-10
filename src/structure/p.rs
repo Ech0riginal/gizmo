@@ -4,6 +4,7 @@ use crate::structure::*;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct P {
+    // TODO finish their P impl
     pub(crate) operator: String,
     pub(crate) value: Box<GValue>,
 }

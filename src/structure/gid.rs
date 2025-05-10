@@ -1,5 +1,5 @@
+use crate::GremlinError;
 use crate::structure::*;
-use crate::{GremlinError, GremlinResult};
 use std::convert::TryFrom;
 use uuid::Uuid;
 
@@ -24,21 +24,24 @@ impl From<()> for GIDs {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum GID {
-    String(String),
-    Int32(i32),
-    Int64(i64),
+macro_rules! gid {
+    ($($variant:ident),+) => {
+        #[derive(Debug, PartialEq, Eq, Hash, Clone)]
+        pub enum GID {
+            $($variant($variant),)+
+        }
+
+        $(
+            impl Into<GID> for $variant {
+                fn into(self) -> GID {
+                    GID::$variant(self)
+                }
+            }
+        )+
+    };
 }
 
-impl GID {
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
-    where
-        T: BorrowFromGID,
-    {
-        T::from_gid(self)
-    }
-}
+gid!(String, Integer, Long);
 
 impl From<&'static str> for GID {
     fn from(val: &str) -> Self {
@@ -46,21 +49,15 @@ impl From<&'static str> for GID {
     }
 }
 
-impl From<String> for GID {
-    fn from(val: String) -> Self {
-        GID::String(val)
-    }
-}
-
 impl From<i32> for GID {
     fn from(val: i32) -> Self {
-        GID::Int32(val)
+        Integer(val).into()
     }
 }
 
 impl From<i64> for GID {
     fn from(val: i64) -> Self {
-        GID::Int64(val)
+        Long(val).into()
     }
 }
 
@@ -91,44 +88,13 @@ impl TryFrom<&GKey> for GID {
         match value {
             GKey::String(s) => {
                 let gid = if let Ok(i) = s.parse::<i64>() {
-                    Self::Int64(i)
+                    Long(i).into()
                 } else {
                     Self::String(s.to_string())
                 };
                 Ok(gid)
             }
-            _ => Err(GremlinError::Cast(format!(
-                "Cannot convert {:?} to GID",
-                value
-            ))),
+            _ => Err(GremlinError::Cast(format!("{:?}", value), "GID".into())),
         }
     }
 }
-
-// Borrow from GID
-
-#[doc(hidden)]
-pub trait BorrowFromGID: Sized {
-    fn from_gid<'a>(v: &'a GID) -> GremlinResult<&'a Self>;
-}
-
-macro_rules! impl_borrow_from_gid {
-    ($t:ty, $v:path) => {
-        impl BorrowFromGID for $t {
-            fn from_gid<'a>(v: &'a GID) -> GremlinResult<&'a $t> {
-                match v {
-                    $v(e) => Ok(e),
-                    _ => Err(GremlinError::Cast(format!(
-                        "Cannot convert {:?} to {}",
-                        v,
-                        stringify!($t)
-                    ))),
-                }
-            }
-        }
-    };
-}
-
-impl_borrow_from_gid!(String, GID::String);
-impl_borrow_from_gid!(i32, GID::Int32);
-impl_borrow_from_gid!(i64, GID::Int64);
