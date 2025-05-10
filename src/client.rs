@@ -138,7 +138,10 @@ where
         Ok(stream)
     }
 
-    pub async fn execute(&self, bytecode: Bytecode) -> GremlinResult<impl GremlinStream + '_> {
+    pub async fn execute<'a>(
+        &self,
+        bytecode: Bytecode,
+    ) -> GremlinResult<impl GremlinStream + use<'a, V>> {
         let bytecode = GValue::Bytecode(bytecode);
         let request = Request::builder()
             .op("bytecode")
