@@ -1,4 +1,3 @@
-use crate::structure::GValue;
 use bb8::RunError;
 
 use thiserror::Error;
@@ -23,8 +22,8 @@ pub enum GremlinError {
     #[error("Got wrong type {0:?}")]
     WrongType(String),
 
-    #[error("Cast error: {0}")]
-    Cast(String),
+    #[error("Cannot cast {0} to {1}")]
+    Cast(String, String),
 
     #[error("JSON error: {0}")]
     Json(String),
