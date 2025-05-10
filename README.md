@@ -1,3 +1,3 @@
 An opinionated Apache TinkerPop client.
 
-WIP
+Why? I'm unemployed and bored.
