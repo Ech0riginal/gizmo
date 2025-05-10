@@ -5,7 +5,6 @@ use crate::{GValue, GremlinError, GremlinResult};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bb8::PooledConnection;
-use futures::SinkExt;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::stream::wrappers::UnboundedReceiverStream;
@@ -38,9 +37,9 @@ impl<V: GremlinIO> Connection<V> {
     }
 
     pub async fn send<'a>(
-        self: PooledConnection<'a, ConnectionOptions<V>>,
+        self: PooledConnection<'_, ConnectionOptions<V>>,
         request: Request,
-    ) -> GremlinResult<impl GremlinStream> {
+    ) -> GremlinResult<impl GremlinStream + use<'a, V>> {
         let (tx, rx) = mpsc::unbounded_channel();
 
         self.socket.write().await.send(&request)?;

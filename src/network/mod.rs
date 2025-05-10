@@ -1,4 +1,3 @@
-use tokio::sync::mpsc;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
 mod connection;
