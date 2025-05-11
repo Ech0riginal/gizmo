@@ -1,5 +1,5 @@
 use crate::GValue;
-use crate::io::graphson::de::Blob;
+use crate::io::graphson::de::{Type, Typed};
 use crate::io::graphson::types::v2::*;
 use crate::io::serde::Deserialize;
 use crate::io::{
@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 impl V2 {
-    fn core_deserializer<'a>(blob: Blob<'a>) -> Result<GValue, Error> {
+    fn core_deserializer<'a>(blob: Type<'a>) -> Result<GValue, Error> {
         let key = get_value!(blob.tag, Value::String)?;
         macro_rules! deserialize {
             ($_type:ty) => {
@@ -58,7 +58,7 @@ impl V2 {
             TRAVERSAL_METRICS => deserialize!(TraversalMetrics),
             TRAVERSER => deserialize!(Traverser),
             //
-            type_tag => Err({ Error::Unsupported(type_tag.to_string()) }),
+            type_tag => Err(Error::Unsupported(type_tag.to_string())),
         }
     }
 
@@ -121,7 +121,7 @@ impl Deserializer<GValue> for V2 {
         match value {
             Value::String(_) => value.deserialize::<Self, String>().map(GValue::from),
             Value::Number(_) => value.deserialize::<Self, Integer>().map(GValue::from),
-            Value::Object(_obj) => match Blob::try_from(value) {
+            Value::Object(_obj) => match value.typed() {
                 Ok(blob) => Self::core_deserializer(blob),
                 Err(err) => match err {
                     Error::Missing(_) => Self::special_deserializer(value),
@@ -273,13 +273,14 @@ impl Deserializer<StarGraph> for V2 {
             msg: "Malformed StarGraph.".to_string(),
             value: val.clone(),
         })?;
-        let vertex = value.deserialize::<Self, Vertex>()?;
+        let vertex = value.typed()?.value.deserialize::<Self, Vertex>()?;
         let yikes = vertex.into();
         Ok(yikes)
     }
 }
 impl Deserializer<TinkerGraph> for V2 {
     fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {
+        let _debug = val.to_string();
         let vertex_values = get_value!(
             val.get("vertices").ok_or(Error::UnexpectedJson {
                 msg: "TinkerGraph missing 'vertices' key".into(),
@@ -296,11 +297,17 @@ impl Deserializer<TinkerGraph> for V2 {
         )?;
         let vertices = vertex_values
             .into_iter()
-            .map(|val| val.deserialize::<Self, Vertex>())
+            .map(|val| match val.typed() {
+                Ok(type_) => type_.value.deserialize::<Self, Vertex>(),
+                Err(e) => Err(e),
+            })
             .collect::<Result<Vec<_>, Error>>()?;
         let edges = edge_values
             .into_iter()
-            .map(|val| val.deserialize::<Self, Edge>())
+            .map(|val| match val.typed() {
+                Ok(type_) => type_.value.deserialize::<Self, Edge>(),
+                Err(e) => Err(e),
+            })
             .collect::<Result<Vec<_>, Error>>()?;
 
         Ok(TinkerGraph { vertices, edges })
@@ -370,7 +377,8 @@ impl Deserializer<VertexProperties> for V2 {
                         Value::Array(arr) => {
                             let mut vec = vec![];
                             for elem in arr {
-                                let vp = elem.deserialize::<Self, VertexProperty>()?;
+                                let vp =
+                                    elem.typed()?.value.deserialize::<Self, VertexProperty>()?;
                                 vec.push(vp);
                             }
                             p.insert(k.clone(), vec);
@@ -395,6 +403,7 @@ impl Deserializer<VertexProperties> for V2 {
 }
 impl Deserializer<VertexProperty> for V2 {
     fn deserialize(val: &Value) -> Result<VertexProperty, Error> {
+        let _debug = val.to_string();
         let mut property = VertexProperty {
             id: val["id"].deserialize::<Self, GID>()?,
             value: Box::new(val["value"].deserialize::<Self, GValue>()?),
@@ -412,7 +421,8 @@ impl Deserializer<VertexProperty> for V2 {
         };
 
         if let Some(vertex_id) = val.get("vertex") {
-            property.vertex = Some(vertex_id.deserialize::<Self, GID>()?);
+            let vertex = vertex_id.typed()?.value.deserialize::<Self, GID>()?;
+            property.vertex = Some(vertex);
         }
 
         property.properties = val

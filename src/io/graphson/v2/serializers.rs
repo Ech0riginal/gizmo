@@ -519,7 +519,7 @@ impl Serializer<Set> for V2 {
 }
 impl Serializer<String> for V2 {
     fn serialize(val: &String) -> Result<serde_json::Value, Error> {
-        todo!()
+        Ok(json!(val))
     }
 }
 impl Serializer<TraversalMetrics> for V2 {
