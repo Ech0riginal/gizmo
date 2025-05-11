@@ -21,32 +21,32 @@ tokio-tungstenite = { version = "0.26.2", features = ["connect", "rustls", "rust
 base64              = { version = "0.22.1" }
 bytes               = "1.10.1"
 #Avoids bringing in time crate (https://github.com/time-rs/time/issues/293)
-chrono              = { version = "0.4.39", default-features = false, features = ["serde"] }
+chrono              = { version = "0.4.41", default-features = false, features = ["serde"] }
 derive_builder      = { version = "0.20.2" }
 futures             = { version = "0.3.31" }
-geojson             = { version = "0.24.1" }
-geo-types           = { version = "0.7.15" }
+geojson             = { version = "0.24.2" }
+geo-types           = { version = "0.7.16" }
 lazy_static         = { version = "1.5.0" }
 #mobc                = { version = "0.8.5", features = ["tokio"] }
 pin-project-lite    = { version = "0.2.16"}
-rustls              = { version = "0.23.15", features = [] }
+rustls              = { version = "0.23.27", features = [] }
 rustls-pemfile      = { version = "2.2.0" }
-rustls-pki-types    = { version = "^1.9" }
-serde               = { version = "1.0.217" }
-serde_json          = { version = "1.0.138", features = ["arbitrary_precision"] }
-serde_derive        = { version = "1.0.217" }
+rustls-pki-types    = { version = "^1.12" }
+serde               = { version = "1.0.219" }
+serde_json          = { version = "1.0.140", features = ["arbitrary_precision"] }
+serde_derive        = { version = "1.0.219" }
 thiserror           = { version = "2.0.12" }
 tungstenite         = { version = "0.26.2", features = ["rustls", "rustls-tls-native-roots"] }
 tokio               = { git = "https://github.com/ech0riginal/tokio", features = ["stream", "tracing", "rustls"] }
-uuid                = { version = "1.12.1", features = ["serde", "v4"] }
-webpki-roots        = { version = "0.26.8" }
+uuid                = { version = "1.16.0", features = ["serde", "v4"] }
+webpki-roots        = { version = "0.26.11" }
 tracing             = { version = "0.1.41", features = ["default"] }
-async-trait         = { version = "0.1.86" }
+async-trait         = { version = "0.1.88" }
 pin-project = "1.1.10"
 
 [dev-dependencies]
 lazy_static = "1.5.0"
-tracing-subscriber = "0.3.18"
+tracing-subscriber = "0.3.19"
 
 [profile.release]
 codegen-units = 8
