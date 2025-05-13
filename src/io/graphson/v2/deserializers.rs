@@ -1,6 +1,7 @@
 use crate::GValue;
 use crate::io::graphson::de::{Type, Typed};
 use crate::io::graphson::types::v2::*;
+use crate::io::response::GResult;
 use crate::io::serde::Deserialize;
 use crate::io::{
     Deserializer, Error, IOHelpers, Response, Status, V2, expect_double, expect_float, expect_i32,
@@ -86,31 +87,53 @@ fn is_response(val: &Value) -> bool {
 
 impl Deserializer<Response> for V2 {
     fn deserialize(value: &Value) -> Result<Response, Error> {
-        let id: Uuid = {
-            let _id = Self::get(value, "request_id")?.clone();
-            serde_json::from_value(_id)?
+        let id = {
+            let _id = Self::get(value, "requestId")?.clone();
+            _id.deserialize::<Self, Uuid>()?
         };
-        let result: GValue = {
+        let result = {
             let result = Self::get(value, "result")?;
-            let data = Self::get(result, "data")?;
-            Self::deserialize(data)?
+            result.deserialize::<Self, GResult>()?
         };
-        let status: Status = {
+        let status = {
             let status = Self::get(value, "status")?;
-            Self::deserialize(status)?
+            status.deserialize::<Self, Status>()?
         };
 
         Ok(Response { id, result, status })
     }
 }
+impl Deserializer<GResult> for V2 {
+    fn deserialize(val: &Value) -> Result<GResult, Error> {
+        let data = Self::get(val, "data")?.deserialize::<Self, GValue>()?;
+        let meta = Self::get(val, "meta")?; //.deserialize::<Self, GValue>()?;
+        let meta = get_value!(meta, Value::Object)?
+            .into_iter()
+            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
+            .map(|(k, result)| match result {
+                Ok(v) => Ok((k, v)),
+                Err(e) => Err(e),
+            })
+            .collect::<Result<Vec<(String, GValue)>, Error>>()?
+            .into_iter()
+            .collect::<HashMap<_, _>>();
+
+        Ok(GResult { data, meta })
+    }
+}
 impl Deserializer<Status> for V2 {
-    fn deserialize(value: &Value) -> Result<Status, Error> {
-        let code = Self::get(value, "code").map(|code| code.as_i64().unwrap() as i16)?;
-        let message = Self::get(value, "message")
+    fn deserialize(val: &Value) -> Result<Status, Error> {
+        let code = Self::get(val, "code").map(|code| code.as_i64().unwrap() as i16)?;
+        let message = Self::get(val, "message")
             .ok()
             .map(|value| value.as_str().unwrap().to_string());
+        let attributes = Self::get(val, "attributes")?.clone();
 
-        Ok(Status { code, message })
+        Ok(Status {
+            code,
+            message,
+            attributes,
+        })
     }
 }
 impl Deserializer<GID> for V2 {
