@@ -1,7 +1,7 @@
 use crate::GValue;
 use crate::io::graphson::types::v2::*;
 use crate::io::serde::Serialize;
-use crate::io::{Args, Error, Request, Serializer, V2};
+use crate::io::{Args, Error, Request, Response, Serializer, Status, V2};
 use crate::structure::*;
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -14,6 +14,25 @@ impl Serializer<Request> for V2 {
             "op": val.op,
             "processor": val.proc,
             "args": val.args.serialize::<Self>()?,
+        }))
+    }
+}
+impl Serializer<Response> for V2 {
+    fn serialize(val: &Response) -> Result<Value, Error> {
+        Ok(json!({
+            "request_id": val.id,
+            "data": {
+                "result": val.result.serialize::<Self>()?,
+            },
+            "status": val.status.serialize::<Self>()?,
+        }))
+    }
+}
+impl Serializer<Status> for V2 {
+    fn serialize(val: &Status) -> Result<Value, Error> {
+        Ok(json!({
+            "code": val.code,
+            "message": val.message,
         }))
     }
 }
@@ -307,10 +326,6 @@ impl Serializer<Vertex> for V2 {
         Ok(json)
     }
 }
-// type VertexProperties = HashMap<String, Vec<VertexProperty>>;
-// impl Serializer<VertexProperties> for V2 {
-//     fn serialize(val: &VertexProperties) -> Result<serde_json::Value, Error> { todo!() }
-// }
 impl Serializer<VertexProperty> for V2 {
     fn serialize(val: &VertexProperty) -> Result<serde_json::Value, Error> {
         let mut root = HashMap::<&'static str, Value>::new();
@@ -344,7 +359,7 @@ impl Serializer<VertexProperty> for V2 {
 }
 impl Serializer<Bytecode> for V2 {
     fn serialize(val: &Bytecode) -> Result<Value, Error> {
-        let steps: Result<Vec<Value>, Error> = val
+        let steps = val
             .steps()
             .iter()
             .map(|m| {
@@ -357,9 +372,8 @@ impl Serializer<Bytecode> for V2 {
                 instruction.extend(arguments?);
                 Ok(Value::Array(instruction))
             })
-            .collect();
-
-        let sources: Result<Vec<Value>, Error> = val
+            .collect::<Result<Vec<Value>, Error>>()?;
+        let sources = val
             .sources()
             .iter()
             .map(|m| {
@@ -372,13 +386,12 @@ impl Serializer<Bytecode> for V2 {
                 instruction.extend(arguments?);
                 Ok(Value::Array(instruction))
             })
-            .collect();
-
+            .collect::<Result<Vec<Value>, Error>>()?;
         Ok(json!({
             "@type" : BYTECODE,
             "@value" : {
-                "step" : steps?,
-                "source" : sources?
+                "step" : steps,
+                "source" : sources,
             }
         }))
     }
