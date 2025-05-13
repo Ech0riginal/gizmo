@@ -22,85 +22,167 @@ macro_rules! types {
     };
 }
 #[cfg(test)]
-pub struct Test {
+pub struct Test<T> {
     pub serial: serde_json::Value,
-    pub object: crate::structure::GValue,
+    pub object: T,
 }
 
+#[macro_export]
 macro_rules! test_prelude {
     () => {
-        use crate::io::macros::Test;
-        use crate::structure::*;
+        pub(self) use super::*;
         #[allow(unused_imports)]
-        use chrono::TimeZone;
-        use serde_json::json;
+        pub(self) use crate::structure::*;
+    };
+}
+#[macro_export]
+macro_rules! tests {
+    ($type_:path) => {
+        pub struct Test {
+            pub(self) serial: serde_json::Value,
+            pub(self) object: $type_,
+        }
     };
 }
 
-macro_rules! test {
+#[macro_export]
+macro_rules! module {
+    ($engine:ident, $mod_:ident, $trait_:path, $fn_:ident, $case:ident, $expected:ident) => {
+        mod $mod_ {
+            pub(self) use super::*;
+
+            #[test]
+            fn ok() {
+                let result = <$engine as $trait_>::$fn_(&TEST_CASE.$case);
+                match result {
+                    Ok(_) => {
+                        assert!(true);
+                    }
+                    Err(e) => {
+                        assert!(false, "{} failed: {:?}", stringify!($mod_), e);
+                    }
+                }
+            }
+
+            #[test]
+            fn accurate() {
+                let result = <$engine as $trait_>::$fn_(&TEST_CASE.$case);
+                assert!(result.is_ok(), "{} failed", stringify!($mod_));
+                assert_eq!(
+                    TEST_CASE.$expected,
+                    result.unwrap(),
+                    "{} doesn't match expectation",
+                    stringify!($mod_)
+                );
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! test_case {
+    ($case:expr) => {
+        lazy_static::lazy_static! {
+            static ref TEST_CASE: Test = $case;
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! gvalue_test {
     ($fun:ident, $engine:ident, $case:expr) => {
         mod $fun {
-            pub(self) use super::*;
+            crate::test_prelude!();
+
+            crate::tests!(crate::GValue);
+
+            lazy_static::lazy_static! {
+                static ref TEST_CASE: Test = $case;
+            }
+
+            crate::module!(
+                $engine,
+                deserialization,
+                crate::io::Deserializer<crate::GValue>,
+                deserialize,
+                serial,
+                object
+            );
+
+            crate::module!(
+                $engine,
+                serialization,
+                crate::io::Serializer<crate::GValue>,
+                serialize,
+                object,
+                serial
+            );
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! response_test {
+    ($fun:ident, $engine:ident, $case:expr) => {
+        mod $fun {
+            crate::test_prelude!();
+
+            crate::tests!(crate::Response);
 
             lazy_static::lazy_static! {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            mod deserialize {
-                pub(self) use super::*;
-                #[allow(unused_imports)]
-                use crate::io::{Deserializer, GremlinIO};
+            crate::module!(
+                $engine,
+                deserialization,
+                crate::io::Deserializer<crate::Response>,
+                deserialize,
+                serial,
+                object
+            );
 
-                #[test]
-                fn ok() {
-                    let result = <$engine as Deserializer<GValue>>::deserialize(&TEST_CASE.serial);
-                    match result {
-                        Ok(_) => assert!(true),
-                        Err(e) => {
-                            assert!(false, "Deserialization failed: {:?}", e);
-                        }
-                    }
-                }
+            crate::module!(
+                $engine,
+                serialization,
+                crate::io::Serializer<crate::Response>,
+                serialize,
+                object,
+                serial
+            );
+        }
+    };
+}
 
-                #[test]
-                fn accurate() {
-                    let result = <$engine as Deserializer<GValue>>::deserialize(&TEST_CASE.serial);
-                    assert!(result.is_ok(), "Deserialization failed");
-                    assert_eq!(
-                        TEST_CASE.object,
-                        result.unwrap(),
-                        "Deserialization doesn't match expectation"
-                    );
-                }
+#[macro_export]
+macro_rules! request_test {
+    ($fun:ident, $engine:ident, $case:expr) => {
+        mod $fun {
+            crate::test_prelude!();
+
+            crate::tests!(crate::Request);
+
+            lazy_static::lazy_static! {
+                pub static ref TEST_CASE: Test = $case;
             }
 
-            mod serialize {
-                pub(self) use super::*;
-                #[allow(unused_imports)]
-                use crate::io::{GremlinIO, Serializer};
+            crate::module!(
+                $engine,
+                deserialization,
+                crate::io::Deserializer<crate::Request>,
+                deserialize,
+                serial,
+                object
+            );
 
-                #[test]
-                fn ok() {
-                    let result = $engine::serialize(&TEST_CASE.object);
-                    match result {
-                        Ok(_) => assert!(true),
-                        Err(e) => {
-                            assert!(false, "Serialization failed: {:?}", e);
-                        }
-                    }
-                }
-
-                #[test]
-                fn accurate() {
-                    let result = $engine::serialize(&TEST_CASE.object);
-                    assert!(result.is_ok(), "Serialization failed");
-                    assert_eq!(
-                        TEST_CASE.serial,
-                        result.unwrap(),
-                        "Serialization doesn't match expectation"
-                    );
-                }
-            }
+            crate::module!(
+                $engine,
+                serialization,
+                crate::io::Serializer<crate::Request>,
+                serialize,
+                object,
+                serial
+            );
         }
     };
 }
@@ -190,4 +272,4 @@ macro_rules! expect_double {
 #[allow(unused_imports)]
 pub(crate) use {expect_double, expect_float, expect_i32, expect_i64, expect_i128, get_value};
 #[allow(unused_imports)]
-pub(crate) use {io, test, test_prelude, types};
+pub(crate) use {gvalue_test, io, test_prelude, types};

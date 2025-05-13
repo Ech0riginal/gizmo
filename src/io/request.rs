@@ -1,9 +1,10 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::GValue;
 use crate::structure::GKey;
+use crate::{GValue, Response};
 use derive_builder::Builder;
 use std::collections::HashMap;
+use std::hash::Hasher;
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Builder)]
@@ -17,6 +18,17 @@ pub struct Request {
 impl Request {
     pub fn builder() -> RequestBuilder {
         RequestBuilder::create_empty()
+    }
+}
+impl Eq for Request {}
+impl PartialEq for Request {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+impl std::hash::Hash for Request {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }
 

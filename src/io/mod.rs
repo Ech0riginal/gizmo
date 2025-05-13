@@ -9,15 +9,16 @@ mod request;
 mod response;
 mod serde;
 
-pub(crate) use macros::{expect_double, expect_float, expect_i32, expect_i64, get_value};
-use serde_json::Value;
+pub(crate) use macros::*;
 
 pub use error::Error;
 pub use graphson::V2; //, V3, V3g};
 pub use request::{Args, Request};
 pub use response::{Response, Status};
+pub use serde::{Deserialize, Serialize};
 
 use crate::structure::{GID, GValue};
+use serde_json::Value;
 
 #[allow(private_bounds)]
 pub trait GremlinIO

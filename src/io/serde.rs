@@ -29,6 +29,6 @@ impl Deserialize for serde_json::Value {
     where
         V: Deserializer<T>,
     {
-        V::deserialize(&self)
+        V::deserialize(&self).map(|a| a.into())
     }
 }
