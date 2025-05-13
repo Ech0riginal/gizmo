@@ -5,7 +5,8 @@
 #![feature(try_trait_v2)]
 #![feature(type_alias_impl_trait)]
 #![feature(impl_trait_in_assoc_type)]
-
+#![feature(associated_type_defaults)]
+#![feature(macro_metavar_expr)]
 #[macro_use]
 extern crate lazy_static;
 
@@ -21,7 +22,10 @@ pub mod structure;
 pub type GremlinResult<T> = Result<T, GremlinError>;
 // pub use client::GremlinClient;
 pub use error::GremlinError;
+pub use io::{Request, Response};
 pub use structure::{GValue, Primitive};
+
+pub(crate) use io::Status;
 
 // pub mod prelude {
 //     pub use super::*;

@@ -1,5 +1,5 @@
 use super::*;
-use crate::io::{GremlinIO, Request, Response};
+use crate::io::{Deserialize, GremlinIO, Request, Response};
 use crate::{GremlinError, GremlinResult};
 use bytes::Bytes;
 use futures::StreamExt;
@@ -128,7 +128,7 @@ impl<V: GremlinIO> GremlinSocket<V> {
             .ok_or(GremlinError::Closed)?;
 
         match serde_json::from_slice::<Value>(&bytes) {
-            Ok(json) => match V::deserialize(&json) {
+            Ok(json) => match json.deserialize::<V, Response>() {
                 Ok(response) => Ok(Some(response)),
                 Err(e) => {
                     tracing::warn!("Gremlin deserialization error: {:?}", e);
