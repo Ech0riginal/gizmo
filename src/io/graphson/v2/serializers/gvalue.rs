@@ -1,84 +1,12 @@
+use crate::GValue;
 use crate::io::graphson::types::v2::*;
-use crate::io::response::GResult;
-use crate::io::serde::Serialize;
-use crate::io::{Args, Error, Request, Response, Serializer, Status, V2};
+use crate::io::*;
 use crate::structure::*;
+use chrono::TimeZone;
 use serde_json::{Value, json};
 use std::collections::HashMap;
 use uuid::Uuid;
 
-impl<T> Serializer<Option<T>> for V2
-where
-    V2: Serializer<T>,
-{
-    fn serialize(val: &Option<T>) -> Result<Value, Error> {
-        match val {
-            None => Ok(Value::Null),
-            Some(inner) => inner.serialize::<Self>(),
-        }
-    }
-}
-
-impl Serializer<Request> for V2 {
-    fn serialize(val: &Request) -> Result<Value, Error> {
-        Ok(json!({
-            "request_id": val.id,
-            "op": val.op,
-            "processor": val.proc,
-            "args": val.args.serialize::<Self>()?,
-        }))
-    }
-}
-impl Serializer<Response> for V2 {
-    fn serialize(val: &Response) -> Result<Value, Error> {
-        Ok(json!({
-            "requestId": val.id,
-            "result": val.result.serialize::<Self>()?,
-            "status": val.status.serialize::<Self>()?,
-        }))
-    }
-}
-impl Serializer<GResult> for V2 {
-    fn serialize(val: &GResult) -> Result<Value, Error> {
-        let mut meta = HashMap::new();
-
-        for (key, value) in val.meta.iter() {
-            let serialized = value.serialize::<Self>()?;
-            meta.insert(Value::String(key.clone()), serialized);
-        }
-
-        Ok(json!({
-            "data": val.data.serialize::<Self>()?,
-            "meta": meta,
-        }))
-    }
-}
-impl Serializer<Status> for V2 {
-    fn serialize(val: &Status) -> Result<Value, Error> {
-        let message = if let Some(msg) = &val.message {
-            msg
-        } else {
-            ""
-        };
-
-        Ok(json!({
-            "code": val.code,
-            "message": message,
-            "attributes": val.attributes,
-        }))
-    }
-}
-impl Serializer<Args> for V2 {
-    fn serialize(value: &Args) -> Result<Value, Error> {
-        todo!()
-    }
-}
-impl Serializer<GID> for V2 {
-    fn serialize(val: &GID) -> Result<Value, Error> {
-        let val: GValue = val.into();
-        val.serialize::<Self>()
-    }
-}
 impl Serializer<GValue> for V2 {
     fn serialize(val: &GValue) -> Result<Value, Error> {
         match val {
@@ -193,7 +121,13 @@ impl Serializer<Long> for V2 {
 }
 impl Serializer<Map> for V2 {
     fn serialize(val: &Map) -> Result<Value, Error> {
-        todo!()
+        let mapd = val
+            .iter()
+            .map(|(k, v)| (String::try_from(k), v.serialize::<Self>()))
+            .filter(|(k, v)| k.is_ok() && v.is_ok())
+            .map(|(k, v)| (k.unwrap(), v.unwrap()))
+            .collect::<HashMap<_, _>>();
+        Ok(json!(mapd))
     }
 }
 impl Serializer<Timestamp> for V2 {
@@ -544,11 +478,6 @@ impl Serializer<Metrics> for V2 {
         todo!()
     }
 }
-// impl Serializer<HashMap<String, GValue>> for V2 {
-//     fn serialize(val: &HashMap<String, GValue>) -> Result<serde_json::Value, Error> {
-//         todo!()
-//     }
-// }
 impl Serializer<Set> for V2 {
     fn serialize(val: &Set) -> Result<Value, Error> {
         let elements = val

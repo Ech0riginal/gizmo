@@ -1,12 +1,14 @@
 pub use crate::io::graphson::v2::{V2, types::*};
-pub use crate::io::macros::*;
+pub use crate::io::*;
+pub use crate::structure::*;
+pub use crate::*;
 pub use chrono::TimeZone;
 pub use serde_json::json;
 pub use std::collections::HashMap;
+pub use std::str::FromStr;
 
 mod core {
-    pub(self) use super::*;
-    use std::str::FromStr;
+    use super::*;
 
     gvalue_test!(
         class,
@@ -78,9 +80,7 @@ mod core {
     );
 }
 mod structure {
-    pub(self) use super::*;
-
-    test_prelude!();
+    use super::*;
 
     macro_rules! marko {
         () => {
@@ -1017,9 +1017,7 @@ mod structure {
     );
 }
 mod process {
-    pub(self) use super::*;
-
-    test_prelude!();
+    use super::*;
 
     gvalue_test!(
         barrier,
@@ -1199,65 +1197,146 @@ mod process {
     );
 }
 mod request {
-    pub(self) use super::*;
+    use super::*;
 
-    test_prelude!();
-
-    gvalue_test!(
+    request_test!(
         authentication_response,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "authentication", "processor" : "", "args" : { "saslMechanism" : "PLAIN", "sasl" : "AHN0ZXBocGhlbgBwYXNzd29yZA==" }}),
-            object: GValue::Null,
+            object: Request {
+                id: ::uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "authentication",
+                proc: "",
+                args: Args::new()
+                    .arg("saslMechanism", "PLAIN")
+                    .arg("sasl", "AHN0ZXBocGhlbgBwYXNzd29yZA=="),
+            },
         }
     );
-    gvalue_test!(
+    request_test!(
         session_eval,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-            object: GValue::Null,
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "session",
+                args: Args::new()
+                    .arg("gremlin", "g.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg(
+                        "session",
+                        GValue::Uuid(
+                            ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                        )
+                    )
+                    .arg("bindings", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("x", GValue::Integer(1.into()));
+                        tmp
+                    }),
+            },
         }
     );
-    gvalue_test!(
+    request_test!(
         session_eval_aliased,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-            object: GValue::Null,
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "session",
+                args: Args::new()
+                    .arg("gremlin", "social.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("aliases", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("g", GValue::String("social".into()));
+                        GValue::Map(Map::from(tmp))
+                    })
+                    .arg(
+                        "session",
+                        GValue::Uuid(
+                            ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                        )
+                    )
+                    .arg("bindings", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("x", GValue::Integer(1.into()));
+                        GValue::Map(Map::from(tmp))
+                    }),
+            },
         }
     );
-    gvalue_test!(
+    request_test!(
         session_close,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "close", "processor" : "session", "args" : { "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" } }}),
-            object: GValue::Null,
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "close",
+                proc: "session",
+                args: Args::new().arg(
+                    "session",
+                    GValue::Uuid(
+                        ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                    )
+                )
+            },
         }
     );
-    gvalue_test!(
+    request_test!(
         sessionless_eval,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-            object: GValue::Null,
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "",
+                args: Args::new()
+                    .arg("gremlin", "g.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("bindings", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("x", GValue::Integer(1.into()));
+                        GValue::Map(Map::from(tmp))
+                    }),
+            },
         }
     );
-    gvalue_test!(
+    request_test!(
         sessionless_eval_aliased,
         V2,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-            object: GValue::Null,
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "",
+                args: Args::new()
+                    .arg("gremlin", "social.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("aliases", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("g", GValue::from("social"));
+                        GValue::Map(Map::from(tmp))
+                    })
+                    .arg("bindings", {
+                        let mut tmp = HashMap::new();
+                        tmp.insert("x", GValue::Integer(1.into()));
+                        GValue::Map(Map::from(tmp))
+                    }),
+            },
         }
     );
 }
 mod response {
-    pub(self) use super::*;
-    use crate::response_test;
-    use std::str::FromStr;
-
-    test_prelude!();
+    use super::*;
 
     response_test!(
         authentication_challenge,
@@ -1389,9 +1468,7 @@ mod response {
     );
 }
 mod extended {
-    pub(self) use super::*;
-
-    test_prelude!();
+    use super::*;
 
     gvalue_test!(
         bigdecimal,
