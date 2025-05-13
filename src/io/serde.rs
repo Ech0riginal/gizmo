@@ -24,8 +24,8 @@ impl<T> Serialize for T {
     }
 }
 
-impl Deserialize for serde_json::Value {
-    fn deserialize<V, T>(&self) -> Result<T, super::Error>
+impl Deserialize for Value {
+    fn deserialize<V, T>(&self) -> Result<T, Error>
     where
         V: Deserializer<T>,
     {

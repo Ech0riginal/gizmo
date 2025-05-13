@@ -13,6 +13,102 @@ use serde_json::Value;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+impl Deserializer<Response> for V2 {
+    fn deserialize(value: &Value) -> Result<Response, Error> {
+        let id = {
+            let _id = Self::get(value, "requestId")?.clone();
+            _id.deserialize::<Self, Uuid>()?
+        };
+        let result = {
+            let result = Self::get(value, "result")?;
+            result.deserialize::<Self, GResult>()?
+        };
+        let status = {
+            let status = Self::get(value, "status")?;
+            status.deserialize::<Self, Status>()?
+        };
+
+        Ok(Response { id, result, status })
+    }
+}
+impl Deserializer<GResult> for V2 {
+    fn deserialize(val: &Value) -> Result<GResult, Error> {
+        let data = Self::get(val, "data")?.deserialize::<Self, GValue>()?;
+        let meta = Self::get(val, "meta")?; //.deserialize::<Self, GValue>()?;
+        let meta = get_value!(meta, Value::Object)?
+            .into_iter()
+            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
+            .map(|(k, result)| match result {
+                Ok(v) => Ok((k, v)),
+                Err(e) => Err(e),
+            })
+            .collect::<Result<Vec<(String, GValue)>, Error>>()?
+            .into_iter()
+            .collect::<HashMap<_, _>>();
+
+        Ok(GResult { data, meta })
+    }
+}
+impl Deserializer<Status> for V2 {
+    fn deserialize(val: &Value) -> Result<Status, Error> {
+        let code = Self::get(val, "code").map(|code| code.as_i64().unwrap() as i16)?;
+        let message = {
+            let tmp = Self::get(val, "message")?;
+            let str = get_value!(tmp, Value::String)?;
+            if str.is_empty() {
+                None
+            } else {
+                Some(str.clone())
+            }
+        };
+        let attributes = Self::get(val, "attributes")?.clone();
+
+        Ok(Status {
+            code,
+            message,
+            attributes,
+        })
+    }
+}
+impl Deserializer<GID> for V2 {
+    fn deserialize(val: &Value) -> Result<GID, Error> {
+        let gvalue = val.deserialize::<Self, GValue>()?;
+        match gvalue {
+            GValue::String(d) => Ok(GID::String(d)),
+            GValue::Integer(d) => Ok(GID::Integer(d)),
+            GValue::Long(d) => Ok(GID::Long(d)),
+            value => Err(Error::UnexpectedGValue {
+                msg: "Ineligible for GKey".into(),
+                value,
+            }),
+        }
+    }
+}
+impl Deserializer<GValue> for V2 {
+    fn deserialize(value: &Value) -> Result<GValue, Error> {
+        match value {
+            Value::String(_) => value.deserialize::<Self, String>().map(GValue::from),
+            Value::Number(_) => value.deserialize::<Self, Integer>().map(GValue::from),
+            Value::Object(_obj) => match value.typed() {
+                Ok(blob) => Self::core_deserializer(blob),
+                Err(err) => match err {
+                    Error::Missing(_) => Self::special_deserializer(value),
+                    _ => panic!(),
+                },
+            },
+            Value::Array(values) => {
+                let collection = values
+                    .iter()
+                    .map(Self::deserialize)
+                    .collect::<Result<Vec<_>, Error>>()?;
+                Ok(GValue::List(List(collection)))
+            }
+            Value::Bool(_) => value.deserialize::<Self, Bool>().map(GValue::from),
+            Value::Null => Ok(GValue::Null),
+        }
+    }
+}
+
 impl V2 {
     fn core_deserializer<'a>(blob: Type<'a>) -> Result<GValue, Error> {
         let key = get_value!(blob.tag, Value::String)?;
@@ -66,9 +162,6 @@ impl V2 {
     fn special_deserializer<'a>(value: &Value) -> Result<GValue, Error> {
         match value {
             val if is_stargraph(val) => value.deserialize::<Self, StarGraph>().map(GValue::from),
-            // val if is_response(val) =>{
-            //     value.deserialize::<Self, Response>()
-            // },
             _ => Err(Error::UnexpectedJson {
                 msg: "Special case".into(),
                 value: value.clone(),
@@ -85,95 +178,8 @@ fn is_response(val: &Value) -> bool {
     val.get("requestId").is_some() && val.get("status").is_some()
 }
 
-impl Deserializer<Response> for V2 {
-    fn deserialize(value: &Value) -> Result<Response, Error> {
-        let id = {
-            let _id = Self::get(value, "requestId")?.clone();
-            _id.deserialize::<Self, Uuid>()?
-        };
-        let result = {
-            let result = Self::get(value, "result")?;
-            result.deserialize::<Self, GResult>()?
-        };
-        let status = {
-            let status = Self::get(value, "status")?;
-            status.deserialize::<Self, Status>()?
-        };
+/*********************************** GValue deserializers *****************************************/
 
-        Ok(Response { id, result, status })
-    }
-}
-impl Deserializer<GResult> for V2 {
-    fn deserialize(val: &Value) -> Result<GResult, Error> {
-        let data = Self::get(val, "data")?.deserialize::<Self, GValue>()?;
-        let meta = Self::get(val, "meta")?; //.deserialize::<Self, GValue>()?;
-        let meta = get_value!(meta, Value::Object)?
-            .into_iter()
-            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
-            .map(|(k, result)| match result {
-                Ok(v) => Ok((k, v)),
-                Err(e) => Err(e),
-            })
-            .collect::<Result<Vec<(String, GValue)>, Error>>()?
-            .into_iter()
-            .collect::<HashMap<_, _>>();
-
-        Ok(GResult { data, meta })
-    }
-}
-impl Deserializer<Status> for V2 {
-    fn deserialize(val: &Value) -> Result<Status, Error> {
-        let code = Self::get(val, "code").map(|code| code.as_i64().unwrap() as i16)?;
-        let message = Self::get(val, "message")
-            .ok()
-            .map(|value| value.as_str().unwrap().to_string());
-        let attributes = Self::get(val, "attributes")?.clone();
-
-        Ok(Status {
-            code,
-            message,
-            attributes,
-        })
-    }
-}
-impl Deserializer<GID> for V2 {
-    fn deserialize(val: &Value) -> Result<GID, Error> {
-        let gvalue = val.deserialize::<Self, GValue>()?;
-        match gvalue {
-            GValue::String(d) => Ok(GID::String(d)),
-            GValue::Integer(d) => Ok(GID::Integer(d)),
-            GValue::Long(d) => Ok(GID::Long(d)),
-            value => Err(Error::UnexpectedGValue {
-                msg: "Ineligible for GKey".into(),
-                value,
-            }),
-        }
-    }
-}
-impl Deserializer<GValue> for V2 {
-    fn deserialize(value: &Value) -> Result<GValue, Error> {
-        match value {
-            Value::String(_) => value.deserialize::<Self, String>().map(GValue::from),
-            Value::Number(_) => value.deserialize::<Self, Integer>().map(GValue::from),
-            Value::Object(_obj) => match value.typed() {
-                Ok(blob) => Self::core_deserializer(blob),
-                Err(err) => match err {
-                    Error::Missing(_) => Self::special_deserializer(value),
-                    _ => panic!(),
-                },
-            },
-            Value::Array(values) => {
-                let collection = values
-                    .iter()
-                    .map(Self::deserialize)
-                    .collect::<Result<Vec<_>, Error>>()?;
-                Ok(GValue::List(List(collection)))
-            }
-            Value::Bool(_) => value.deserialize::<Self, Bool>().map(GValue::from),
-            Value::Null => Ok(GValue::Null),
-        }
-    }
-}
 impl Deserializer<Bool> for V2 {
     fn deserialize(val: &Value) -> Result<Bool, Error> {
         let bool = get_value!(val, Value::Bool)?;

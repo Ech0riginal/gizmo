@@ -32,6 +32,8 @@ macro_rules! test_prelude {
     () => {
         pub(self) use super::*;
         #[allow(unused_imports)]
+        pub(self) use crate::io::*;
+        #[allow(unused_imports)]
         pub(self) use crate::structure::*;
     };
 }

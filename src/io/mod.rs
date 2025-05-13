@@ -10,6 +10,8 @@ mod response;
 mod serde;
 
 pub(crate) use macros::*;
+pub(crate) use request::*;
+pub(crate) use response::*;
 
 pub use error::Error;
 pub use graphson::V2; //, V3, V3g};

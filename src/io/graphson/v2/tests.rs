@@ -1269,8 +1269,12 @@ mod response {
                 status: crate::Status {
                     code: 407,
                     message: Default::default(),
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
                 },
-                result: GValue::Null,
+                result: GResult {
+                    meta: HashMap::new(),
+                    data: GValue::Null,
+                },
             },
         }
     );
@@ -1283,90 +1287,103 @@ mod response {
                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
                 status: crate::Status {
                     code: 200,
-                    message: Default::default(),
+                    message: None,
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
                 },
-                result: GValue::Vertex(Vertex {
-                    id: GID::Integer(1.into()),
-                    label: "person".into(),
-                    properties: {
-                        let mut tmp = HashMap::new();
-                        tmp.insert(
-                            "name".into(),
-                            vec![VertexProperty {
-                                id: GID::Long(0.into()),
-                                label: "name".into(),
-                                value: Box::new(GValue::String("marko".into())),
-                                vertex: Some(GID::Integer(1.into())),
-                                properties: Default::default(),
-                            }],
-                        );
-                        tmp.insert(
-                            "location".into(),
-                            vec![
-                                VertexProperty {
-                                    id: GID::Long(6.into()),
-                                    value: Box::new(GValue::String("san diego".into())),
-                                    label: "location".into(),
+                result: GResult {
+                    meta: HashMap::new(),
+                    data: GValue::List(List(vec![GValue::Vertex(Vertex {
+                        id: GID::Integer(1.into()),
+                        label: "person".into(),
+                        properties: {
+                            let mut tmp = HashMap::new();
+                            tmp.insert(
+                                "name".into(),
+                                vec![VertexProperty {
+                                    id: GID::Long(0.into()),
+                                    label: "name".into(),
+                                    value: Box::new(GValue::String("marko".into())),
                                     vertex: Some(GID::Integer(1.into())),
-                                    properties: Some({
-                                        let mut tmp2 = HashMap::new();
-                                        tmp2.insert(
-                                            "startTime".into(),
-                                            GValue::Integer(1997.into()),
-                                        );
-                                        tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
-                                        tmp2
-                                    }),
-                                },
-                                VertexProperty {
-                                    id: GID::Long(7.into()),
-                                    label: "location".into(),
-                                    value: Box::new(GValue::String("santa cruz".into())),
-                                    vertex: Some(GID::Integer(1.into())),
-                                    properties: Some({
-                                        let mut tmp2 = HashMap::new();
-                                        tmp2.insert(
-                                            "startTime".into(),
-                                            GValue::Integer(2001.into()),
-                                        );
-                                        tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
-                                        tmp2
-                                    }),
-                                },
-                                VertexProperty {
-                                    id: GID::Long(8.into()),
-                                    label: "location".into(),
-                                    value: Box::new(GValue::String("brussels".into())),
-                                    vertex: Some(GID::Integer(1.into())),
-                                    properties: Some({
-                                        let mut tmp2 = HashMap::new();
-                                        tmp2.insert(
-                                            "startTime".into(),
-                                            GValue::Integer(2004.into()),
-                                        );
-                                        tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
-                                        tmp2
-                                    }),
-                                },
-                                VertexProperty {
-                                    id: GID::Long(9.into()),
-                                    label: "location".into(),
-                                    value: Box::new(GValue::String("santa fe".into())),
-                                    vertex: Some(GID::Integer(1.into())),
-                                    properties: Some({
-                                        let mut tmp2 = HashMap::new();
-                                        tmp2.insert(
-                                            "startTime".into(),
-                                            GValue::Integer(2005.into()),
-                                        );
-                                        tmp2
-                                    }),
-                                },
-                            ],
-                        );
-                        tmp
-                    },
-                }),
+                                    properties: Default::default(),
+                                }],
+                            );
+                            tmp.insert(
+                                "location".into(),
+                                vec![
+                                    VertexProperty {
+                                        id: GID::Long(6.into()),
+                                        value: Box::new(GValue::String("san diego".into())),
+                                        label: "location".into(),
+                                        vertex: Some(GID::Integer(1.into())),
+                                        properties: Some({
+                                            let mut tmp2 = HashMap::new();
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(1997.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2001.into()),
+                                            );
+                                            tmp2
+                                        }),
+                                    },
+                                    VertexProperty {
+                                        id: GID::Long(7.into()),
+                                        label: "location".into(),
+                                        value: Box::new(GValue::String("santa cruz".into())),
+                                        vertex: Some(GID::Integer(1.into())),
+                                        properties: Some({
+                                            let mut tmp2 = HashMap::new();
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2001.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2004.into()),
+                                            );
+                                            tmp2
+                                        }),
+                                    },
+                                    VertexProperty {
+                                        id: GID::Long(8.into()),
+                                        label: "location".into(),
+                                        value: Box::new(GValue::String("brussels".into())),
+                                        vertex: Some(GID::Integer(1.into())),
+                                        properties: Some({
+                                            let mut tmp2 = HashMap::new();
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2004.into()),
+                                            );
+                                            tmp2.insert(
+                                                "endTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
+                                            tmp2
+                                        }),
+                                    },
+                                    VertexProperty {
+                                        id: GID::Long(9.into()),
+                                        label: "location".into(),
+                                        value: Box::new(GValue::String("santa fe".into())),
+                                        vertex: Some(GID::Integer(1.into())),
+                                        properties: Some({
+                                            let mut tmp2 = HashMap::new();
+                                            tmp2.insert(
+                                                "startTime".into(),
+                                                GValue::Integer(2005.into()),
+                                            );
+                                            tmp2
+                                        }),
+                                    },
+                                ],
+                            );
+                            tmp
+                        },
+                    })]))
+                },
             },
         }
     );
