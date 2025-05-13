@@ -260,7 +260,11 @@ impl From<Infallible> for GremlinError {
 }
 impl From<GValue> for Vec<String> {
     fn from(value: GValue) -> Self {
-        todo!()
+        match value {
+            GValue::List(list) => list.into_iter().flat_map(|i| i.take::<String>()).collect(),
+            GValue::Set(set) => set.into_iter().flat_map(|i| i.take::<String>()).collect(),
+            _ => vec![],
+        }
     }
 }
 impl From<TraversalBuilder> for GValue {

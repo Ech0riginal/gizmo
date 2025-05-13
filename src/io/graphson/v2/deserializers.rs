@@ -63,16 +63,27 @@ impl V2 {
     }
 
     fn special_deserializer<'a>(value: &Value) -> Result<GValue, Error> {
-        if let Some(_) = value.get("starVertex") {
-            value.deserialize::<Self, StarGraph>().map(GValue::from)
-        } else {
-            Err(Error::UnexpectedJson {
+        match value {
+            val if is_stargraph(val) => value.deserialize::<Self, StarGraph>().map(GValue::from),
+            // val if is_response(val) =>{
+            //     value.deserialize::<Self, Response>()
+            // },
+            _ => Err(Error::UnexpectedJson {
                 msg: "Special case".into(),
                 value: value.clone(),
-            })
+            }),
         }
     }
 }
+
+fn is_stargraph(val: &Value) -> bool {
+    val.get("starVertex").is_some()
+}
+
+fn is_response(val: &Value) -> bool {
+    val.get("requestId").is_some() && val.get("status").is_some()
+}
+
 impl Deserializer<Response> for V2 {
     fn deserialize(value: &Value) -> Result<Response, Error> {
         let id: Uuid = {
@@ -442,7 +453,7 @@ impl Deserializer<VertexProperty> for V2 {
     }
 }
 impl Deserializer<Bytecode> for V2 {
-    fn deserialize(val: &Value) -> Result<Bytecode, Error> {
+    fn deserialize(_val: &Value) -> Result<Bytecode, Error> {
         todo!()
     }
 }
@@ -572,7 +583,7 @@ impl Deserializer<TraversalMetrics> for V2 {
     }
 }
 impl Deserializer<Traverser> for V2 {
-    fn deserialize(val: &Value) -> Result<Traverser, Error> {
+    fn deserialize(_val: &Value) -> Result<Traverser, Error> {
         todo!()
     }
 }

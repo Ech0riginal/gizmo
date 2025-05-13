@@ -1,16 +1,14 @@
-pub(self) use crate::io::graphson::v2::{V2, types::*};
-pub(self) use crate::io::macros::*;
-pub(self) use std::collections::HashMap;
+pub use crate::io::graphson::v2::{V2, types::*};
+pub use crate::io::macros::*;
+pub use chrono::TimeZone;
+pub use serde_json::json;
+pub use std::collections::HashMap;
 
 mod core {
     pub(self) use super::*;
-
-    use ::uuid::Uuid;
     use std::str::FromStr;
 
-    test_prelude!();
-
-    test!(
+    gvalue_test!(
         class,
         V2,
         Test {
@@ -18,7 +16,7 @@ mod core {
             object: GValue::Class("java.io.File".into()),
         }
     );
-    test!(
+    gvalue_test!(
         date,
         V2,
         Test {
@@ -28,7 +26,7 @@ mod core {
             )),
         }
     );
-    test!(
+    gvalue_test!(
         timestamp,
         V2,
         Test {
@@ -36,7 +34,7 @@ mod core {
             object: GValue::Timestamp(Timestamp(1481750076295i64)),
         }
     );
-    test!(
+    gvalue_test!(
         double,
         V2,
         Test {
@@ -44,7 +42,7 @@ mod core {
             object: GValue::Double(100.0.into()),
         }
     );
-    test!(
+    gvalue_test!(
         float,
         V2,
         Test {
@@ -52,7 +50,7 @@ mod core {
             object: GValue::Float(100.0.into()),
         }
     );
-    test!(
+    gvalue_test!(
         integer,
         V2,
         Test {
@@ -60,7 +58,7 @@ mod core {
             object: GValue::Integer(100.into()),
         }
     );
-    test!(
+    gvalue_test!(
         long,
         V2,
         Test {
@@ -68,12 +66,14 @@ mod core {
             object: GValue::Long(100.into()),
         }
     );
-    test!(
+    gvalue_test!(
         uuid,
         V2,
         Test {
             serial: json!({ "@type" : UUID, "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786"}),
-            object: GValue::Uuid(Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()),
+            object: GValue::Uuid(
+                ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+            ),
         }
     );
 }
@@ -157,7 +157,7 @@ mod structure {
         };
     }
 
-    test!(
+    gvalue_test!(
         edge,
         V2,
         Test {
@@ -179,7 +179,7 @@ mod structure {
             }),
         }
     );
-    test!(
+    gvalue_test!(
         path,
         V2,
         Test {
@@ -238,7 +238,7 @@ mod structure {
             )),
         }
     );
-    test!(
+    gvalue_test!(
         property,
         V2,
         Test {
@@ -264,7 +264,7 @@ mod structure {
             }),
         }
     );
-    test!(
+    gvalue_test!(
         stargraph,
         V2,
         Test {
@@ -342,7 +342,7 @@ mod structure {
         }
     );
 
-    test!(
+    gvalue_test!(
         tinkergraph,
         V2,
         Test {
@@ -934,7 +934,7 @@ mod structure {
             }),
         }
     );
-    test!(
+    gvalue_test!(
         tree,
         V2,
         Test {
@@ -993,7 +993,7 @@ mod structure {
             }),
         }
     );
-    test!(
+    gvalue_test!(
         vertex,
         V2,
         Test {
@@ -1001,7 +1001,7 @@ mod structure {
             object: marko!(),
         }
     );
-    test!(
+    gvalue_test!(
         vertexproperty,
         V2,
         Test {
@@ -1021,7 +1021,7 @@ mod process {
 
     test_prelude!();
 
-    test!(
+    gvalue_test!(
         barrier,
         V2,
         Test {
@@ -1029,7 +1029,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         binding,
         V2,
         Test {
@@ -1037,7 +1037,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         bytecode,
         V2,
         Test {
@@ -1045,7 +1045,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         cardinality,
         V2,
         Test {
@@ -1053,7 +1053,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         column,
         V2,
         Test {
@@ -1061,7 +1061,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         direction,
         V2,
         Test {
@@ -1069,7 +1069,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         operator,
         V2,
         Test {
@@ -1077,7 +1077,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         order,
         V2,
         Test {
@@ -1085,7 +1085,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         pick,
         V2,
         Test {
@@ -1093,7 +1093,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         pop,
         V2,
         Test {
@@ -1101,7 +1101,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         lambda,
         V2,
         Test {
@@ -1109,7 +1109,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         metrics,
         V2,
         Test {
@@ -1117,7 +1117,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         p,
         V2,
         Test {
@@ -1125,7 +1125,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         p_within,
         V2,
         Test {
@@ -1133,7 +1133,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         p_without,
         V2,
         Test {
@@ -1141,7 +1141,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         p_and,
         V2,
         Test {
@@ -1149,7 +1149,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         p_or,
         V2,
         Test {
@@ -1157,7 +1157,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         scope,
         V2,
         Test {
@@ -1165,7 +1165,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         t,
         V2,
         Test {
@@ -1173,7 +1173,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         textp,
         V2,
         Test {
@@ -1181,7 +1181,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         traversalmetrics,
         V2,
         Test {
@@ -1189,7 +1189,7 @@ mod process {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         traverser,
         V2,
         Test {
@@ -1203,7 +1203,7 @@ mod request {
 
     test_prelude!();
 
-    test!(
+    gvalue_test!(
         authentication_response,
         V2,
         Test {
@@ -1211,7 +1211,7 @@ mod request {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         session_eval,
         V2,
         Test {
@@ -1219,7 +1219,7 @@ mod request {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         session_eval_aliased,
         V2,
         Test {
@@ -1227,7 +1227,7 @@ mod request {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         session_close,
         V2,
         Test {
@@ -1235,7 +1235,7 @@ mod request {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         sessionless_eval,
         V2,
         Test {
@@ -1243,7 +1243,7 @@ mod request {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         sessionless_eval_aliased,
         V2,
         Test {
@@ -1254,23 +1254,120 @@ mod request {
 }
 mod response {
     pub(self) use super::*;
+    use crate::response_test;
+    use std::str::FromStr;
 
     test_prelude!();
 
-    test!(
+    response_test!(
         authentication_challenge,
         V2,
         Test {
             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { } }, "result" : { "data" : null, "meta" : { } }}),
-            object: GValue::Null,
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 407,
+                    message: Default::default(),
+                },
+                result: GValue::Null,
+            },
         }
     );
-    test!(
+    response_test!(
         standard_result,
         V2,
         Test {
             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 200, "attributes" : { } }, "result" : { "data" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } ], "meta" : { } }}),
-            object: GValue::Null,
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 200,
+                    message: Default::default(),
+                },
+                result: GValue::Vertex(Vertex {
+                    id: GID::Integer(1.into()),
+                    label: "person".into(),
+                    properties: {
+                        let mut tmp = HashMap::new();
+                        tmp.insert(
+                            "name".into(),
+                            vec![VertexProperty {
+                                id: GID::Long(0.into()),
+                                label: "name".into(),
+                                value: Box::new(GValue::String("marko".into())),
+                                vertex: Some(GID::Integer(1.into())),
+                                properties: Default::default(),
+                            }],
+                        );
+                        tmp.insert(
+                            "location".into(),
+                            vec![
+                                VertexProperty {
+                                    id: GID::Long(6.into()),
+                                    value: Box::new(GValue::String("san diego".into())),
+                                    label: "location".into(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = HashMap::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(1997.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(7.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa cruz".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = HashMap::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2001.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(8.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("brussels".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = HashMap::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2004.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(9.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa fe".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = HashMap::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2005.into()),
+                                        );
+                                        tmp2
+                                    }),
+                                },
+                            ],
+                        );
+                        tmp
+                    },
+                }),
+            },
         }
     );
 }
@@ -1279,7 +1376,7 @@ mod extended {
 
     test_prelude!();
 
-    test!(
+    gvalue_test!(
         bigdecimal,
         V2,
         Test {
@@ -1287,7 +1384,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         biginteger,
         V2,
         Test {
@@ -1295,7 +1392,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         byte,
         V2,
         Test {
@@ -1303,7 +1400,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         bytebuffer,
         V2,
         Test {
@@ -1311,7 +1408,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         char,
         V2,
         Test {
@@ -1319,7 +1416,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         duration,
         V2,
         Test {
@@ -1327,7 +1424,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         inetaddress,
         V2,
         Test {
@@ -1335,7 +1432,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         instant,
         V2,
         Test {
@@ -1343,7 +1440,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         localdate,
         V2,
         Test {
@@ -1351,7 +1448,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         localdatetime,
         V2,
         Test {
@@ -1359,7 +1456,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         localtime,
         V2,
         Test {
@@ -1367,7 +1464,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         monthday,
         V2,
         Test {
@@ -1375,7 +1472,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         offsetdatetime,
         V2,
         Test {
@@ -1383,7 +1480,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         offsettime,
         V2,
         Test {
@@ -1391,7 +1488,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         period,
         V2,
         Test {
@@ -1399,7 +1496,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         short,
         V2,
         Test {
@@ -1407,7 +1504,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         year,
         V2,
         Test {
@@ -1415,7 +1512,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         yearmonth,
         V2,
         Test {
@@ -1423,7 +1520,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         zoneddatetime,
         V2,
         Test {
@@ -1431,7 +1528,7 @@ mod extended {
             object: GValue::Null,
         }
     );
-    test!(
+    gvalue_test!(
         zoneoffset,
         V2,
         Test {
