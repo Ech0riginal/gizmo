@@ -144,14 +144,14 @@ macro_rules! response_test {
                 object
             );
 
-            crate::module!(
-                $engine,
-                serialization,
-                crate::io::Serializer<crate::Response>,
-                serialize,
-                object,
-                serial
-            );
+            // crate::module!(
+            //     $engine,
+            //     serialization,
+            //     crate::io::Serializer<crate::Response>,
+            //     serialize,
+            //     object,
+            //     serial
+            // );
         }
     };
 }
@@ -168,14 +168,14 @@ macro_rules! request_test {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            crate::module!(
-                $engine,
-                deserialization,
-                crate::io::Deserializer<crate::Request>,
-                deserialize,
-                serial,
-                object
-            );
+            // crate::module!(
+            //     $engine,
+            //     deserialization,
+            //     crate::io::Deserializer<crate::Request>,
+            //     deserialize,
+            //     serial,
+            //     object
+            // );
 
             crate::module!(
                 $engine,

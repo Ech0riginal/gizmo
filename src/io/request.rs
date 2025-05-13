@@ -46,6 +46,17 @@ impl Args {
         Self::insert(&mut self.0, key, value);
         self
     }
+
+    pub fn iter(&self) -> std::collections::hash_map::Iter<&'static str, GValue> {
+        self.0.iter()
+    }
+}
+
+impl std::ops::Deref for Args {
+    type Target = HashMap<&'static str, GValue>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl Insert<GValue> for Args {
