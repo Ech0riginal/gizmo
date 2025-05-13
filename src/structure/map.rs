@@ -154,3 +154,14 @@ impl TryFrom<GKey> for String {
         }
     }
 }
+impl TryFrom<&GKey> for String {
+    type Error = GremlinError;
+
+    fn try_from(k: &GKey) -> Result<Self, Self::Error> {
+        if let GKey::String(s) = k {
+            Ok(s.clone())
+        } else {
+            Err(GremlinError::Cast(format!("{:?}", k), "String".into()))
+        }
+    }
+}
