@@ -25,3 +25,21 @@ impl Serializer<TraversalMetrics> for V2 {
         todo!()
     }
 }
+
+impl Deserializer<TraversalMetrics> for V3 {
+    fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
+        let mut metrics = D::deserialize(&val)?.take::<Map>()?;
+
+        let duration = remove_or_else(&mut metrics, "dur", TRAVERSAL_METRICS)?.take::<f64>()?;
+
+        let m = remove_or_else(&mut metrics, "metrics", TRAVERSAL_METRICS)?
+            .take::<List>()?
+            .take()
+            .drain(0..)
+            .map(|e| e.take::<Metric>())
+            .filter_map(Result::ok)
+            .collect();
+
+        Ok(TraversalMetrics::new(duration, m).into())
+    }
+}

@@ -58,3 +58,43 @@ impl Serializer<Metrics> for V2 {
         todo!()
     }
 }
+
+impl Deserializer<Metrics> for V3 {
+    fn deserialize(val: &Value) -> Result<Metrics, Error> {
+        let mut metric = D::deserialize(&val)?.take::<Map>()?;
+
+        let duration = remove_or_else(&mut metric, "dur", METRICS)?.take::<f64>()?;
+        let id = remove_or_else(&mut metric, "id", METRICS)?.take::<String>()?;
+        let name = remove_or_else(&mut metric, "name", METRICS)?.take::<String>()?;
+
+        let mut counts = remove_or_else(&mut metric, "counts", METRICS)?.take::<Map>()?;
+        let traversers = remove_or_else(&mut counts, "traverserCount", METRICS)?.take::<i64>()?;
+        let count = remove_or_else(&mut counts, "elementCount", METRICS)?.take::<i64>()?;
+
+        let mut annotations = remove(&mut metric, "annotations", METRICS)
+            .map(|e| e.take::<Map>())
+            .unwrap_or_else(|| Ok(Map::empty()))?;
+
+        let perc_duration = remove(&mut annotations, "percentDur", METRICS)
+            .map(|e| e.take::<f64>())
+            .unwrap_or_else(|| Ok(0.0))?;
+
+        let nested: GremlinResult<Vec<Metric>> = remove(&mut metric, "metrics", METRICS)
+            .map(|e| e.take::<List>())
+            .unwrap_or_else(|| Ok(List::new(vec![])))?
+            .take()
+            .into_iter()
+            .map(|e| e.take::<Metric>())
+            .collect();
+        Ok(Metrics::new(
+            id,
+            name,
+            duration,
+            count,
+            traversers,
+            perc_duration,
+            nested?,
+        )
+        .into())
+    }
+}

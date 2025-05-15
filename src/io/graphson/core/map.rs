@@ -12,6 +12,26 @@ impl Serializer<Map> for V2 {
     }
 }
 
+impl Deserializer<Map> for V3 {
+    fn deserialize(val: &Value) -> Result<Map, Error> {
+        let val = get_value!(val, Value::Array)?;
+        let mut map = HashMap::new();
+        if !val.is_empty() {
+            let mut x = 0;
+            while x < val.len() {
+                let key_value = D::deserialize(&val[x])?;
+                let key: GKey = GKey::from(key_value);
+                let vald = &val[x + 1];
+                let _debug_val = format!("{}", &vald);
+                let value = D::deserialize(vald)?;
+                map.insert(key, value);
+                x += 2;
+            }
+        }
+        Ok(Map(map).into())
+    }
+}
+
 impl Serializer<Map> for V3 {
     fn serialize(val: &Map) -> Result<Value, Error> {
         let keys = val
