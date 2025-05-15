@@ -25,6 +25,8 @@ pub use error::GremlinError;
 pub use io::{Request, Response};
 pub use structure::{GValue, Primitive};
 
+pub(self) trait Sealed {}
+
 pub(crate) use io::Status;
 
 // pub mod prelude {

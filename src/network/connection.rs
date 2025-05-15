@@ -1,5 +1,5 @@
 use super::*;
-use crate::io::{Args, GResult, GremlinIO, Request};
+use crate::io::{Args, GremlinIO, Request};
 use crate::options::{ConnectionOptions, Credentials};
 use crate::{GValue, GremlinError, GremlinResult};
 use base64::Engine;
@@ -93,7 +93,7 @@ impl<V: GremlinIO> Connection<V> {
                             match pending.write().await.remove(&response.id) {
                                 Some(callback) => {
                                     callback
-                                        .send(Some(Ok(response.result.data)))
+                                        .send(Some(Ok(response.data)))
                                         .map_err(|_| GremlinError::Closed)?;
                                     callback.send(None).map_err(|_| GremlinError::Closed)?;
                                 }
@@ -105,7 +105,7 @@ impl<V: GremlinIO> Connection<V> {
 
                             match pending.read().await.get(&response.id) {
                                 Some(callback) => callback
-                                    .send(Some(Ok(response.result.data)))
+                                    .send(Some(Ok(response.data)))
                                     .map_err(|_| GremlinError::Closed)?,
                                 _ => {}
                             }
@@ -134,7 +134,7 @@ impl<V: GremlinIO> Connection<V> {
                                 // TODO request ids could get lost in here
                                 match pending.read().await.get(&response.id) {
                                     Some(callback) => callback
-                                        .send(Some(Ok(response.result.data)))
+                                        .send(Some(Ok(response.data)))
                                         .map_err(|_| GremlinError::Closed)?,
                                     _ => {}
                                 }
