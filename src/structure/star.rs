@@ -1,5 +1,6 @@
 use crate::structure::{GID, Vertex, VertexProperty};
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StarGraph {
@@ -25,5 +26,13 @@ impl From<Vertex> for StarGraph {
             label: value.label.clone(),
             properties: value.properties.clone(),
         }
+    }
+}
+
+impl Eq for StarGraph {}
+impl Hash for StarGraph {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.label.hash(state);
     }
 }

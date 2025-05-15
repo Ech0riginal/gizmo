@@ -1,6 +1,6 @@
 use crate::structure::*;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TextP {
     pub(crate) operator: String,
     pub(crate) value: Box<GValue>,

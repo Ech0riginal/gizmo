@@ -1,5 +1,6 @@
 use super::{Column, Direction, Merge};
 use crate::process::traversal::TraversalBuilder;
+use crate::structure::geometry::Geometry;
 use crate::structure::label::LabelType;
 use crate::structure::traverser::Traverser;
 use crate::structure::tree::Tree;
@@ -70,7 +71,7 @@ macro_rules! enom {
     ($($variant:ident($primitive:ty)),+) => {
         /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
         #[allow(clippy::large_enum_variant)]
-        #[derive(PartialEq, Clone)]
+        #[derive(Clone, Eq, Hash, PartialEq)]
         pub enum GValue {
             Null,
             $($variant($primitive),)+
@@ -112,7 +113,7 @@ enom!(
     Set(Set),
     String(String),
     Timestamp(Timestamp),
-    Uuid(uuid::Uuid),
+    Uuid(Uuid),
     // Structure
     Edge(Edge),
     Path(Path),
@@ -131,7 +132,7 @@ enom!(
     Direction(Direction),
     // Operator
     Order(Order),
-    // Pick(String)
+    // Pick(String),
     Pop(Pop),
     // Lambda
     // Metrics
@@ -147,7 +148,7 @@ enom!(
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
     TextP(TextP),
-    Geometry(geo_types::Geometry),
+    Geometry(Geometry),
     Merge(Merge),
     BulkSet(BulkSet)
 );

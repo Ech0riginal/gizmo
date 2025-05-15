@@ -8,7 +8,7 @@ pub struct MergeBuilder {
     map: HashMap<GKey, GValue>,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Merge {
     OnCreate,
     OnMatch,

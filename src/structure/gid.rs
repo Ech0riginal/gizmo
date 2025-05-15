@@ -1,7 +1,6 @@
 use crate::GremlinError;
 use crate::structure::*;
 use std::convert::TryFrom;
-use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct GIDs(pub(crate) Vec<GID>);

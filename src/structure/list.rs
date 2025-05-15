@@ -1,6 +1,6 @@
 use crate::structure::*;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct List(pub(crate) Vec<GValue>);
 
 impl List {

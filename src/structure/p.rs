@@ -2,7 +2,7 @@ use crate::structure::either::Either2;
 use crate::structure::text_p::TextP;
 use crate::structure::*;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct P {
     // TODO finish their P impl
     pub(crate) operator: String,

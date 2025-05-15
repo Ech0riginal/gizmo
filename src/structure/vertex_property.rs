@@ -1,5 +1,6 @@
 use crate::structure::{GID, GValue, Property};
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum GProperty {
@@ -82,5 +83,17 @@ impl VertexProperty {
 
     pub fn label(&self) -> &String {
         &self.label
+    }
+}
+impl Eq for VertexProperty {}
+impl Hash for VertexProperty {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.label.hash(state);
+        self.value.hash(state);
+
+        if let Some(id) = &self.vertex {
+            id.hash(state);
+        }
     }
 }

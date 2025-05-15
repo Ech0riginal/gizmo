@@ -1,7 +1,7 @@
 use crate::structure::*;
 use std::fmt::Formatter;
 
-#[derive(PartialEq, Clone, Default)]
+#[derive(Default, Eq, PartialEq, Clone, Hash)]
 pub struct Bytecode {
     source_instructions: Vec<Instruction>,
     step_instructions: Vec<Instruction>,
@@ -48,7 +48,7 @@ impl Bytecode {
     }
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(Eq, PartialEq, Clone, Hash)]
 pub struct Instruction {
     pub(crate) operator: String,
     pub(crate) args: Vec<GValue>,

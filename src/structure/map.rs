@@ -13,6 +13,15 @@ use std::fmt::Formatter;
 crate::primitive_prelude!();
 crate::very_primitive!(Map, HashMap<GKey, GValue>);
 
+impl Hash for Map {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for (k, v) in self.iter() {
+            k.hash(state);
+            v.hash(state);
+        }
+    }
+}
+
 impl<S> From<HashMap<S, GValue>> for Map
 where
     S: AsRef<str>,

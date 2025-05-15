@@ -1,6 +1,6 @@
 use crate::structure::{Double, Long};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TraversalExplanation {
     final_t: Vec<String>,
     original: Vec<String>,
@@ -19,7 +19,7 @@ impl TraversalExplanation {
         &self.intermediate
     }
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct IntermediateRepr {
     traversal: Vec<String>,
     strategy: String,
@@ -49,7 +49,7 @@ impl TraversalExplanation {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TraversalMetrics {
     duration: Double,
     metrics: Vec<Metrics>,
@@ -71,7 +71,7 @@ impl TraversalMetrics {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Metrics {
     id: String,
     duration: Double,
@@ -82,49 +82,41 @@ pub struct Metrics {
     nested: Vec<Metrics>,
 }
 
-impl Metrics {
-    pub fn id(&self) -> &String {
-        &self.id
-    }
-    pub fn name(&self) -> &String {
-        &self.name
-    }
-    pub fn duration(&self) -> &f64 {
-        &self.duration
-    }
-
-    pub fn perc_duration(&self) -> &f64 {
-        &self.perc_duration
-    }
-    pub fn count(&self) -> &i64 {
-        &self.count
-    }
-    pub fn traversers(&self) -> &i64 {
-        &self.traversers
-    }
-}
+getters!(
+    Metrics,
+    id -> String,
+    name -> String,
+    duration -> Double,
+    perc_duration -> Double,
+    count -> Long,
+    traversers -> Long
+);
 
 impl Metrics {
-    pub fn new<T, V>(
-        id: T,
-        name: V,
-        duration: Double,
-        count: Long,
-        traversers: Long,
-        perc_duration: Double,
+    pub fn new<I, N, D, C, T, P>(
+        id: I,
+        name: N,
+        duration: D,
+        count: C,
+        traversers: T,
+        perc_duration: P,
         nested: Vec<Metrics>,
     ) -> Self
     where
-        T: Into<String>,
-        V: Into<String>,
+        I: Into<String>,
+        N: Into<String>,
+        D: Into<Double>,
+        C: Into<Long>,
+        T: Into<Long>,
+        P: Into<Double>,
     {
         Metrics {
             id: id.into(),
             name: name.into(),
-            duration,
-            count,
-            traversers,
-            perc_duration,
+            duration: duration.into(),
+            count: count.into(),
+            traversers: traversers.into(),
+            perc_duration: perc_duration.into(),
             nested,
         }
     }

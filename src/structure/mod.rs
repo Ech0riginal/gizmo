@@ -26,15 +26,14 @@ macro_rules! primitive {
 
         crate::display!($name);
 
-        impl From<$inner> for $name {
-            fn from(value: $inner) -> Self {
-                Self(value)
-            }
-        }
-
         impl Into<$inner> for $name {
             fn into(self) -> $inner {
                 self.0
+            }
+        }
+        impl Into<$name> for $inner {
+            fn into(self) -> $name {
+                $name(self)
             }
         }
     };
@@ -46,6 +45,13 @@ macro_rules! very_primitive {
         crate::primitive!($name, $inner);
         crate::partial_eq!($name);
         crate::eq!($name);
+    };
+}
+
+#[macro_export]
+macro_rules! getters {
+    ($struct_:ident, $($field:ident -> $type_:ty),+) => {
+        impl $struct_ { $(pub fn $field(&self) -> &$type_ { &self.$field })+ }
     };
 }
 
@@ -137,12 +143,15 @@ macro_rules! partial_eq {
     };
 }
 
+// TODO move these elsewhere
 primitive_prelude!();
 very_primitive!(Bool, bool);
 very_primitive!(Float, f32);
 very_primitive!(Double, f64);
 very_primitive!(Integer, i32);
 very_primitive!(Long, i64);
+
+use std::hash::{Hash, Hasher};
 
 impl Hash for Bool {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -179,6 +188,7 @@ mod datetime;
 mod direction;
 mod edge;
 mod either;
+mod geometry;
 mod gid;
 mod label;
 mod list;
@@ -202,6 +212,7 @@ mod tinker;
 mod token;
 mod traverser;
 mod tree;
+mod uuid;
 mod value;
 mod vertex;
 mod vertex_property;
@@ -231,16 +242,15 @@ pub use result::GResultSet;
 pub use scope::Scope;
 pub use set::Set;
 pub use star::StarGraph;
-use std::hash::{Hash, Hasher};
 pub use t::T;
 pub use text_p::TextP;
 pub use tinker::TinkerGraph;
 pub use token::Token;
 pub use traverser::Traverser;
 pub use tree::Tree;
+pub use uuid::Uuid;
 pub use value::GValue;
 pub use vertex::Vertex;
 pub use vertex_property::{GProperty, VertexProperty};
 
-use crate::GremlinResult;
 pub(crate) use tree::Branch;
