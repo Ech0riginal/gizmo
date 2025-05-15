@@ -2,8 +2,10 @@ use crate::io::graphson::prelude::*;
 
 impl Deserializer<Float> for V2 {
     fn deserialize(val: &Value) -> Result<Float, Error> {
-        let val = expect_float!(val);
-        Ok(Float(val))
+        get_value!(val, Value::Number)?
+            .as_f64()
+            .map(|f| Float(f as f32))
+            .ok_or(Error::unexpected(val, "Not floating-point"))
     }
 }
 

@@ -2,8 +2,10 @@ use crate::io::graphson::prelude::*;
 
 impl Deserializer<Double> for V2 {
     fn deserialize(val: &Value) -> Result<Double, Error> {
-        let val = expect_double!(val);
-        Ok(Double(val))
+        get_value!(val, Value::Number)?
+            .as_f64()
+            .map(Double)
+            .ok_or(Error::unexpected(val, "Not an f64"))
     }
 }
 

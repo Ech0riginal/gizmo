@@ -190,25 +190,35 @@ macro_rules! request_test {
 }
 
 macro_rules! get_value {
-    ($value:expr,Value::$v:ident) => {
+    ($value:expr,$v:path) => {
         match $value {
-            Value::$v(e) => Ok(e),
-            _ => Err($crate::io::error::Error::UnexpectedJson {
-                msg: format!("Expected {}", stringify!($v)),
-                value: $value.clone(),
-            }),
+            $v(e) => Ok(e),
+            _ => Err($crate::io::error::Error::unexpected(
+                $value,
+                &format!("Expected {}", stringify!($v)),
+            )),
         }
     };
-
-    ($value:expr,GValue::$v:ident) => {
-        match $value {
-            GValue::$v(e) => Ok(e),
-            v => Err($crate::io::error::Error::UnexpectedGValue {
-                msg: format!("Expected {}", stringify!($v)),
-                value: v.clone(),
-            }),
-        }
-    };
+    
+    // ($value:expr,Value::$v:ident) => {
+    //     match $value {
+    //         Value::$v(e) => Ok(e),
+    //         _ => Err($crate::io::error::Error::UnexpectedJson {
+    //             msg: format!("Expected {}", stringify!($v)),
+    //             value: $value.clone(),
+    //         }),
+    //     }
+    // };
+    // 
+    // ($value:expr,GValue::$v:ident) => {
+    //     match $value {
+    //         GValue::$v(e) => Ok(e),
+    //         v => Err($crate::io::error::Error::UnexpectedGValue {
+    //             msg: format!("Expected {}", stringify!($v)),
+    //             value: v.clone(),
+    //         }),
+    //     }
+    // };
 }
 
 macro_rules! expect_i32 {

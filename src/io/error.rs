@@ -1,5 +1,6 @@
-use crate::GremlinError;
+use crate::{GValue, GremlinError};
 use std::fmt::Debug;
+use serde_json::Value;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -15,7 +16,10 @@ pub enum Error {
         value: serde_json::Value,
     },
     #[error("UnexpectedGValue. {msg}: {value:?}")]
-    UnexpectedGValue { msg: String, value: crate::GValue },
+    UnexpectedGValue {
+        msg: String,
+        value: crate::GValue
+    },
     #[error("Value is missing key '{0}'")]
     Missing(&'static str),
     #[error("Cannot cast {0} to {1}")]
@@ -46,5 +50,48 @@ where
             .filter(|result| result.is_err())
             .take(1)
             .collect()
+    }
+}
+
+
+impl Error {
+    pub(crate) fn unexpected<V, S>(val: V, msg: S) -> Self
+        where
+            Self: Expect<V>,
+            S: AsRef<str>,
+    {
+        Self::expect(val, msg.as_ref())
+    }
+}
+
+trait Expect<T> {
+    fn expect(value: T, msg: &str) -> Error;
+}
+
+impl Expect<Value> for Error {
+    fn expect(val: Value, msg: &str) -> Error {
+        Self::UnexpectedJson {
+            msg: msg.to_string(),
+            value: val,
+        }
+    }
+}
+
+
+impl Expect<&Value> for Error {
+    fn expect(val: &Value, msg: &str) -> Error {
+        Self::UnexpectedJson {
+            msg: msg.to_string(),
+            value: val.clone(),
+        }
+    }
+}
+
+impl Expect<&GValue> for Error {
+    fn expect(val: &GValue, msg: &str) -> Error {
+        Self::UnexpectedGValue {
+            msg: msg.to_string(),
+            value: val.clone(),
+        }
     }
 }

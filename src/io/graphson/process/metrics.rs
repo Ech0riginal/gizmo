@@ -61,40 +61,35 @@ impl Serializer<Metrics> for V2 {
 
 impl Deserializer<Metrics> for V3 {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
-        let mut metric = D::deserialize(&val)?.take::<Map>()?;
-
-        let duration = remove_or_else(&mut metric, "dur", METRICS)?.take::<f64>()?;
-        let id = remove_or_else(&mut metric, "id", METRICS)?.take::<String>()?;
-        let name = remove_or_else(&mut metric, "name", METRICS)?.take::<String>()?;
-
-        let mut counts = remove_or_else(&mut metric, "counts", METRICS)?.take::<Map>()?;
-        let traversers = remove_or_else(&mut counts, "traverserCount", METRICS)?.take::<i64>()?;
-        let count = remove_or_else(&mut counts, "elementCount", METRICS)?.take::<i64>()?;
-
-        let mut annotations = remove(&mut metric, "annotations", METRICS)
-            .map(|e| e.take::<Map>())
-            .unwrap_or_else(|| Ok(Map::empty()))?;
-
-        let perc_duration = remove(&mut annotations, "percentDur", METRICS)
-            .map(|e| e.take::<f64>())
-            .unwrap_or_else(|| Ok(0.0))?;
-
-        let nested: GremlinResult<Vec<Metric>> = remove(&mut metric, "metrics", METRICS)
-            .map(|e| e.take::<List>())
-            .unwrap_or_else(|| Ok(List::new(vec![])))?
-            .take()
+        fn get<'a>(map: &'a serde_json::Map<String, Value>, key: &'static str) -> Result<&'a Value, Error> {
+            map.get(key).ok_or(Error::Missing(key))
+        }
+        
+        let obj = get_value!(val, Value::Object)?;
+        let counts = get_value!(get(obj, "counts")?, Value::Object)?;
+        let annotations = get_value!(get(obj, "annotations")?, Value::Object)?;
+        let metrics = get_value!(get(obj, "metrics")?, Value::Array)?;
+        
+        let id = get(obj, "id")?.deserialize::<Self, String>()?;
+        let name = get(obj,"name")?.deserialize::<Self, String>()?;
+        let duration = get(obj, "dur")?.deserialize::<Self, Double>()?;
+        let traversers = get(counts, "traverserCount")?.deserialize::<Self, Long>()?;
+        let count = get(counts, "elementCount")?.deserialize::<Self, Long>()?;
+        let perc_duration = get(annotations, "percentDur")?.deserialize::<Self, Double>()?;
+        let nested = metrics
             .into_iter()
-            .map(|e| e.take::<Metric>())
-            .collect();
-        Ok(Metrics::new(
+            .map(|v| v.deserialize::<Self, Metrics>())
+            .collect::<Result<Vec<_>, Error>>()?;
+        let metrics = Metrics::new(
             id,
             name,
             duration,
             count,
             traversers,
             perc_duration,
-            nested?,
-        )
-        .into())
+            nested,
+        );
+        
+        Ok(metrics.into())
     }
 }

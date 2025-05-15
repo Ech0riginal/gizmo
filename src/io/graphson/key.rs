@@ -5,3 +5,9 @@ impl Serializer<GKey> for V3 {
         todo!()
     }
 }
+
+impl Deserializer<GKey> for V3 {
+    fn deserialize(val: &Value) -> Result<GKey, Error> {
+        todo!()
+    }
+}

@@ -19,11 +19,10 @@ impl Deserializer<Map> for V3 {
         if !val.is_empty() {
             let mut x = 0;
             while x < val.len() {
-                let key_value = D::deserialize(&val[x])?;
-                let key: GKey = GKey::from(key_value);
+                let key = val[x].deserialize::<Self, GKey>()?;
                 let vald = &val[x + 1];
                 let _debug_val = format!("{}", &vald);
-                let value = D::deserialize(vald)?;
+                let value = vald.deserialize::<Self, GValue>()?;
                 map.insert(key, value);
                 x += 2;
             }

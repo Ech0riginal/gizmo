@@ -2,8 +2,10 @@ use crate::io::graphson::prelude::*;
 
 impl Deserializer<Integer> for V2 {
     fn deserialize(val: &Value) -> Result<Integer, Error> {
-        let val = expect_i32!(val);
-        Ok(Integer(val))
+        get_value!(val, Value::Number)?
+            .as_i64()
+            .map(|i| Integer(i as i32))
+            .ok_or(Error::unexpected(val, "Not a number"))
     }
 }
 

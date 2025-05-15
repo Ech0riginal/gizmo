@@ -54,6 +54,14 @@ crate::io::macros::types! {
     TRAVERSER, "g:Traverser"
 }
 
+crate::io::macros::types! {
+    custom,
+    // SQLg will emit this value
+    GEOMETRY, "g:Geometry",
+    // while JanusGraph will emit this one
+    GEOSHAPE, "g:Geoshape"
+}
+
 mod typed {
     use crate::io::macros::get_value;
     use crate::io::{Deserialize, Deserializer, Error, Serialize, Serializer};
