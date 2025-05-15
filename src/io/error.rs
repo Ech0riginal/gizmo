@@ -7,6 +7,8 @@ pub enum Error {
     Serde(#[from] serde_json::Error),
     #[error("{0} is not supported.")]
     Unsupported(String),
+    #[error("{0} was not expected.")]
+    Unexpected(String),
     #[error("Unexpected JSON. {msg}: {value:?}")]
     UnexpectedJson {
         msg: String,
