@@ -39,16 +39,17 @@ impl Args {
     pub fn new() -> Self {
         Self(HashMap::with_capacity(8))
     }
+  
+    pub fn iter(&self) -> std::collections::hash_map::Iter<&'static str, GValue> {
+        self.0.iter()
+    }
+    
     pub fn arg<V>(mut self, key: &'static str, value: V) -> Self
     where
         Self: Insert<V>,
     {
         Self::insert(&mut self.0, key, value);
         self
-    }
-
-    pub fn iter(&self) -> std::collections::hash_map::Iter<&'static str, GValue> {
-        self.0.iter()
     }
 }
 
@@ -99,6 +100,6 @@ insert!(&'a str);
 insert!(HashMap<&str, GValue>);
 insert!(HashMap<GKey, GValue>);
 
-pub(crate) trait Insert<I> {
+trait Insert<I> {
     fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: I);
 }

@@ -1,21 +1,30 @@
-mod v2;
-// mod v3;
-// mod v3g;
+mod core;
+mod id;
+mod process;
+mod request;
+mod response;
+mod structure;
+mod tags;
+mod value;
+mod versions;
 
-mod de;
-mod placeholder;
-// #[cfg(test)]
-// pub(self) mod tests;
+mod key;
+#[cfg(test)]
+mod tests;
 
-pub use v2::V2;
-// pub use v3::V3;
-// pub use v3g::V3g;
+pub use tags::{Tag, Type};
+pub use versions::*;
 
-/// Encompasses GraphSON v2, v3, and our custom types. Our custom types will always be the last in
-/// this list.
-#[allow(unused)]
-pub(crate) mod types {
-    pub(crate) use super::v2::types as v2;
-    // pub(crate) use super::v3::types as v3;
-    // pub(crate) use super::v3g::types as v3g;
+pub(self) mod prelude {
+    pub use serde_json::{Value, json};
+    pub use std::collections::HashMap;
+
+    pub use super::versions::*;
+    pub use crate::io::graphson::tags::{Typed, core::*, process::*, structure::*};
+    pub use crate::io::macros::*;
+    pub use crate::io::{Deserialize, Deserializer};
+    pub use crate::io::{Error, IOHelpers};
+    pub use crate::io::{Serialize, Serializer};
+    pub use crate::passthrough;
+    pub use crate::structure::*;
 }
