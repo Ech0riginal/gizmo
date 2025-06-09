@@ -1,4 +1,5 @@
 [package]
+authors = ["Ech0riginal <samwatkins94@me.com>"]
 name = "structure"
 version = "0.1.0"
 edition = "2024"
@@ -13,6 +14,6 @@ lazy_static         = { version = "1.5.0" }
 serde               = { version = "1.0.219" }
 serde_json          = { version = "1.0.140", features = ["arbitrary_precision"] }
 thiserror           = { version = "2.0.12" }
-uuid                = { version = "1.16.0", features = ["serde", "v4"] }
+uuid                = { version = "1.17.0", features = ["serde", "v4"] }
 tracing             = { version = "0.1.41", features = ["default"] }
 
