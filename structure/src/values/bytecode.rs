@@ -3,8 +3,8 @@ use std::fmt::Formatter;
 
 #[derive(Default, Eq, PartialEq, Clone, Hash)]
 pub struct Bytecode {
-    source_instructions: Vec<Instruction>,
-    step_instructions: Vec<Instruction>,
+    pub(crate) source_instructions: List<Instruction>,
+    pub(crate) step_instructions: List<Instruction>,
 }
 
 impl std::fmt::Debug for Bytecode {
@@ -24,14 +24,14 @@ impl Bytecode {
         Default::default()
     }
 
-    pub fn add_source<S>(&mut self, source_name: S, args: Vec<GValue>)
+    pub fn add_source<S>(&mut self, source_name: S, args: List<GValue>)
     where
         S: AsRef<str>,
     {
         self.source_instructions
             .push(Instruction::new(source_name.as_ref().to_string(), args));
     }
-    pub fn add_step<S>(&mut self, step_name: S, args: Vec<GValue>)
+    pub fn add_step<S>(&mut self, step_name: S, args: List<GValue>)
     where
         S: AsRef<str>,
     {
@@ -39,11 +39,11 @@ impl Bytecode {
             .push(Instruction::new(step_name.as_ref().to_string(), args));
     }
 
-    pub fn sources(&self) -> &Vec<Instruction> {
+    pub fn sources(&self) -> &List<Instruction> {
         &self.source_instructions
     }
 
-    pub fn steps(&self) -> &Vec<Instruction> {
+    pub fn steps(&self) -> &List<Instruction> {
         &self.step_instructions
     }
 }
@@ -51,7 +51,7 @@ impl Bytecode {
 #[derive(Eq, PartialEq, Clone, Hash)]
 pub struct Instruction {
     pub(crate) operator: String,
-    pub(crate) args: Vec<GValue>,
+    pub(crate) args: List<GValue>,
 }
 
 impl std::fmt::Debug for Instruction {
@@ -86,7 +86,7 @@ impl std::fmt::Debug for Instruction {
 }
 
 impl Instruction {
-    pub fn new(operator: String, args: Vec<GValue>) -> Instruction {
+    pub fn new(operator: String, args: List<GValue>) -> Instruction {
         Instruction { operator, args }
     }
 }
