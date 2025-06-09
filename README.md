@@ -1,3 +1,3 @@
 An opinionated Apache TinkerPop client.
 
-Why? I'm unemployed and bored.
+Why? Largely: I'm unemployed, bored, and there's no proper GraphSON ser/de crate.
