@@ -1,9 +1,40 @@
 use crate::io::graphson::prelude::*;
-use indexmap::{IndexMap, indexset};
 
 impl Deserializer<Vertex> for V3 {
     fn deserialize(val: &Value) -> Result<Vertex, Error> {
-        todo!()
+        let map = get_value!(val, Value::Object)?;
+        let id = map
+            .get("id")
+            .ok_or("id".missing())?
+            .deserialize::<Self, GID>()?;
+        let label = map
+            .get("label")
+            .ok_or("label".missing())?
+            .deserialize::<Self, String>()?;
+        let properties = {
+            let properties_val = map.get("properties").ok_or("properties".missing())?;
+            let props = get_value!(properties_val, Value::Object)?;
+            let mut map = Map::new();
+
+            for (key, value) in props.into_iter() {
+                let properties = get_value!(value, Value::Array)?
+                    .into_iter()
+                    .map(|item| item.typed())
+                    .collect::<Result<Vec<Type<'_>>, Error>>()?
+                    .into_iter()
+                    .map(|typed| typed.value.deserialize::<Self, VertexProperty>())
+                    .collect::<Result<List<VertexProperty>, Error>>()?;
+                map.insert(key.to_string(), properties);
+            }
+
+            map
+        };
+
+        Ok(Vertex {
+            id,
+            label,
+            properties,
+        })
     }
 }
 

@@ -7,7 +7,7 @@ impl Deserializer<StarGraph> for V2 {
             value: val.clone(),
         })?;
         let vertex = value.typed()?.value.deserialize::<Self, Vertex>()?;
-        let yikes = vertex.into();
+        let yikes = StarGraph::from(vertex);
         Ok(yikes)
     }
 }

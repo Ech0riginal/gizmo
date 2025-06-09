@@ -1,3 +1,4 @@
+use crate::io::error::Missing;
 use crate::io::graphson::prelude::*;
 
 impl Deserializer<Metrics> for V2 {
@@ -5,27 +6,27 @@ impl Deserializer<Metrics> for V2 {
         let metric = get_value!(val, Value::Object)?.to_owned();
         let duration = metric
             .get("dur")
-            .ok_or(Error::missing("dur"))?
+            .ok_or("dur".missing())?
             .deserialize::<Self, Double>()?;
         let id = metric
             .get("id")
-            .ok_or(Error::missing("id"))?
+            .ok_or("id".missing())?
             .deserialize::<Self, String>()?;
         let name = metric
             .get("name")
-            .ok_or(Error::missing("name"))?
+            .ok_or("name".missing())?
             .deserialize::<Self, String>()?;
         let counts = get_value!(
-            metric.get("counts").ok_or(Error::missing("counts"))?,
+            metric.get("counts").ok_or("counts".missing())?,
             Value::Object
         )?;
         let traversers = counts
             .get("traverserCount")
-            .ok_or(Error::missing("traverserCount"))?
+            .ok_or("traverserCount".missing())?
             .deserialize::<Self, Long>()?;
         let count = counts
             .get("elementCount")
-            .ok_or(Error::missing("elementCount"))?
+            .ok_or("elementCount".missing())?
             .deserialize::<Self, Long>()?;
         let annotations = get_value!(
             metric
@@ -36,11 +37,11 @@ impl Deserializer<Metrics> for V2 {
         )?;
         let perc_duration = annotations
             .get("percentDur")
-            .ok_or(Error::missing("percentDur"))?
+            .ok_or("percentDur".missing())?
             .deserialize::<Self, Double>()
             .unwrap_or(Double(0.0));
         let nested = get_value!(
-            metric.get("metrics").ok_or(Error::missing("metrics"))?,
+            metric.get("metrics").ok_or("metrics".missing())?,
             Value::Array
         )?
         .into_iter()

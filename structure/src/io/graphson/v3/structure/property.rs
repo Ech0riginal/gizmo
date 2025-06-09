@@ -6,11 +6,11 @@ impl Deserializer<Property> for V3 {
         let val = get_value!(val, Value::Object)?;
         let key = val
             .get("key")
-            .ok_or(Error::missing("key"))?
+            .ok_or("key".missing())?
             .deserialize::<Self, String>()?;
         let value = Box::new(
             val.get("value")
-                .ok_or(Error::missing("value"))?
+                .ok_or("value".missing())?
                 .deserialize::<Self, GValue>()?,
         );
         let mut element = Box::new(GValue::Null);

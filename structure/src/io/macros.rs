@@ -32,6 +32,8 @@ macro_rules! test_prelude {
     () => {
         pub(self) use super::*;
         #[allow(unused_imports)]
+        pub(self) use crate::io::graphson::tests::diff::{Diff, Diffd};
+        #[allow(unused_imports)]
         pub(self) use crate::io::*;
         #[allow(unused_imports)]
         pub(self) use crate::*;
@@ -49,40 +51,71 @@ macro_rules! tests {
 
 #[macro_export]
 macro_rules! module {
-    ($engine:ident, $mod_:ident, $trait_:path, $fn_:ident, $case:ident, $expected:ident) => {
-        mod $mod_ {
+    ($engine:ident, serialization) => {
+        mod serialization {
             pub(self) use super::*;
 
             #[test]
             fn ok() {
-                let result = <$engine as $trait_>::$fn_(&TEST_CASE.$case);
+                let result =
+                    <$engine as crate::io::Serializer<crate::GValue>>::serialize(&TEST_CASE.object);
                 match result {
                     Ok(_) => {
                         assert!(true);
                     }
                     Err(e) => {
-                        assert!(false, "{} failed: {:?}", stringify!($mod_), e);
+                        assert!(false, "serialization failed: {:?}", e);
                     }
                 }
             }
 
             #[test]
             fn accurate() {
-                let result = <$engine as $trait_>::$fn_(&TEST_CASE.$case);
-                assert!(result.is_ok(), "{} failed", stringify!($mod_));
-                let result = result.unwrap();
+                let result =
+                    <$engine as crate::io::Serializer<crate::GValue>>::serialize(&TEST_CASE.object);
+                assert!(result.is_ok(), "serialization failed: {:?}", result);
+                let item = result.unwrap();
+                assert!(
+                    TEST_CASE.serial == item,
+                    "expected: {:?}\nactual:   {:?}\n",
+                    TEST_CASE.serial,
+                    item
+                );
+            }
+        }
+    };
 
-                std::panic::set_hook(Box::new(|info| {
-                    eprintln!("{} doesn't match expectation", stringify!($mod_));
-                    eprintln!("{}", info);
-                }));
+    ($engine:ident, deserialization) => {
+        mod deserialization {
+            pub(self) use super::*;
 
-                if (TEST_CASE.$expected != result) {
-                    assert!(
-                        false,
-                        "expected: {}\nactual:   {}\n",
-                        TEST_CASE.$expected, result
-                    );
+            #[test]
+            fn ok() {
+                let result = <$engine as crate::io::Deserializer<crate::GValue>>::deserialize(
+                    &TEST_CASE.serial,
+                );
+                assert!(result.is_ok(), "deserialization failed: {:?}", result);
+            }
+
+            #[test]
+            fn accurate() {
+                let result = <$engine as crate::io::Deserializer<crate::GValue>>::deserialize(
+                    &TEST_CASE.serial,
+                );
+                match result {
+                    Err(e) => {
+                        assert!(false, "deserialization failed: {:?}", e);
+                    }
+                    Ok(item) => {
+                        if (TEST_CASE.object != item) {
+                            assert!(
+                                TEST_CASE.object.diff(&item) == Diffd::Same,
+                                "expected: {:?}\nactual:   {:?}\n",
+                                TEST_CASE.object,
+                                item
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -110,23 +143,8 @@ macro_rules! gvalue_test {
                 static ref TEST_CASE: Test = $case;
             }
 
-            crate::module!(
-                $engine,
-                deserialization,
-                crate::io::Deserializer<crate::GValue>,
-                deserialize,
-                serial,
-                object
-            );
-
-            crate::module!(
-                $engine,
-                serialization,
-                crate::io::Serializer<crate::GValue>,
-                serialize,
-                object,
-                serial
-            );
+            crate::module!($engine, deserialization);
+            crate::module!($engine, serialization);
         }
     };
 }

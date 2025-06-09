@@ -1,6 +1,5 @@
 use crate::io::graphson::prelude::*;
 use crate::io::graphson::tags::{Tag, Type};
-use indexmap::IndexSet;
 
 impl V3 {
     fn core_deserializer<'a>(blob: Type<'a>) -> Result<GValue, Error> {

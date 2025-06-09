@@ -7,7 +7,7 @@ mod versions;
 
 mod key;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 mod v2;
 mod v3;
 
@@ -20,10 +20,11 @@ pub(self) mod prelude {
 
     pub use super::versions::*;
 
+    pub use crate::io::error::{Error, Missing};
     pub use crate::io::graphson::tags::*;
     pub use crate::io::macros::*;
+    pub use crate::io::utils::Ensure;
     pub use crate::io::{Deserialize, Deserializer};
-    pub use crate::io::{Error, IOHelpers};
     pub use crate::io::{Serialize, Serializer};
     pub use crate::passthrough;
     pub use crate::primitive::*;

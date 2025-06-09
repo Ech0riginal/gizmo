@@ -1,6 +1,5 @@
 use crate::io::graphson::prelude::*;
 use crate::io::graphson::tags::{Tag, Type};
-use indexmap::IndexSet;
 use serde_json::Value;
 
 impl V2 {

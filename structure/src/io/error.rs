@@ -28,20 +28,15 @@ pub enum Error {
     Huh,
 }
 
-impl Error {
-    pub fn missing(name: &'static str) -> Self {
-        Self::Missing(name.to_string())
-    }
+pub trait Missing {
+    fn missing(&self) -> Error;
 }
 
-// impl From<crate::Error> for Error {
-//     fn from(value: crate::Error) -> Self {
-//         match value {
-//             Error::Cast(from_, to_) => Self::Cast(from_, to_),
-//             _ => panic!("unhandled gremlin in the pipes!"),
-//         }
-//     }
-// }
+impl<T: AsRef<str>> Missing for T {
+    fn missing(&self) -> Error {
+        Error::Missing(self.as_ref().to_string())
+    }
+}
 
 impl<T, E> FromIterator<Result<T, E>> for Error
 where

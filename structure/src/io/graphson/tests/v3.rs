@@ -153,38 +153,7 @@ mod structure {
         edge,
         V3,
         Test {
-            serial: json!({
-                "@type": "g:Edge",
-                "@value": {
-                    "id": {
-                        "@type": "g:Int32",
-                        "@value": 13
-                    },
-                    "label": "develops",
-                    "inVLabel": "software",
-                    "outVLabel": "person",
-                    "inV": {
-                        "@type": "g:Int32",
-                        "@value": 10
-                    },
-                    "outV": {
-                        "@type": "g:Int32",
-                        "@value": 1
-                    },
-                    "properties": {
-                        "since": {
-                            "@type": "g:Property",
-                            "@value": {
-                                "key": "since",
-                                "value": {
-                                    "@type": "g:Int32",
-                                    "@value": 2009
-                                }
-                            }
-                        }
-                    }
-                }
-            }),
+            serial: json!({"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":13},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":1},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2009}}}}}}),
             object: GValue::Edge(Edge {
                 id: GID::Integer(13.into()),
                 label: "develops".to_string(),

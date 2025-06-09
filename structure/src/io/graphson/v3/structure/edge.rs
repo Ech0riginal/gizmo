@@ -7,30 +7,30 @@ impl Deserializer<Edge> for V3 {
         let map = get_value!(val, Value::Object)?;
         let id = map
             .get("id")
-            .ok_or(Error::missing("id"))?
+            .ok_or("id".missing())?
             .deserialize::<Self, GID>()?;
         let label = map
             .get("label")
-            .ok_or(Error::missing("label"))?
+            .ok_or("label".missing())?
             .deserialize::<Self, String>()?;
         let in_v = map
             .get("inV")
-            .ok_or(Error::missing("inV"))?
+            .ok_or("inV".missing())?
             .deserialize::<Self, GID>()?;
         let in_v_label = map
             .get("inVLabel")
-            .ok_or(Error::missing("inVLabel"))?
+            .ok_or("inVLabel".missing())?
             .deserialize::<Self, String>()?;
         let out_v = map
             .get("outV")
-            .ok_or(Error::missing("outV"))?
+            .ok_or("outV".missing())?
             .deserialize::<Self, GID>()?;
         let out_v_label = map
             .get("outVLabel")
-            .ok_or(Error::missing("outVLabel"))?
+            .ok_or("outVLabel".missing())?
             .deserialize::<Self, String>()?;
         let properties = {
-            let val = map.get("properties").ok_or(Error::missing("properties"))?; //.deserialize::<Self, Map>()?;
+            let val = map.get("properties").ok_or("properties".missing())?; //.deserialize::<Self, Map>()?;
             let map = get_value!(val, Value::Object)?;
             let mut indexed = Map::new();
             for (k, v) in map.iter() {

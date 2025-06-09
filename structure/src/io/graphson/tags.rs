@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use crate::io::error::Missing;
 use crate::io::macros::get_value;
 use crate::io::{Deserialize, Deserializer, Error, Serialize, Serializer};
 use serde_json::Value;
@@ -22,10 +23,10 @@ impl Typed for Value {
     fn typed<'a>(&'a self) -> Result<Type<'a>, Error> {
         let tagd = self
             .get(TYPE_TAG)
-            .ok_or(Error::missing(TYPE_TAG))
+            .ok_or(TYPE_TAG.missing())
             .map(|v| v.as_str().unwrap())?;
         let tag = Tag::try_from(tagd)?;
-        let value = self.get(VALUE_TAG).ok_or(Error::missing(VALUE_TAG))?;
+        let value = self.get(VALUE_TAG).ok_or(VALUE_TAG.missing())?;
 
         Ok(Type { tag, value })
     }

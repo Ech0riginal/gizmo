@@ -1,3 +1,4 @@
+use crate::io::error::Missing;
 use crate::io::graphson::prelude::*;
 use indexmap::IndexMap;
 
@@ -6,25 +7,37 @@ impl Deserializer<VertexProperty> for V3 {
         let map = get_value!(val, Value::Object)?;
         let id = map
             .get("id")
-            .ok_or(Error::missing("id"))?
+            .ok_or("id".missing())?
             .deserialize::<Self, GID>()?;
         let label = map
             .get("label")
-            .ok_or(Error::missing("label"))?
+            .ok_or("label".missing())?
             .deserialize::<Self, String>()?;
         let value = {
             let tmp = map
                 .get("value")
-                .ok_or(Error::missing("value"))?
+                .ok_or("value".missing())?
                 .deserialize::<Self, GValue>()?;
             Box::new(tmp)
         };
+        let mut properties = None;
+
+        if let Some(props) = map.get("properties") {
+            let mut tmp = Map::new();
+            let prop_map = get_value!(props, Value::Object)?;
+            for (key, value) in prop_map.into_iter() {
+                let value = value.deserialize::<Self, GValue>()?;
+                tmp.insert(key.to_string(), value);
+            }
+            properties = Some(tmp);
+        }
+
         Ok(VertexProperty {
             id,
             value,
             vertex: None,
             label,
-            properties: None,
+            properties,
         })
     }
 }

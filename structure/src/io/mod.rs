@@ -4,11 +4,12 @@ mod api;
 // mod binary;
 // mod binary;
 mod error;
-mod graphson;
+pub(crate) mod graphson;
 mod macros;
 mod request;
 mod response;
 mod seal;
+mod utils;
 
 pub use api::*;
 pub use error::Error;

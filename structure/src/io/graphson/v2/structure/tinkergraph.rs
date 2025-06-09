@@ -1,5 +1,4 @@
 use crate::io::graphson::prelude::*;
-use indexmap::IndexSet;
 
 impl Deserializer<TinkerGraph> for V2 {
     fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {

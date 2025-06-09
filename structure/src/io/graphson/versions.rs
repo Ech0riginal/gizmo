@@ -10,8 +10,6 @@ macro_rules! io {
             const mime: &'static str = $mime;
         }
 
-        impl crate::io::IOHelpers for $id {}
-
         unsafe impl Send for $id {}
 
         unsafe impl Sync for $id {}

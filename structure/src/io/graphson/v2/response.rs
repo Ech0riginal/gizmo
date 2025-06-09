@@ -7,13 +7,11 @@ use uuid::Uuid;
 
 impl Deserializer<Response> for V2 {
     fn deserialize(value: &Value) -> Result<Response, Error> {
-        let id = {
-            let _id = V2::get(value, "requestId")?.clone();
-            _id.deserialize::<Self, Uuid>()?
-        };
-        let result = Self::get(value, "result")?;
-        let data = Self::get(result, "data")?.deserialize::<Self, GValue>()?;
-        let meta = Self::get(result, "meta")?;
+        let map = get_value!(value, Value::Object)?;
+        let id = map.ensure("requestId")?.deserialize::<Self, Uuid>()?;
+        let result = map.ensure("result")?;
+        let data = result.ensure("data")?.deserialize::<Self, GValue>()?;
+        let meta = result.ensure("meta")?;
         let meta = get_value!(meta, Value::Object)?
             .into_iter()
             .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
@@ -24,12 +22,7 @@ impl Deserializer<Response> for V2 {
             .collect::<Result<Vec<(String, GValue)>, Error>>()?
             .into_iter()
             .collect::<HashMap<_, _>>();
-
-        let status = {
-            let status = Self::get(value, "status")?;
-            status.deserialize::<Self, Status>()?
-        };
-
+        let status = value.ensure("status")?.deserialize::<Self, Status>()?;
         Ok(Response {
             id,
             status,
@@ -60,9 +53,11 @@ impl Serializer<Response> for V2 {
 
 impl Deserializer<Status> for V2 {
     fn deserialize(val: &Value) -> Result<Status, Error> {
-        let code = Self::get(val, "code").map(|code| code.as_i64().unwrap() as i16)?;
+        let code = val
+            .ensure("code")
+            .map(|code| code.as_i64().unwrap() as i16)?;
         let message = {
-            let tmp = Self::get(val, "message")?;
+            let tmp = val.ensure("message")?;
             let str = get_value!(tmp, Value::String)?;
             if str.is_empty() {
                 None
@@ -70,7 +65,7 @@ impl Deserializer<Status> for V2 {
                 Some(str.clone())
             }
         };
-        let attributes = Self::get(val, "attributes")?.clone();
+        let attributes = val.ensure("attributes")?.clone();
 
         Ok(Status {
             code,

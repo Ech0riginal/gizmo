@@ -1,5 +1,4 @@
 use crate::io::graphson::prelude::*;
-use indexmap::IndexSet;
 
 impl Deserializer<TraversalMetrics> for V2 {
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
@@ -7,10 +6,10 @@ impl Deserializer<TraversalMetrics> for V2 {
 
         let duration = metrics
             .get("dur")
-            .ok_or(Error::missing("dur"))?
+            .ok_or("dur".missing())?
             .deserialize::<Self, Double>()?;
         let metrics = get_value!(
-            metrics.get("metrics").ok_or(Error::missing("metrics"))?,
+            metrics.get("metrics").ok_or("metrics".missing())?,
             Value::Array
         )?
         .into_iter()

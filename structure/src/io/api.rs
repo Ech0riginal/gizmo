@@ -42,12 +42,6 @@ pub trait Serializer<T>: Sealed {
     fn serialize(val: &T) -> Result<Value, Error>;
 }
 
-pub trait IOHelpers {
-    fn get<'a>(value: &'a Value, key: &'static str) -> Result<&'a Value, Error> {
-        value.get(key).ok_or(Error::missing(key))
-    }
-}
-
 mod blankets {
     use crate::io::api::{Deserialize, Serialize};
     use crate::io::{Deserializer, Error, Serializer};
