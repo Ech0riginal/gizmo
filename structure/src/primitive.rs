@@ -34,11 +34,6 @@ macro_rules! primitive {
                 $name(self)
             }
         }
-        // impl Into<crate::GValue> for $inner {
-        //     fn into(self) -> crate::GValue {
-        //         crate::GValue::$name($name(self))
-        //     }
-        // }
     };
 }
 
