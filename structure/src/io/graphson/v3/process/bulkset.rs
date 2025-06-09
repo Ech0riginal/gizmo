@@ -45,7 +45,7 @@ impl Deserializer<BulkSet> for V3 {
                     None
                 }
             })
-            .collect::<Map2<GValue, GValue>>();
+            .collect::<Map<GValue, GValue>>();
 
         // TODO populate BulkSet occurrences
 

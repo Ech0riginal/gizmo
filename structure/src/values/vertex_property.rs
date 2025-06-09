@@ -1,4 +1,4 @@
-use crate::{GID, GValue, Map2, Property};
+use crate::{GID, GValue, Map, Property};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -53,7 +53,7 @@ pub struct VertexProperty {
     pub(crate) value: Box<GValue>,
     pub(crate) vertex: Option<GID>,
     pub(crate) label: String,
-    pub(crate) properties: Option<Map2<String, GValue>>,
+    pub(crate) properties: Option<Map<String, GValue>>,
 }
 
 impl VertexProperty {

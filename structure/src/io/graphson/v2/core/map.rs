@@ -1,11 +1,11 @@
 use crate::io::graphson::prelude::*;
 use indexmap::IndexMap;
 
-impl<K, V> Serializer<Map2<K, V>> for V2
+impl<K, V> Serializer<Map<K, V>> for V2
 where
     Self: Serializer<K> + Serializer<V>,
 {
-    fn serialize(val: &Map2<K, V>) -> Result<Value, Error> {
+    fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mapd = val
             .iter()
             .map(|(k, v)| (k.serialize::<Self>(), v.serialize::<Self>()))

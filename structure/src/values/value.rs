@@ -103,7 +103,7 @@ enom!(
     Integer(Integer),
     List(List<GValue>),
     Long(Long),
-    Map(Map2<GValue, GValue>),
+    Map(Map<GValue, GValue>),
     Set(Set),
     String(String),
     Timestamp(Timestamp),
@@ -192,7 +192,7 @@ where
     GValue: From<T>,
 {
     fn from(v: IndexMap<T, GValue>) -> Self {
-        GValue::Map(Map2(
+        GValue::Map(Map(
             v.into_iter()
                 .map(|(k, v)| (GValue::from(k), v))
                 .collect::<IndexMap<GValue, GValue>>(),

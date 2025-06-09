@@ -1,10 +1,10 @@
 // use crate::process::traversal::step::OptionStep;
-use crate::{GValue, Map2};
+use crate::{GValue, Map};
 
 #[derive(Clone)]
 pub struct MergeBuilder {
     pub(crate) inner: Merge,
-    map: Map2<GValue, GValue>,
+    map: Map<GValue, GValue>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]

@@ -93,7 +93,7 @@ mod core {
                     "test", { "@type" : "g:Int32", "@value" : 123 }
                 ]
             }),
-            object: GValue::Map(Map2({
+            object: GValue::Map(Map({
                 let mut tmp = IndexMap::new();
                 tmp.insert(
                     chrono::Utc
@@ -191,12 +191,12 @@ mod structure {
                 in_v: Vertex {
                     id: GID::Integer(10.into()),
                     label: "software".into(),
-                    properties: Map2::new(),
+                    properties: Map::new(),
                 },
                 out_v: Vertex {
                     id: GID::Integer(1.into()),
                     label: "person".into(),
-                    properties: Map2::new(),
+                    properties: Map::new(),
                 },
                 properties: [(
                     "since".into(),
@@ -232,7 +232,7 @@ mod structure {
                             id: 10i32.into(),
                             label: "software".to_string(),
                             properties: {
-                                let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                                let mut tmp = Map::<String, List<VertexProperty>>::new();
                                 tmp.insert(
                                     "name".into(),
                                     list![VertexProperty {
@@ -250,7 +250,7 @@ mod structure {
                             id: 11i32.into(),
                             label: "software".to_string(),
                             properties: {
-                                let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                                let mut tmp = Map::<String, List<VertexProperty>>::new();
                                 tmp.insert(
                                     "name".into(),
                                     list![VertexProperty {
@@ -293,7 +293,7 @@ mod structure {
                         id: GID::Integer(1.into()),
                         label: "person".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -313,7 +313,7 @@ mod structure {
                                         label: "location".into(),
                                         vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
-                                            let mut tmp2 = Map2::<String, GValue>::new();
+                                            let mut tmp2 = Map::<String, GValue>::new();
                                             tmp2.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(1997.into()),
@@ -331,7 +331,7 @@ mod structure {
                                         value: Box::new(GValue::String("santa cruz".into())),
                                         vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
-                                            let mut tmp2 = Map2::<String, GValue>::new();
+                                            let mut tmp2 = Map::<String, GValue>::new();
                                             tmp2.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2001.into()),
@@ -349,7 +349,7 @@ mod structure {
                                         value: Box::new(GValue::String("brussels".into())),
                                         vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
-                                            let mut tmp2 = Map2::<String, GValue>::new();
+                                            let mut tmp2 = Map::<String, GValue>::new();
                                             tmp2.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2004.into()),
@@ -367,7 +367,7 @@ mod structure {
                                         value: Box::new(GValue::String("santa fe".into())),
                                         vertex: Some(GID::Integer(1.into())),
                                         properties: Some({
-                                            let mut tmp2 = Map2::<String, GValue>::new();
+                                            let mut tmp2 = Map::<String, GValue>::new();
                                             tmp2.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2005.into()),
@@ -384,7 +384,7 @@ mod structure {
                         id: GID::Integer(7.into()),
                         label: "person".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -404,7 +404,7 @@ mod structure {
                                         vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(1990.into()),
@@ -422,7 +422,7 @@ mod structure {
                                         vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2000.into()),
@@ -440,7 +440,7 @@ mod structure {
                                         vertex: Some(GID::Integer(7.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2006.into()),
@@ -457,7 +457,7 @@ mod structure {
                         id: GID::Integer(8.into()),
                         label: "person".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -477,7 +477,7 @@ mod structure {
                                         vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2004.into()),
@@ -495,7 +495,7 @@ mod structure {
                                         vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2007.into()),
@@ -513,7 +513,7 @@ mod structure {
                                         vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2011.into()),
@@ -531,7 +531,7 @@ mod structure {
                                         vertex: Some(GID::Integer(8.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2014.into()),
@@ -548,7 +548,7 @@ mod structure {
                         id: GID::Integer(9.into()),
                         label: "person".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -568,7 +568,7 @@ mod structure {
                                         vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(1982.into()),
@@ -586,7 +586,7 @@ mod structure {
                                         vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2005.into()),
@@ -604,7 +604,7 @@ mod structure {
                                         vertex: Some(GID::Integer(9.into())),
                                         label: "location".into(),
                                         properties: Some({
-                                            let mut tmp = Map2::<String, GValue>::new();
+                                            let mut tmp = Map::<String, GValue>::new();
                                             tmp.insert(
                                                 "startTime".into(),
                                                 GValue::Integer(2009.into()),
@@ -621,7 +621,7 @@ mod structure {
                         id: GID::Integer(10.into()),
                         label: "software".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -639,7 +639,7 @@ mod structure {
                         id: GID::Integer(11.into()),
                         label: "software".into(),
                         properties: {
-                            let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                            let mut tmp = Map::<String, List<VertexProperty>>::new();
                             tmp.insert(
                                 "name".into(),
                                 list![VertexProperty {
@@ -989,7 +989,7 @@ mod structure {
                 id: GID::Integer(1.into()),
                 label: "person".into(),
                 properties: {
-                    let mut tmp = Map2::<String, List<VertexProperty>>::new();
+                    let mut tmp = Map::<String, List<VertexProperty>>::new();
                     tmp.insert(
                         "name".into(),
                         list![VertexProperty {
@@ -1009,7 +1009,7 @@ mod structure {
                                 label: "location".into(),
                                 vertex: None,
                                 properties: Some({
-                                    let mut tmp2 = Map2::<String, GValue>::new();
+                                    let mut tmp2 = Map::<String, GValue>::new();
                                     tmp2.insert("startTime".into(), GValue::Integer(1997.into()));
                                     tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
                                     tmp2
@@ -1021,7 +1021,7 @@ mod structure {
                                 value: Box::new(GValue::String("santa cruz".into())),
                                 vertex: None,
                                 properties: Some({
-                                    let mut tmp2 = Map2::<String, GValue>::new();
+                                    let mut tmp2 = Map::<String, GValue>::new();
                                     tmp2.insert("startTime".into(), GValue::Integer(2001.into()));
                                     tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
                                     tmp2
@@ -1033,7 +1033,7 @@ mod structure {
                                 value: Box::new(GValue::String("brussels".into())),
                                 vertex: None,
                                 properties: Some({
-                                    let mut tmp2 = Map2::<String, GValue>::new();
+                                    let mut tmp2 = Map::<String, GValue>::new();
                                     tmp2.insert("startTime".into(), GValue::Integer(2004.into()));
                                     tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
                                     tmp2
@@ -1045,7 +1045,7 @@ mod structure {
                                 value: Box::new(GValue::String("santa fe".into())),
                                 vertex: None,
                                 properties: Some({
-                                    let mut tmp2 = Map2::<String, GValue>::new();
+                                    let mut tmp2 = Map::<String, GValue>::new();
                                     tmp2.insert("startTime".into(), GValue::Integer(2005.into()));
                                     tmp2
                                 }),

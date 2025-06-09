@@ -11,7 +11,7 @@ pub struct Edge {
     pub(crate) label: String,
     pub(crate) in_v: Vertex,
     pub(crate) out_v: Vertex,
-    pub(crate) properties: Map2<String, Box<GValue>>,
+    pub(crate) properties: Map<String, Box<GValue>>,
 }
 
 // impl Edge {

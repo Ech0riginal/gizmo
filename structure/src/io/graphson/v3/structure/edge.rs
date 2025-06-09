@@ -30,9 +30,9 @@ impl Deserializer<Edge> for V3 {
             .ok_or(Error::missing("outVLabel"))?
             .deserialize::<Self, String>()?;
         let properties = {
-            let val = map.get("properties").ok_or(Error::missing("properties"))?; //.deserialize::<Self, Map2>()?;
+            let val = map.get("properties").ok_or(Error::missing("properties"))?; //.deserialize::<Self, Map>()?;
             let map = get_value!(val, Value::Object)?;
-            let mut indexed = Map2::new();
+            let mut indexed = Map::new();
             for (k, v) in map.iter() {
                 indexed.insert(k.to_string(), Box::new(v.deserialize::<Self, GValue>()?));
             }

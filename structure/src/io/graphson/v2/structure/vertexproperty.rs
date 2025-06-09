@@ -6,7 +6,7 @@ impl Deserializer<super::VertexProperties> for V2 {
     fn deserialize(val: &Value) -> Result<super::VertexProperties, Error> {
         match val {
             Value::Object(o) => {
-                let mut p = Map2::new();
+                let mut p = Map::new();
                 for (k, v) in o {
                     match v {
                         Value::Array(arr) => {
@@ -29,7 +29,7 @@ impl Deserializer<super::VertexProperties> for V2 {
                 }
                 Ok(p)
             }
-            Value::Null => Ok(Map2::new()),
+            Value::Null => Ok(Map::new()),
             value => Err(Error::UnexpectedJson {
                 msg: "Expected object or null for properties".into(),
                 value: value.clone(),
@@ -72,7 +72,7 @@ impl Deserializer<VertexProperty> for V2 {
                     })
                     .filter(|(_, v)| v.is_ok())
                     .map(|(k, v)| (k.clone(), v.unwrap()))
-                    .collect::<Map2<String, GValue>>()
+                    .collect::<Map<String, GValue>>()
             });
 
         Ok(property)

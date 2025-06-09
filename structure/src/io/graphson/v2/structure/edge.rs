@@ -37,7 +37,7 @@ impl Deserializer<Edge> for V2 {
                 label: out_v_label,
                 properties: Default::default(),
             },
-            properties: Map2::new(),
+            properties: Map::new(),
         })
     }
 }

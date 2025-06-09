@@ -17,7 +17,7 @@ impl V3 {
             Tag::Long => blob.value.deserialize::<Self, Long>().map(GValue::from),
             Tag::Map => blob
                 .value
-                .deserialize::<Self, Map2<GValue, GValue>>()
+                .deserialize::<Self, Map<GValue, GValue>>()
                 .map(GValue::from),
             Tag::Set => blob.value.deserialize::<Self, Set>().map(GValue::from),
             Tag::Timestamp => blob

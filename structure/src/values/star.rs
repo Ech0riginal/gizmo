@@ -1,4 +1,4 @@
-use crate::{GID, List, Map2, Vertex, VertexProperty};
+use crate::{GID, List, Map, Vertex, VertexProperty};
 
 use std::hash::{Hash, Hasher};
 
@@ -6,7 +6,7 @@ use std::hash::{Hash, Hasher};
 pub struct StarGraph {
     pub(crate) id: GID,
     pub(crate) label: String,
-    pub(crate) properties: Map2<String, List<VertexProperty>>,
+    pub(crate) properties: Map<String, List<VertexProperty>>,
 }
 
 impl From<&StarGraph> for Vertex {

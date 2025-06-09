@@ -48,7 +48,7 @@ pub use geometry::*;
 pub use gid::{GID, GIDs};
 pub use label::{LabelType, Labels};
 pub use list::List;
-pub use map::Map2;
+pub use map::Map;
 pub use merge::Merge;
 pub use metrics::{IntermediateRepr, Metrics, TraversalExplanation, TraversalMetrics};
 pub use null::Null;

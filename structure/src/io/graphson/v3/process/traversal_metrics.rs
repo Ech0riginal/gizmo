@@ -3,7 +3,7 @@ use crate::{GValue, List};
 
 impl Deserializer<TraversalMetrics> for V3 {
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
-        let mut metrics = val.deserialize::<Self, Map2<GValue, GValue>>()?;
+        let mut metrics = val.deserialize::<Self, Map<GValue, GValue>>()?;
 
         let duration = metrics.remove_ok::<Double, _>("dur")?;
         let m = metrics

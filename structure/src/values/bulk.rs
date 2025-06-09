@@ -1,9 +1,9 @@
-use crate::{GValue, Map2};
+use crate::{GValue, Map};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct BulkSet {
-    pub map: Map2<GValue, GValue>,
+    pub map: Map<GValue, GValue>,
     pub occurrences: usize,
 }
 
