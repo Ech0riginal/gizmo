@@ -1,5 +1,5 @@
 use crate::{Double, List, Long};
-use indexmap::IndexSet;
+
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
