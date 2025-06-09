@@ -1,6 +1,6 @@
 use super::*;
 use crate::io::{Deserialize, GremlinIO, Request, Response};
-use crate::{GremlinError, GremlinResult};
+use crate::{Error, GremlinResult};
 use bytes::Bytes;
 use futures::StreamExt;
 use serde_json::Value;
@@ -11,6 +11,8 @@ use tokio::sync::{RwLock, mpsc};
 use tungstenite::Message;
 
 /// Handles underlying WebSocket messaging, exposing data relevant only to Gremlin
+///
+/// TODO get rid of this shit and swap to Actix's WS implementation
 #[derive(Clone)]
 pub struct GremlinSocket<V> {
     valid: Arc<RwLock<bool>>,
@@ -108,7 +110,7 @@ impl<V: GremlinIO> GremlinSocket<V> {
         match V::serialize(request) {
             Ok(json) => {
                 let bytes = Bytes::from(json.to_string().into_bytes());
-                self.tx.send(bytes).map_err(|_| GremlinError::Closed)?;
+                self.tx.send(bytes).map_err(|_| Error::Closed)?;
             }
             Err(e) => {
                 tracing::warn!("Serialization error: {:?}", e);
@@ -125,7 +127,7 @@ impl<V: GremlinIO> GremlinSocket<V> {
             .await
             .recv()
             .await
-            .ok_or(GremlinError::Closed)?;
+            .ok_or(Error::Closed)?;
 
         match serde_json::from_slice::<Value>(&bytes) {
             Ok(json) => match json.deserialize::<V, Response>() {

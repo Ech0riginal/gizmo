@@ -9,8 +9,8 @@ use super::step::RepeatStep;
 use super::step::SelectStep;
 use super::step::UntilStep;
 use super::step::WhereStep;
-use crate::structure::*;
-use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
+use crate::*;
+use crate::{Either2, GIDs, IntoPredicate, Labels, T};
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,

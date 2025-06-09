@@ -1,8 +1,8 @@
 use crate::io::{Args, GremlinIO, Request};
 use crate::network::GremlinStream;
 use crate::options::ConnectionOptions;
-use crate::structure::*;
-use crate::{GremlinError, GremlinResult};
+use crate::*;
+use crate::{Error, GremlinResult};
 use bb8::{Pool, PooledConnection};
 use std::collections::HashMap;
 
@@ -23,7 +23,7 @@ impl<'a, V: GremlinIO> SessionedClient<'a, V> {
                 .unwrap();
             self.connection.send(request).await
         } else {
-            Err(GremlinError::Generic("No session to close".to_string()))
+            Err(Error::Generic("No session to close".to_string()))
         }
     }
 }

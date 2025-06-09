@@ -22,7 +22,7 @@ mod where_step;
 
 pub(crate) mod prelude {
     pub use crate::process::traversal::TraversalBuilder;
-    pub use crate::structure::*;
+    pub use crate::*;
     pub use std::collections::HashMap;
 }
 

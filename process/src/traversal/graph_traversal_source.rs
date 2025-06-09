@@ -4,7 +4,7 @@ use crate::io::GremlinIO;
 use crate::process::traversal::remote::MockTerminator;
 use crate::process::traversal::step::*;
 use crate::process::traversal::{AsyncTerminator, GraphTraversal, Terminator, TraversalBuilder};
-use crate::structure::*;
+use crate::*;
 
 #[derive(Clone)]
 pub struct GraphTraversalSource<A: Terminator<GValue>> {
@@ -147,7 +147,7 @@ mod tests {
 
     use super::GraphTraversalSource;
     use crate::process::traversal::{__, Bytecode};
-    use crate::structure::{GValue, Order, P, Scope, T};
+    use crate::{GValue, Order, P, Scope, T};
 
     fn empty() -> GraphTraversalSource<MockTerminator> {
         GraphTraversalSource::new(MockTerminator {})

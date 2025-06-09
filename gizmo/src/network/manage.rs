@@ -1,4 +1,4 @@
-use crate::GremlinError;
+use crate::Error;
 use crate::io::GremlinIO;
 use crate::options::ConnectionOptions;
 use bb8::ManageConnection;
@@ -14,7 +14,7 @@ where
     V: GremlinIO,
 {
     type Connection = super::Connection<V>;
-    type Error = GremlinError;
+    type Error = Error;
 
     fn connect(&self) -> impl Future<Output = Result<Self::Connection, Self::Error>> + Send {
         async move {
@@ -22,7 +22,7 @@ where
             let request = websocket_url
                 .clone()
                 .into_client_request()
-                .map_err(|e| GremlinError::Generic(e.to_string()))?;
+                .map_err(|e| Error::Generic(e.to_string()))?;
 
             let connector = if let Some(opts) = &self.tls_options {
                 let config = opts.clone().config()?;
@@ -32,19 +32,19 @@ where
                 Connector::Plain
             };
             let url = request.uri();
-            let mode = uri_mode(url).map_err(|e| GremlinError::Generic(e.to_string()))?;
+            let mode = uri_mode(url).map_err(|e| Error::Generic(e.to_string()))?;
             let host = request
                 .uri()
                 .host()
-                .ok_or_else(|| GremlinError::Generic("No Hostname".into()))?;
+                .ok_or_else(|| Error::Generic("No Hostname".into()))?;
             let port = url.port_u16().unwrap_or(match mode {
                 Mode::Plain => 80,
                 Mode::Tls => 443,
             });
             let mut stream = std::net::TcpStream::connect((host, port))
-                .map_err(|e| GremlinError::Generic(format!("Unable to connect {e:?}")))?;
+                .map_err(|e| Error::Generic(format!("Unable to connect {e:?}")))?;
             NoDelay::set_nodelay(&mut stream, true)
-                .map_err(|e| GremlinError::Generic(e.to_string()))?;
+                .map_err(|e| Error::Generic(e.to_string()))?;
 
             let websocket_config = self.websocket_options.clone().map(Into::into);
 
@@ -72,7 +72,7 @@ where
     ) -> impl Future<Output = Result<(), Self::Error>> + Send {
         async move {
             if !conn.valid().await {
-                Err(GremlinError::Generic("Connection is disconnected".into()))
+                Err(Error::Generic("Connection is disconnected".into()))
             } else {
                 Ok(())
             }

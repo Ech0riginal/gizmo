@@ -1,7 +1,7 @@
 use crate::GValue;
 use crate::process::traversal::step::*;
 use crate::process::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
-use crate::structure::*;
+use crate::*;
 use std::marker::PhantomData;
 
 #[derive(Clone)]

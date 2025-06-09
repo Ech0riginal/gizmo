@@ -1,5 +1,5 @@
 use crate::process::traversal::step::*;
-use crate::structure::*;
+use crate::*;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {

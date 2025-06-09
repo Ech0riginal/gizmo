@@ -1,5 +1,5 @@
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::*;
+use crate::*;
 use std::collections::HashMap;
 
 pub struct OptionStep {

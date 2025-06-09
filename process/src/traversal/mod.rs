@@ -1,4 +1,4 @@
-use crate::structure::{Bytecode, GResultSet};
+use crate::{Bytecode, GResultSet};
 use crate::{GValue, GremlinResult};
 use std::marker::PhantomData;
 
@@ -40,7 +40,7 @@ pub trait Traversal<S, E> {
 //     }
 // }
 
-// impl<V: GremlinIO> RemoteTraversalIterator<SD, crate::structure::Null> {
+// impl<V: GremlinIO> RemoteTraversalIterator<SD, crate::Null> {
 //     pub fn iterate(&mut self) -> GremlinResult<()> {
 //         while let Some(response) = self.next() {
 //             //consume the entire iterator, returning any errors
@@ -92,7 +92,7 @@ impl<V: GremlinIO, T> RemoteTraversalStream<V, T> {
     }
 }
 
-impl<V: GremlinIO> RemoteTraversalStream<V, crate::structure::Null> {
+impl<V: GremlinIO> RemoteTraversalStream<V, crate::Null> {
     pub async fn iterate(&mut self) -> GremlinResult<()> {
         while let Some(response) = self.stream.next().await {
             //consume the entire stream, returning any errors

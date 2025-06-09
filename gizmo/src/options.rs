@@ -1,4 +1,4 @@
-use crate::GremlinError;
+use crate::Error;
 use crate::io::GremlinIO;
 use derive_builder::Builder;
 use rustls_pki_types::pem::PemObject;
@@ -23,7 +23,7 @@ pub struct TlsOptions {
 impl TlsOptions {
     /// Copied pretty directly from https://github.com/rustls/rustls/blob/main/examples/src/bin/tlsclient-mio.rs
     /// and https://github.com/rustls/tokio-rustls/blob/main/examples/client.rs
-    pub(crate) fn config(self) -> Result<tokio::rustls::rustls::ClientConfig, GremlinError> {
+    pub(crate) fn config(self) -> Result<tokio::rustls::rustls::ClientConfig, Error> {
         let mut cert_store = rustls::RootCertStore::empty();
 
         if let Some(ca_file) = self.authority {

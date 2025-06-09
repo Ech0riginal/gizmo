@@ -1,7 +1,7 @@
 use super::*;
 use crate::io::{Args, GremlinIO, Request};
 use crate::options::{ConnectionOptions, Credentials};
-use crate::{GValue, GremlinError, GremlinResult};
+use crate::{GValue, Error, GremlinResult};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use bb8::PooledConnection;
@@ -94,8 +94,8 @@ impl<V: GremlinIO> Connection<V> {
                                 Some(callback) => {
                                     callback
                                         .send(Some(Ok(response.data)))
-                                        .map_err(|_| GremlinError::Closed)?;
-                                    callback.send(None).map_err(|_| GremlinError::Closed)?;
+                                        .map_err(|_| Error::Closed)?;
+                                    callback.send(None).map_err(|_| Error::Closed)?;
                                 }
                                 _ => {}
                             }
@@ -106,7 +106,7 @@ impl<V: GremlinIO> Connection<V> {
                             match pending.read().await.get(&response.id) {
                                 Some(callback) => callback
                                     .send(Some(Ok(response.data)))
-                                    .map_err(|_| GremlinError::Closed)?,
+                                    .map_err(|_| Error::Closed)?,
                                 _ => {}
                             }
                         }
@@ -135,7 +135,7 @@ impl<V: GremlinIO> Connection<V> {
                                 match pending.read().await.get(&response.id) {
                                     Some(callback) => callback
                                         .send(Some(Ok(response.data)))
-                                        .map_err(|_| GremlinError::Closed)?,
+                                        .map_err(|_| Error::Closed)?,
                                     _ => {}
                                 }
                             }
@@ -155,8 +155,8 @@ impl<V: GremlinIO> Connection<V> {
                         drop(safe_socket);
 
                         match error {
-                            GremlinError::Json(_) => {}
-                            GremlinError::Websocket(_) | GremlinError::Closed => break,
+                            Error::Json(_) => {}
+                            Error::Websocket(_) | Error::Closed => break,
                             e => panic!("Unhandled error type emitted by GremlinSocket! {:?}", e),
                         }
                     }
