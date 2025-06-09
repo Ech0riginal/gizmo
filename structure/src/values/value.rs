@@ -1,6 +1,5 @@
 use crate::*;
 use indexmap::{IndexMap, IndexSet};
-use std::collections::HashMap;
 use std::convert::Infallible;
 use std::fmt::Formatter;
 
@@ -192,11 +191,10 @@ where
     GValue: From<T>,
 {
     fn from(v: IndexMap<T, GValue>) -> Self {
-        GValue::Map(Map(
-            v.into_iter()
-                .map(|(k, v)| (GValue::from(k), v))
-                .collect::<IndexMap<GValue, GValue>>(),
-        ))
+        GValue::Map(Map(v
+            .into_iter()
+            .map(|(k, v)| (GValue::from(k), v))
+            .collect::<IndexMap<GValue, GValue>>()))
     }
 }
 

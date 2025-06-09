@@ -72,4 +72,5 @@ pub use value::GValue;
 pub use vertex::Vertex;
 pub use vertex_property::{GProperty, VertexProperty};
 
+pub(crate) use bytecode::Instruction;
 pub(crate) use list::list;

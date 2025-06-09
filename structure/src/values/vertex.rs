@@ -12,11 +12,7 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub(crate) fn new<T>(
-        id: GID,
-        label: T,
-        properties: Map<String, List<VertexProperty>>,
-    ) -> Vertex
+    pub(crate) fn new<T>(id: GID, label: T, properties: Map<String, List<VertexProperty>>) -> Vertex
     where
         T: Into<String>,
     {
@@ -40,7 +36,8 @@ impl Vertex {
     }
 
     pub fn property(&self, key: &str) -> Option<&VertexProperty> {
-        self.properties.get(key).and_then(|v| v.get(0))
+        let key = key.to_string();
+        self.properties.get(&key).and_then(|v| v.get(0))
     }
 }
 

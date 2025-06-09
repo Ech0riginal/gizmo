@@ -91,9 +91,8 @@ impl<K, V> Map<K, V>
 where
     K: Eq + Hash,
 {
-    pub fn get<T: Into<K>>(&self, key: T) -> Option<&V> {
-        let key = key.into();
-        self.0.get(&key)
+    pub fn get(&self, key: &K) -> Option<&V> {
+        self.0.get(key)
     }
     pub fn remove<T: Into<K>>(&mut self, key: T) -> Option<V> {
         let key = key.into();
