@@ -10,10 +10,8 @@ impl Deserializer<Float> for V2 {
 impl Serializer<Float> for V2 {
     fn serialize(val: &Float) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type" : FLOAT,
+            "@type" : Tag::Float,
             "@value" : **val,
         }))
     }
 }
-
-passthrough!(Float, V3 to V2);

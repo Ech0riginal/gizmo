@@ -1,4 +1,5 @@
 use crate::io::graphson::prelude::*;
+use indexmap::IndexSet;
 
 impl Deserializer<TinkerGraph> for V2 {
     fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {
@@ -23,14 +24,14 @@ impl Deserializer<TinkerGraph> for V2 {
                 Ok(type_) => type_.value.deserialize::<Self, Vertex>(),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Vec<_>, Error>>()?;
+            .collect::<Result<List<_>, Error>>()?;
         let edges = edge_values
             .into_iter()
             .map(|val| match val.typed() {
                 Ok(type_) => type_.value.deserialize::<Self, Edge>(),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Vec<_>, Error>>()?;
+            .collect::<Result<List<_>, Error>>()?;
 
         Ok(TinkerGraph { vertices, edges })
     }
@@ -50,7 +51,7 @@ impl Serializer<TinkerGraph> for V2 {
             .collect::<Result<Vec<_>, Error>>()?;
 
         Ok(json!({
-            "@type": TINKER_GRAPH,
+            "@type": Tag::TinkerGraph,
             "@value": {
                 "vertices": vertices,
                 "edges": edges,

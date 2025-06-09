@@ -10,10 +10,8 @@ impl Deserializer<Double> for V2 {
 impl Serializer<Double> for V2 {
     fn serialize(val: &Double) -> Result<Value, Error> {
         Ok(json!({
-            "@type" : DOUBLE,
+            "@type" : Tag::Double,
             "@value" : **val,
         }))
     }
 }
-
-passthrough!(Double, V3 to V2);

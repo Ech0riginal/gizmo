@@ -10,10 +10,8 @@ impl Deserializer<Long> for V2 {
 impl Serializer<Long> for V2 {
     fn serialize(val: &Long) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type" : LONG,
+            "@type" : Tag::Long,
             "@value" : **val,
         }))
     }
 }
-
-passthrough!(Long, V3 to V2);

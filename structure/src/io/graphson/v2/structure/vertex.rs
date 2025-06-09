@@ -32,7 +32,7 @@ impl Serializer<Vertex> for V2 {
                     (
                         label.clone(),
                         properties
-                            .into_iter()
+                            .iter()
                             .flat_map(|vp| vp.serialize::<Self>())
                             .collect::<Vec<_>>(),
                     )
@@ -40,7 +40,7 @@ impl Serializer<Vertex> for V2 {
                 .collect::<HashMap<String, Vec<Value>>>();
             value.insert("properties", serde_json::to_value(&properties)?);
         }
-        root.insert("@type", Value::String(VERTEX.into()));
+        root.insert("@type", Value::String(Tag::Vertex.into()));
         root.insert("@value", serde_json::to_value(&value)?);
 
         let json = json!(root);

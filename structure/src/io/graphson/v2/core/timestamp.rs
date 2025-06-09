@@ -11,10 +11,8 @@ impl Deserializer<Timestamp> for V2 {
 impl Serializer<Timestamp> for V2 {
     fn serialize(val: &Timestamp) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type": TIMESTAMP,
+            "@type": Tag::Timestamp,
             "@value": val.0,
         }))
     }
 }
-
-passthrough!(Timestamp, V3 to V2);

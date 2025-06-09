@@ -1,4 +1,5 @@
 use crate::io::graphson::prelude::*;
+
 use std::collections::HashMap;
 
 impl Deserializer<Edge> for V2 {
@@ -23,25 +24,29 @@ impl Deserializer<Edge> for V2 {
             .get("outVLabel")
             .map(|label| get_value!(label, Value::String).map(Clone::clone).unwrap())
             .unwrap_or("Unavailable".into());
-        Ok(Edge::new(
-            edge_id,
+        Ok(Edge {
+            id: edge_id,
             label,
-            in_v_id,
-            in_v_label,
-            out_v_id,
-            out_v_label,
-            HashMap::new(),
-        ))
+            in_v: Vertex {
+                id: in_v_id,
+                label: in_v_label,
+                properties: Default::default(),
+            },
+            out_v: Vertex {
+                id: out_v_id,
+                label: out_v_label,
+                properties: Default::default(),
+            },
+            properties: Map2::new(),
+        })
     }
 }
 
 impl Serializer<Edge> for V2 {
-    fn serialize(val: &Edge) -> Result<serde_json::Value, Error> {
+    fn serialize(val: &Edge) -> Result<Value, Error> {
         serialize_edge::<Self>(val, true)
     }
 }
-
-passthrough!(Edge, V3 to V2);
 
 pub fn serialize_edge<S>(edge: &Edge, serialize_labels: bool) -> Result<Value, Error>
 where
@@ -50,8 +55,8 @@ where
     S: Serializer<String>,
 {
     let mut value = HashMap::new();
-    value.insert("id", edge.id().serialize::<S>()?);
-    value.insert("label", edge.label().serialize::<S>()?);
+    value.insert("id", edge.id.serialize::<S>()?);
+    value.insert("label", edge.label.serialize::<S>()?);
     if serialize_labels {
         value.insert("inVLabel", edge.in_v.label().serialize::<S>()?);
         value.insert("outVLabel", edge.out_v.label().serialize::<S>()?);
@@ -74,7 +79,7 @@ where
     }
 
     Ok(json!({
-        "@type": EDGE,
+        "@type": Tag::Edge,
         "@value": value
     }))
 }

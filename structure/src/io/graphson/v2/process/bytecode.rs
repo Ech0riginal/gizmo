@@ -37,7 +37,7 @@ impl Serializer<Bytecode> for V2 {
             })
             .collect::<Result<Vec<Value>, Error>>()?;
         Ok(json!({
-            "@type" : BYTECODE,
+            "@type" : Tag::Bytecode,
             "@value" : {
                 "step" : steps,
                 "source" : sources,

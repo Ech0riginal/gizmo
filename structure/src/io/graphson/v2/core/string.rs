@@ -12,5 +12,3 @@ impl Serializer<String> for V2 {
         Ok(json!(val))
     }
 }
-
-passthrough!(String, V3 to V2);

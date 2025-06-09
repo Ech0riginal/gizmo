@@ -23,7 +23,7 @@ impl Serializer<Cardinality> for V2 {
             Cardinality::Single => "single",
         };
         Ok(json!({
-            "@type": CARDINALITY,
+            "@type": Tag::Cardinality,
             "@value": str,
         }))
     }

@@ -33,7 +33,7 @@ impl Deserializer<Property> for V2 {
 impl Serializer<Property> for V2 {
     fn serialize(val: &Property) -> Result<Value, Error> {
         Ok(json!({
-            "@type": PROPERTY,
+            "@type": Tag::Property,
             "@value": {
                 "key": val.key,
                 "value": (&*val.value).serialize::<Self>()?,
@@ -41,18 +41,6 @@ impl Serializer<Property> for V2 {
                     GValue::Edge(edge) => super::edge::serialize_edge::<Self>(edge, false)?,
                     element => element.serialize::<Self>()?,
                 }
-            }
-        }))
-    }
-}
-
-impl Serializer<Property> for V3 {
-    fn serialize(val: &Property) -> Result<Value, Error> {
-        Ok(json!({
-            "@type": "g:Property",
-            "@value": {
-              "key" : val.key.serialize::<Self>()?,
-              "value" : val.value.serialize::<Self>()?,
             }
         }))
     }

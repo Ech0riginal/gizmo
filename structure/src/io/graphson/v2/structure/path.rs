@@ -11,7 +11,7 @@ impl Deserializer<Path> for V2 {
 impl Serializer<Path> for V2 {
     fn serialize(val: &Path) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type" : PATH,
+            "@type" : Tag::Path,
             "@value": {
                 "labels" : (&*val.labels).serialize::<Self>()?,
                 "objects" : (&*val.objects).serialize::<Self>()?,

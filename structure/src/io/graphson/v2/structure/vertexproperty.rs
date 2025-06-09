@@ -1,21 +1,23 @@
 use crate::io::graphson::prelude::*;
+
 use std::collections::HashMap;
 
 impl Deserializer<super::VertexProperties> for V2 {
     fn deserialize(val: &Value) -> Result<super::VertexProperties, Error> {
         match val {
             Value::Object(o) => {
-                let mut p = HashMap::new();
+                let mut p = Map2::new();
                 for (k, v) in o {
                     match v {
                         Value::Array(arr) => {
-                            let mut vec = vec![];
-                            for elem in arr {
-                                let vp =
-                                    elem.typed()?.value.deserialize::<Self, VertexProperty>()?;
-                                vec.push(vp);
-                            }
-                            p.insert(k.clone(), vec);
+                            let list = arr
+                                .into_iter()
+                                .map(|e| e.typed())
+                                .collect::<Result<List<_>, Error>>()?
+                                .into_iter()
+                                .map(|tt| tt.value.deserialize::<Self, VertexProperty>())
+                                .collect::<Result<List<_>, Error>>()?;
+                            p.insert(k.clone(), list);
                         }
                         value => {
                             return Err(Error::UnexpectedJson {
@@ -27,7 +29,7 @@ impl Deserializer<super::VertexProperties> for V2 {
                 }
                 Ok(p)
             }
-            Value::Null => Ok(HashMap::new()),
+            Value::Null => Ok(Map2::new()),
             value => Err(Error::UnexpectedJson {
                 msg: "Expected object or null for properties".into(),
                 value: value.clone(),
@@ -70,7 +72,7 @@ impl Deserializer<VertexProperty> for V2 {
                     })
                     .filter(|(_, v)| v.is_ok())
                     .map(|(k, v)| (k.clone(), v.unwrap()))
-                    .collect::<HashMap<String, GValue>>()
+                    .collect::<Map2<String, GValue>>()
             });
 
         Ok(property)
@@ -100,7 +102,7 @@ impl Serializer<VertexProperty> for V2 {
             value.insert("properties", serde_json::to_value(&map)?);
         }
 
-        root.insert("@type", Value::String(VERTEX_PROPERTY.into()));
+        root.insert("@type", Value::String(Tag::VertexProperty.into()));
         root.insert("@value", serde_json::to_value(&value)?);
 
         let json = json!(root);

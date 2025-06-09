@@ -13,10 +13,8 @@ impl Deserializer<Date> for V2 {
 impl Serializer<Date> for V2 {
     fn serialize(val: &Date) -> Result<Value, Error> {
         Ok(json!({
-            "@type" : DATE,
+            "@type" : Tag::Date,
             "@value" : val.timestamp_millis()
         }))
     }
 }
-
-passthrough!(Date, V3 to V2);

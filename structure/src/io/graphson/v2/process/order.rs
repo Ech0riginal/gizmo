@@ -8,7 +8,7 @@ impl Serializer<Order> for V2 {
             Order::Shuffle => "shuffle",
         };
         Ok(json!({
-            "@type": ORDER,
+            "@type": Tag::Order,
             "@value": str,
         }))
     }

@@ -12,5 +12,3 @@ impl Serializer<Bool> for V2 {
         Ok(Value::Bool(**val))
     }
 }
-
-passthrough!(Bool, V3 to V2);

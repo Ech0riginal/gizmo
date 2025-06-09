@@ -21,7 +21,7 @@ impl Serializer<Direction> for V2 {
             Direction::In | Direction::To => "IN",
         };
         Ok(json!({
-            "@type" : DIRECTION,
+            "@type" : Tag::Direction,
             "@value" : direction_str,
         }))
     }

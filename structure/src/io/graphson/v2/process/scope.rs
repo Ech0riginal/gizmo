@@ -8,7 +8,7 @@ impl Serializer<Scope> for V2 {
         };
 
         Ok(json!({
-            "@type" : SCOPE,
+            "@type" : Tag::Scope,
             "@value" : v
         }))
     }

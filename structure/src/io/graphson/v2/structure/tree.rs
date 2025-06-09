@@ -1,4 +1,5 @@
 use crate::io::graphson::prelude::*;
+use indexmap::IndexSet;
 
 impl Deserializer<Tree> for V2 {
     fn deserialize(val: &Value) -> Result<Tree, Error> {
@@ -6,7 +7,7 @@ impl Deserializer<Tree> for V2 {
         let branches = array
             .into_iter()
             .map(|val| val.deserialize::<Self, Branch>())
-            .collect::<Result<Vec<_>, Error>>()?;
+            .collect::<Result<List<_>, Error>>()?;
         Ok(Tree { branches })
     }
 }
@@ -46,7 +47,7 @@ impl Serializer<Tree> for V2 {
             .map(|b| b.serialize::<Self>())
             .collect::<Result<Vec<_>, Error>>()?;
         Ok(json!({
-            "@type": TREE,
+            "@type": Tag::Tree,
             "@value": branches,
         }))
     }

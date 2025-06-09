@@ -9,7 +9,7 @@ impl Serializer<Pop> for V2 {
             Pop::Mixed => "mixed",
         };
         Ok(json!({
-            "@type": POP,
+            "@type": Tag::Pop,
             "@value": str,
         }))
     }

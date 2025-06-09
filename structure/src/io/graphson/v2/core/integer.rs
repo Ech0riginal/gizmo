@@ -10,10 +10,8 @@ impl Deserializer<Integer> for V2 {
 impl Serializer<Integer> for V2 {
     fn serialize(val: &Integer) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type" : INT,
+            "@type" : Tag::Integer,
             "@value" : **val,
         }))
     }
 }
-
-passthrough!(Integer, V3 to V2);

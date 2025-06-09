@@ -22,7 +22,7 @@ impl Deserializer<T> for V2 {
 impl Serializer<T> for V2 {
     fn serialize(val: &T) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "@type": T,
+            "@type": Tag::T,
             "@value": match val {
                 T::Id => "id",
                 T::Key => "key",
