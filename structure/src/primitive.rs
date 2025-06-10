@@ -179,6 +179,7 @@ very_primitive!(Double, f64);
 very_primitive!(Integer, i32);
 very_primitive!(Long, i64);
 
+use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
 impl Hash for Bool {

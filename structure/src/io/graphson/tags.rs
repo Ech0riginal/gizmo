@@ -22,14 +22,18 @@ pub trait Typed {
 impl Typed for Value {
     /// Validates a type against the expected { `@type`: ..., `@value`: ... } format
     fn typed<'a>(&'a self) -> Result<Type<'a>, Error> {
-        let tagd = self
-            .get(TYPE_TAG)
-            .ok_or(TYPE_TAG.missing())
-            .map(|v| v.as_str().unwrap())?;
-        let tag = Tag::try_from(tagd)?;
-        let value = self.ensure(VALUE_TAG)?;
+        let tag = match self.ensure(TYPE_TAG) {
+            Ok(v) => {
+                let tagd = v.as_str().unwrap();
+                Tag::try_from(tagd)?
+            }
+            Err(e) => return Err(e),
+        };
 
-        Ok(Type { tag, value })
+        match self.ensure(VALUE_TAG) {
+            Ok(value) => Ok(Type { tag, value }),
+            Err(e) => Err(e),
+        }
     }
 }
 

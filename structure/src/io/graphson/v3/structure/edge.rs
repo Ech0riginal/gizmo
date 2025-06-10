@@ -29,14 +29,15 @@ impl Deserializer<Edge> for V3 {
             .get("outVLabel")
             .ok_or("outVLabel".missing())?
             .deserialize::<Self, String>()?;
-        let properties = {
-            let val = map.get("properties").ok_or("properties".missing())?; //.deserialize::<Self, Map>()?;
-            let map = get_value!(val, Value::Object)?;
+        let properties = if let Some(properties_val) = map.get("properties") {
+            let map = get_value!(properties_val, Value::Object)?;
             let mut indexed = Map::new();
             for (k, v) in map.iter() {
                 indexed.insert(k.to_string(), Box::new(v.deserialize::<Self, GValue>()?));
             }
             indexed
+        } else {
+            Default::default()
         };
 
         Ok(Edge {
@@ -90,6 +91,7 @@ where
             .collect::<Result<Vec<_>, Error>>()?
             .into_iter()
             .collect::<HashMap<&String, Value>>();
+        // let debug = format!("{:?}", &properties);
         value.insert("properties", serde_json::to_value(&properties)?);
     }
 

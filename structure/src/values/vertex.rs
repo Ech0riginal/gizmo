@@ -1,5 +1,5 @@
-use crate::VertexProperty;
 use crate::{GID, List, Map};
+use crate::{Primitive, VertexProperty, primitive};
 use indexmap::map::{IntoIter, Iter};
 use std::hash::Hasher;
 
@@ -10,6 +10,9 @@ pub struct Vertex {
     pub(crate) properties: Map<String, List<VertexProperty>>,
 }
 
+impl Primitive for Vertex {
+    const name: &'static str = "Vertex";
+}
 impl Vertex {
     pub(crate) fn new<T>(id: GID, label: T, properties: Map<String, List<VertexProperty>>) -> Vertex
     where

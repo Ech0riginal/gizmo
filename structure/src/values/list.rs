@@ -4,10 +4,6 @@ primitive_prelude!();
 
 pub struct List<T>(pub(crate) Vec<T>);
 
-impl<T> crate::Primitive for List<T> {
-    const name: &'static str = "List";
-}
-
 impl<T> Default for List<T> {
     fn default() -> Self {
         list![]

@@ -166,7 +166,6 @@ impl GValue {
     }
 }
 
-
 impl From<&str> for GValue {
     fn from(v: &str) -> Self {
         Self::String(v.to_string())

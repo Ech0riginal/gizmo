@@ -72,4 +72,6 @@ pub use value::GValue;
 pub use vertex::Vertex;
 pub use vertex_property::{GProperty, VertexProperty};
 
+#[allow(clippy::unused)]
+pub(crate) use bytecode::Instruction;
 pub(crate) use list::list;

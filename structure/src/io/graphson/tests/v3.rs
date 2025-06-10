@@ -226,7 +226,7 @@ mod structure {
         tinkergraph,
         V3,
         Test {
-            serial: json!({ "@type" : "tinker:graph", "@value" : { "vertices" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 1 }, "value" : "stephen", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 10 }, "value" : "centreville", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1990 }, "endTime" : { "@type" : "g:Int32", "@value" : 2000 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 11 }, "value" : "dulles", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2000 }, "endTime" : { "@type" : "g:Int32", "@value" : 2006 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 12 }, "value" : "purcellville", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2006 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 2 }, "value" : "matthias", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 13 }, "value" : "bremen", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2007 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 14 }, "value" : "baltimore", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2007 }, "endTime" : { "@type" : "g:Int32", "@value" : 2011 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 15 }, "value" : "oakland", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2011 }, "endTime" : { "@type" : "g:Int32", "@value" : 2014 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 16 }, "value" : "seattle", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2014 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 3 }, "value" : "daniel", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 17 }, "value" : "spremberg", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1982 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 18 }, "value" : "kaiserslautern", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 }, "endTime" : { "@type" : "g:Int32", "@value" : 2009 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 19 }, "value" : "aachen", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2009 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 4 }, "value" : "gremlin", "label" : "name" } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 5 }, "value" : "tinkergraph", "label" : "name" } } ] } } } ], "edges" : [ { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2009 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 14 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2010 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 15 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 4 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 16 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 5 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 17 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "since" : { "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2010 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 18 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "since" : { "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2011 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 19 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 5 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 20 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 4 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 21 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "since" : { "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2012 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 22 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 3 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 23 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 3 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 24 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 9 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 5 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 25 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 9 }, "properties" : { "skill" : { "@type" : "g:Property", "@value" : { "key" : "skill", "value" : { "@type" : "g:Int32", "@value" : 3 } } } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 26 }, "label" : "traverses", "inVLabel" : "software", "outVLabel" : "software", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 10 } } } ] }}),
+            serial: json!({"@type":"tinker:graph","@value":{"vertices":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":7},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":1},"value":"stephen","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":10},"value":"centreville","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1990},"endTime":{"@type":"g:Int32","@value":2000}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":11},"value":"dulles","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2000},"endTime":{"@type":"g:Int32","@value":2006}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":12},"value":"purcellville","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2006}}}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":8},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":2},"value":"matthias","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":13},"value":"bremen","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2007}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":14},"value":"baltimore","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2007},"endTime":{"@type":"g:Int32","@value":2011}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":15},"value":"oakland","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2011},"endTime":{"@type":"g:Int32","@value":2014}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":16},"value":"seattle","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2014}}}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":9},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":3},"value":"daniel","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":17},"value":"spremberg","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1982},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":18},"value":"kaiserslautern","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005},"endTime":{"@type":"g:Int32","@value":2009}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":19},"value":"aachen","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2009}}}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":10},"label":"software","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":4},"value":"gremlin","label":"name"}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":11},"label":"software","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":5},"value":"tinkergraph","label":"name"}}]}}}],"edges":[{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":13},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":1},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2009}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":14},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":1},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2010}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":15},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":1},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":4}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":16},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":1},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":5}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":17},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":7},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2010}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":18},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":7},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2011}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":19},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":7},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":5}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":20},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":7},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":4}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":21},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":8},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2012}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":22},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":8},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":3}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":23},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":8},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":3}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":24},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":9},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":5}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":25},"label":"uses","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":9},"properties":{"skill":{"@type":"g:Property","@value":{"key":"skill","value":{"@type":"g:Int32","@value":3}}}}}},{"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":26},"label":"traverses","inVLabel":"software","outVLabel":"software","inV":{"@type":"g:Int32","@value":11},"outV":{"@type":"g:Int32","@value":10}}}]}}),
             object: GValue::TinkerGraph(TinkerGraph {
                 vertices: list![
                     Vertex {
@@ -608,8 +608,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2009.into()))),]
-                            .into(),
+                        properties: [(
+                            "since".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "since".to_string(),
+                                value: Box::new(Integer(2009).into()),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(14.into()),
@@ -624,8 +631,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2010.into()))),]
-                            .into(),
+                        properties: [(
+                            "since".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "since".to_string(),
+                                value: Box::new(Integer(2010).into()),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(15.into()),
@@ -640,7 +654,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(4.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(4.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(16.into()),
@@ -655,7 +677,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(5.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(17.into()),
@@ -670,8 +700,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2010.into()))),]
-                            .into(),
+                        properties: [(
+                            "since".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "since".to_string(),
+                                value: Box::new(GValue::Integer(2010.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(18.into()),
@@ -686,8 +723,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2011.into()))),]
-                            .into(),
+                        properties: [(
+                            "since".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "since".to_string(),
+                                value: Box::new(GValue::Integer(2011.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(19.into()),
@@ -702,7 +746,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(5.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(20.into()),
@@ -717,7 +769,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(4.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(4.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(21.into()),
@@ -732,8 +792,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("since".into(), Box::new(GValue::Integer(2012.into()))),]
-                            .into(),
+                        properties: [(
+                            "since".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "since".to_string(),
+                                value: Box::new(GValue::Integer(2012.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(22.into()),
@@ -748,7 +815,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(3.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(23.into()),
@@ -763,7 +838,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(3.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(24.into()),
@@ -778,7 +861,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(5.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(5.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(25.into()),
@@ -793,7 +884,15 @@ mod structure {
                             label: "person".into(),
                             properties: Default::default(),
                         },
-                        properties: [("skill".into(), Box::new(GValue::Integer(3.into()))),].into(),
+                        properties: [(
+                            "skill".into(),
+                            Box::new(GValue::Property(Property {
+                                key: "skill".to_string(),
+                                value: Box::new(GValue::Integer(3.into())),
+                                element: Box::new(GValue::Null),
+                            }))
+                        ),]
+                        .into(),
                     },
                     Edge {
                         id: GID::Integer(26.into()),

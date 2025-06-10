@@ -2,7 +2,6 @@ use crate::io::graphson::prelude::*;
 
 impl Deserializer<TinkerGraph> for V2 {
     fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {
-        let _debug = val.to_string();
         let vertex_values = get_value!(
             val.get("vertices").ok_or(Error::UnexpectedJson {
                 msg: "TinkerGraph missing 'vertices' key".into(),

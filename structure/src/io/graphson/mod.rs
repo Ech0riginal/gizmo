@@ -12,7 +12,7 @@ pub use tags::{Tag, Type};
 pub use v2::V2;
 pub use v3::V3;
 
- mod prelude {
+mod prelude {
     pub use serde_json::{Value, json};
     pub use std::collections::HashMap;
 

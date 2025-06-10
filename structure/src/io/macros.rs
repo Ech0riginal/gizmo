@@ -32,7 +32,7 @@ macro_rules! test_prelude {
     () => {
         pub(self) use super::*;
         #[allow(unused_imports)]
-        pub(self) use $crate::io::graphson::tests::diff::{Diff, Diffd};
+        pub(self) use $crate::io::graphson::tests::diff::{Diff, Difference};
         #[allow(unused_imports)]
         pub(self) use $crate::io::*;
         #[allow(unused_imports)]
@@ -57,8 +57,9 @@ macro_rules! module {
 
             #[test]
             fn ok() {
-                let result =
-                    <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(&TEST_CASE.object);
+                let result = <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(
+                    &TEST_CASE.object,
+                );
                 match result {
                     Ok(_) => {
                         assert!(true);
@@ -71,16 +72,20 @@ macro_rules! module {
 
             #[test]
             fn accurate() {
-                let result =
-                    <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(&TEST_CASE.object);
-                assert!(result.is_ok(), "serialization failed: {:?}", result);
-                let item = result.unwrap();
-                assert!(
-                    TEST_CASE.serial == item,
-                    "expected: {:?}\nactual:   {:?}\n",
-                    TEST_CASE.serial,
-                    item
+                let result = <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(
+                    &TEST_CASE.object,
                 );
+                match result {
+                    Err(e) => {
+                        assert!(false, "serialization failed: {:?}", e);
+                    }
+                    Ok(item) => {
+                        if (TEST_CASE.serial != item) {
+                            let debug = TEST_CASE.serial.diff(&item);
+                            assert!(debug.diff == Difference::Same, "{}", debug);
+                        }
+                    }
+                }
             }
         }
     };
@@ -108,12 +113,8 @@ macro_rules! module {
                     }
                     Ok(item) => {
                         if (TEST_CASE.object != item) {
-                            assert!(
-                                TEST_CASE.object.diff(&item) == Diffd::Same,
-                                "expected: {:?}\nactual:   {:?}\n",
-                                TEST_CASE.object,
-                                item
-                            );
+                            let debug = TEST_CASE.object.diff(&item);
+                            assert!(debug.diff == Difference::Same, "{}", debug);
                         }
                     }
                 }
