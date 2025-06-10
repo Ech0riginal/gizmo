@@ -134,6 +134,7 @@ enom!(
     T(T),
     TraversalMetrics(TraversalMetrics),
     Traverser(Traverser),
+    Geometry(Geometry),
     // Request
     Int128(i128),
     Token(Token),
@@ -141,7 +142,6 @@ enom!(
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
     TextP(TextP),
-    Geometry(Geometry),
     Merge(Merge),
     BulkSet(BulkSet)
 );

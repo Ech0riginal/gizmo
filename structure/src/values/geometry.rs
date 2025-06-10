@@ -1,19 +1,10 @@
+use crate::{primitive_prelude, very_primitive};
 use geo_types::Geometry::*;
 use std::hash::Hasher;
-use std::ops::Deref;
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Geometry(geo_types::Geometry);
+primitive_prelude!();
+very_primitive!(Geometry, geo_types::Geometry<f64>);
 
-impl Deref for Geometry {
-    type Target = geo_types::Geometry;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Eq for Geometry {}
 impl std::hash::Hash for Geometry {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match &self.0 {

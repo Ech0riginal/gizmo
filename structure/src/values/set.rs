@@ -5,6 +5,7 @@ use std::hash::{Hash, Hasher};
 
 crate::primitive_prelude!();
 crate::very_primitive!(Set, IndexSet<GValue>);
+crate::new!(Set, IndexSet);
 crate::iter!(Set);
 crate::into_iter!(Set);
 
