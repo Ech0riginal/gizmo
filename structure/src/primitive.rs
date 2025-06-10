@@ -56,6 +56,17 @@ macro_rules! getters {
 }
 
 #[macro_export]
+macro_rules! new {
+    ($name:ident, $inner:ident) => {
+        impl $name {
+            pub fn new() -> Self {
+                Self($inner::new())
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! deref {
     ($variant:ident, $primitive:ty) => {
         impl ops::Deref for $variant {
