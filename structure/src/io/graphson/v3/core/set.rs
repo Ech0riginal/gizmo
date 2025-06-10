@@ -24,9 +24,18 @@ impl Serializer<Set> for V3 {
             .iter()
             .map(|v| v.serialize::<Self>())
             .collect::<Result<Vec<Value>, Error>>()?;
-        Ok(json!({
-            "@type": Tag::Set,
-            "@value": elements,
-        }))
+
+        if elements.is_empty() {
+            // Why.
+            Ok(json!({
+                "@type": Tag::Set,
+                "@value": [ ],
+            }))
+        } else {
+            Ok(json!({
+                "@type": Tag::Set,
+                "@value": elements,
+            }))
+        }
     }
 }

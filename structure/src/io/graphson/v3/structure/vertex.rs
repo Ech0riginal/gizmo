@@ -11,8 +11,7 @@ impl Deserializer<Vertex> for V3 {
             .get("label")
             .ok_or("label".missing())?
             .deserialize::<Self, String>()?;
-        let properties = {
-            let properties_val = map.get("properties").ok_or("properties".missing())?;
+        let properties = if let Some(properties_val) = map.get("properties") {
             let props = get_value!(properties_val, Value::Object)?;
             let mut map = Map::new();
 
@@ -28,6 +27,8 @@ impl Deserializer<Vertex> for V3 {
             }
 
             map
+        } else {
+            Default::default()
         };
 
         Ok(Vertex {
@@ -40,24 +41,44 @@ impl Deserializer<Vertex> for V3 {
 
 impl Serializer<Vertex> for V3 {
     fn serialize(val: &Vertex) -> Result<Value, Error> {
-        let mut properties = serde_json::Map::new();
-
-        for (k, v) in val.properties.iter() {
-            let mut props = vec![];
-            for i in v.iter() {
-                let result = i.serialize::<Self>();
-                props.push(result?);
-            }
-            properties.insert(k.to_string(), Value::Array(props));
+        // 'embedded' Vertices don't include 'properties'?
+        // If I have to refactor this whole thing to
+        // include a Context I'm naming this flag is_stupid
+        if val.properties.is_empty() {
+            serialize_small_vertex(val)
+        } else {
+            serialize_big_vertex(val)
         }
-
-        Ok(json!({
-            "@type": Tag::Vertex,
-            "@value": {
-                "id": val.id.serialize::<Self>()?,
-                "label": val.label.serialize::<Self>()?,
-                "properties": properties,
-            }
-        }))
     }
+}
+
+fn serialize_big_vertex(v: &Vertex) -> Result<Value, Error> {
+    let mut properties = serde_json::Map::new();
+    for (k, v) in v.properties.iter() {
+        let mut props = vec![];
+        for i in v.iter() {
+            let result = i.serialize::<V3>();
+            props.push(result?);
+        }
+        properties.insert(k.to_string(), Value::Array(props));
+    }
+
+    Ok(json!({
+        "@type": Tag::Vertex,
+        "@value": {
+            "id": v.id.serialize::<V3>()?,
+            "label": v.label.serialize::<V3>()?,
+            "properties": properties,
+        }
+    }))
+}
+
+fn serialize_small_vertex(v: &Vertex) -> Result<Value, Error> {
+    Ok(json!({
+        "@type": Tag::Vertex,
+        "@value": {
+            "id": v.id.serialize::<V3>()?,
+            "label": v.label.serialize::<V3>()?,
+        }
+    }))
 }
