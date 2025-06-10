@@ -6,11 +6,7 @@ mod api;
 mod error;
 pub(crate) mod graphson;
 mod macros;
-mod request;
-mod response;
 mod utils;
 
 pub use api::*;
 pub use error::Error;
-pub use request::{Args, Request};
-pub use response::{Response, Status};

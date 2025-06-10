@@ -1,5 +1,5 @@
 use crate::io::graphson::prelude::*;
-use crate::io::{Response, Status};
+use crate::{Response, Status};
 
 use serde_json::Value;
 use std::collections::HashMap;

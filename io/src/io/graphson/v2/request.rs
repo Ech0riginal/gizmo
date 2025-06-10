@@ -1,5 +1,5 @@
 use crate::io::graphson::prelude::*;
-use crate::io::{Args, Request};
+use crate::{Args, Request};
 
 impl Deserializer<Request> for V2 {
     fn deserialize(val: &Value) -> Result<Request, Error> {

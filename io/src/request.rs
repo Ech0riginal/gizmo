@@ -1,9 +1,8 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::GValue;
+use crate::{GValue, Map};
 use derive_builder::Builder;
 use indexmap::IndexMap;
-use std::collections::HashMap;
 use std::hash::Hasher;
 use uuid::Uuid;
 
@@ -33,14 +32,20 @@ impl std::hash::Hash for Request {
 }
 
 #[derive(Debug, Clone)]
-pub struct Args(HashMap<&'static str, GValue>);
+pub struct Args(pub(crate) Map<&'static str, GValue>);
+
+impl Default for Args {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Args {
     pub fn new() -> Self {
-        Self(HashMap::with_capacity(8))
+        Self(Map::with_capacity(8))
     }
 
-    pub fn iter(&self) -> std::collections::hash_map::Iter<&'static str, GValue> {
+    pub fn iter(&self) -> indexmap::map::Iter<&'static str, GValue> {
         self.0.iter()
     }
 
@@ -54,14 +59,14 @@ impl Args {
 }
 
 impl std::ops::Deref for Args {
-    type Target = HashMap<&'static str, GValue>;
+    type Target = IndexMap<&'static str, GValue>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl Insert<GValue> for Args {
-    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: GValue) {
+    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: GValue) {
         map.insert(key, value);
     }
 }
@@ -70,7 +75,7 @@ impl<I> Insert<Option<I>> for Args
 where
     Args: Insert<I>,
 {
-    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: Option<I>) {
+    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: Option<I>) {
         if let Some(inner_value) = value {
             Args::insert(map, key, inner_value);
         }
@@ -80,14 +85,14 @@ where
 macro_rules! insert {
     ($ty:path) => {
        impl Insert<$ty> for Args {
-            fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: $ty) {
+            fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: $ty) {
                 Args::insert(map, key, GValue::from(value));
             }
         }
     };
     (&$lt:lifetime $ty:path) => {
         impl<$lt> Insert<&$lt $ty> for Args {
-            fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: &$lt $ty) {
+            fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: &$lt $ty) {
                 Args::insert(map, key, GValue::from(value));
             }
         }
@@ -101,5 +106,5 @@ insert!(IndexMap<&str, GValue>);
 insert!(IndexMap<GValue, GValue>);
 
 trait Insert<I> {
-    fn insert(map: &mut HashMap<&'static str, GValue>, key: &'static str, value: I);
+    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: I);
 }

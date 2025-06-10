@@ -18,6 +18,7 @@ mod prelude {
 
     pub use super::*;
 
+    pub use crate::graph::*;
     pub use crate::io::error::{Error, Missing};
     pub use crate::io::graphson::tags::*;
     pub use crate::io::macros::*;
@@ -25,5 +26,4 @@ mod prelude {
     pub use crate::io::{Deserialize, Deserializer};
     pub use crate::io::{Serialize, Serializer};
     pub use crate::passthrough;
-    pub use crate::graph::*;
 }

@@ -37,6 +37,8 @@ macro_rules! test_prelude {
         pub(self) use $crate::io::*;
         #[allow(unused_imports)]
         pub(self) use $crate::*;
+        #[allow(unused_imports)]
+        pub(self) use $crate::{Args, Request, Response, Status};
     };
 }
 #[macro_export]
@@ -51,15 +53,13 @@ macro_rules! tests {
 
 #[macro_export]
 macro_rules! module {
-    ($engine:ident, serialization) => {
+    ($engine:ident, serialize $ty:ty) => {
         mod serialization {
             pub(self) use super::*;
 
             #[test]
             fn ok() {
-                let result = <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(
-                    &TEST_CASE.object,
-                );
+                let result = <$engine as $crate::io::Serializer<$ty>>::serialize(&TEST_CASE.object);
                 match result {
                     Ok(_) => {
                         assert!(true);
@@ -72,9 +72,7 @@ macro_rules! module {
 
             #[test]
             fn accurate() {
-                let result = <$engine as $crate::io::Serializer<$crate::GValue>>::serialize(
-                    &TEST_CASE.object,
-                );
+                let result = <$engine as $crate::io::Serializer<$ty>>::serialize(&TEST_CASE.object);
                 match result {
                     Err(e) => {
                         assert!(false, "serialization failed: {:?}", e);
@@ -90,23 +88,21 @@ macro_rules! module {
         }
     };
 
-    ($engine:ident, deserialization) => {
+    ($engine:ident, deserialize $ty:ty) => {
         mod deserialization {
             pub(self) use super::*;
 
             #[test]
             fn ok() {
-                let result = <$engine as $crate::io::Deserializer<$crate::GValue>>::deserialize(
-                    &TEST_CASE.serial,
-                );
+                let result =
+                    <$engine as $crate::io::Deserializer<$ty>>::deserialize(&TEST_CASE.serial);
                 assert!(result.is_ok(), "deserialization failed: {:?}", result);
             }
 
             #[test]
             fn accurate() {
-                let result = <$engine as $crate::io::Deserializer<$crate::GValue>>::deserialize(
-                    &TEST_CASE.serial,
-                );
+                let result =
+                    <$engine as $crate::io::Deserializer<$ty>>::deserialize(&TEST_CASE.serial);
                 match result {
                     Err(e) => {
                         assert!(false, "deserialization failed: {:?}", e);
@@ -144,8 +140,8 @@ macro_rules! gvalue_test {
                 static ref TEST_CASE: Test = $case;
             }
 
-            $crate::module!($engine, deserialization);
-            $crate::module!($engine, serialization);
+            $crate::module!($engine, deserialize $crate::GValue);
+            $crate::module!($engine, serialize crate::GValue);
         }
     };
 }
@@ -162,23 +158,8 @@ macro_rules! response_test {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            $crate::module!(
-                $engine,
-                deserialization,
-                $crate::io::Deserializer<$crate::Response>,
-                deserialize,
-                serial,
-                object
-            );
-
-            // crate::module!(
-            //     $engine,
-            //     serialization,
-            //     crate::io::Serializer<crate::Response>,
-            //     serialize,
-            //     object,
-            //     serial
-            // );
+            $crate::module!($engine, deserialize $crate::Response);
+            //$crate::module!($engine, serialization);
         }
     };
 }
@@ -195,23 +176,8 @@ macro_rules! request_test {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            // crate::module!(
-            //     $engine,
-            //     deserialization,
-            //     crate::io::Deserializer<crate::Request>,
-            //     deserialize,
-            //     serial,
-            //     object
-            // );
-
-            $crate::module!(
-                $engine,
-                serialization,
-                $crate::io::Serializer<$crate::Request>,
-                serialize,
-                object,
-                serial
-            );
+            // $crate::module!($engine, deserialization);
+            $crate::module!($engine, serialize $crate::Request);
         }
     };
 }

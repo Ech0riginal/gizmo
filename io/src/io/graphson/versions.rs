@@ -26,9 +26,8 @@ mod undefined {
     //! A virtual placeholder for when we initialize the client.
 
     use super::Undefined;
-    use crate::GID;
-    use crate::GValue;
-    use crate::io::{Deserializer, Error, Request, Response, Serializer};
+    use crate::io::{Deserializer, Error, Serializer};
+    use crate::{GID, GValue, Request, Response};
     use serde_json::Value;
 
     impl Deserializer<Response> for Undefined {
