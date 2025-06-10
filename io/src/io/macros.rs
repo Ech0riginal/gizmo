@@ -141,7 +141,7 @@ macro_rules! gvalue_test {
             }
 
             $crate::module!($engine, deserialize $crate::GValue);
-            $crate::module!($engine, serialize crate::GValue);
+            $crate::module!($engine, serialize $crate::GValue);
         }
     };
 }
@@ -159,7 +159,7 @@ macro_rules! response_test {
             }
 
             $crate::module!($engine, deserialize $crate::Response);
-            //$crate::module!($engine, serialization);
+            // $crate::module!($engine, serialize $crate::Response);
         }
     };
 }
@@ -176,7 +176,7 @@ macro_rules! request_test {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            // $crate::module!($engine, deserialization);
+            // $crate::module!($engine, deserialize $crate::Request);
             $crate::module!($engine, serialize $crate::Request);
         }
     };

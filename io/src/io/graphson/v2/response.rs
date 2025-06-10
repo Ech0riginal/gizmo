@@ -19,9 +19,7 @@ impl Deserializer<Response> for V2 {
                 Ok(v) => Ok((k, v)),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Vec<(String, GValue)>, Error>>()?
-            .into_iter()
-            .collect::<HashMap<_, _>>();
+            .collect::<Result<Map<String, GValue>, Error>>()?;
         let status = value.ensure("status")?.deserialize::<Self, Status>()?;
         Ok(Response {
             id,

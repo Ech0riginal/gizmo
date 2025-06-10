@@ -1470,125 +1470,125 @@ mod request {
         }
     );
 }
-// mod response {
-//     use super::*;
-//
-//     response_test!(
-//         authentication_challenge,
-//         V3,
-//         Test {
-//             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { "@type" : "g:Map", "@value" : [ ] } }, "result" : { "data" : null, "meta" : { "@type" : "g:Map", "@value" : [ ] } }}),
-//             object: crate::Response {
-//                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
-//                 status: crate::Status {
-//                     code: 407,
-//                     message: Default::default(),
-//                     attributes: serde_json::Value::Object(serde_json::Map::new()),
-//                 },
-//                 data: GValue::Null,
-//                 meta: IndexMap::new(),
-//             },
-//         }
-//     );
-//     response_test!(
-//         standard_result,
-//         V3,
-//         Test {
-//             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 200, "attributes" : { "@type" : "g:Map", "@value" : [ ] } }, "result" : { "data" : { "@type" : "g:List", "@value" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } ] }, "meta" : { "@type" : "g:Map", "@value" : [ ] } }}),
-//             object: crate::Response {
-//                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
-//                 status: crate::Status {
-//                     code: 200,
-//                     message: None,
-//                     attributes: serde_json::Value::Object(serde_json::Map::new()),
-//                 },
-//                 meta: IndexMap::new(),
-//                 data: GValue::List(list![GValue::Vertex(Vertex {
-//                     id: GID::Integer(1.into()),
-//                     label: "person".into(),
-//                     properties: {
-//                         let mut tmp = IndexMap::new();
-//                         tmp.insert(
-//                             "name".into(),
-//                             indexset![VertexProperty {
-//                                 id: GID::Long(0.into()),
-//                                 label: "name".into(),
-//                                 value: Box::new(GValue::String("marko".into())),
-//                                 vertex: Some(GID::Integer(1.into())),
-//                                 properties: Default::default(),
-//                             }],
-//                         );
-//                         tmp.insert(
-//                             "location".into(),
-//                             indexset![
-//                                 VertexProperty {
-//                                     id: GID::Long(6.into()),
-//                                     value: Box::new(GValue::String("san diego".into())),
-//                                     label: "location".into(),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = IndexMap::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(1997.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(7.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("santa cruz".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = IndexMap::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2001.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(8.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("brussels".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = IndexMap::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2004.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(9.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("santa fe".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = IndexMap::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2005.into()),
-//                                         );
-//                                         tmp2
-//                                     }),
-//                                 },
-//                             ],
-//                         );
-//                         tmp
-//                     },
-//                 })]))
-//             },
-//         }
-//     );
-// }
+mod response {
+    use super::*;
+
+    response_test!(
+        authentication_challenge,
+        V3,
+        Test {
+            serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { "@type" : "g:Map", "@value" : [ ] } }, "result" : { "data" : null, "meta" : { "@type" : "g:Map", "@value" : [ ] } }}),
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 407,
+                    message: Default::default(),
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
+                },
+                data: GValue::Null,
+                meta: Map::new(),
+            },
+        }
+    );
+    response_test!(
+        standard_result,
+        V3,
+        Test {
+            serial: json!({"requestId":"41d2e28a-20a4-4ab0-b379-d810dede3786","status":{"message":"","code":200,"attributes":{"@type":"g:Map","@value":[]}},"result":{"data":{"@type":"g:List","@value":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}}]},"meta":{"@type":"g:Map","@value":[]}}}),
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 200,
+                    message: None,
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
+                },
+                meta: Map::new(),
+                data: GValue::List(list![GValue::Vertex(Vertex {
+                    id: GID::Integer(1.into()),
+                    label: "person".into(),
+                    properties: {
+                        let mut tmp = Map::new();
+                        tmp.insert(
+                            "name".into(),
+                            list![VertexProperty {
+                                id: GID::Long(0.into()),
+                                label: "name".into(),
+                                value: Box::new(GValue::String("marko".into())),
+                                vertex: Some(GID::Integer(1.into())),
+                                properties: Default::default(),
+                            }],
+                        );
+                        tmp.insert(
+                            "location".into(),
+                            list![
+                                VertexProperty {
+                                    id: GID::Long(6.into()),
+                                    value: Box::new(GValue::String("san diego".into())),
+                                    label: "location".into(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(1997.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(7.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa cruz".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2001.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(8.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("brussels".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2004.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(9.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa fe".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2005.into()),
+                                        );
+                                        tmp2
+                                    }),
+                                },
+                            ],
+                        );
+                        tmp
+                    },
+                })])
+            },
+        }
+    );
+}
 // mod extended {
 //     use super::*;
 //

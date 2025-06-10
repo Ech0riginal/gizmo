@@ -1,4 +1,4 @@
-use crate::GValue;
+use crate::{GValue, Map};
 use std::collections::HashMap;
 use std::hash::Hasher;
 
@@ -7,7 +7,7 @@ pub struct Response {
     pub id: uuid::Uuid,
     pub data: GValue,
     pub status: Status,
-    pub meta: HashMap<String, GValue>,
+    pub meta: Map<String, GValue>,
 }
 
 impl Eq for Response {}

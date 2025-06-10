@@ -77,15 +77,6 @@ pub trait Diff {
     fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a>;
 }
 
-macro_rules! basic {
-    ($a:ident, $b:ident) => {
-        if $a == $b {
-            $a.differ($b, Same)
-        } else {
-            $a.differ($b, Intrinsic)
-        }
-    };
-}
 macro_rules! branch {
     ($a:ident, $b:ident, $field:ident) => {
         let result = $a.$field.diff(&$b.$field);
@@ -97,6 +88,31 @@ macro_rules! branch {
 macro_rules! same {
     ($a:ident, $b:ident) => {
         $a.differ($b, Same)
+    };
+}
+
+macro_rules! diff {
+    ($variant:ident, $($field:ident),+) => {
+        impl Diff for $variant {
+            fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+                $(branch!(self, other, $field);)+
+                same!(self, other)
+            }
+        }
+    };
+}
+
+macro_rules! basic {
+    ($variant:ident) => {
+        impl Diff for $variant {
+            fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+                if self == other {
+                    self.differ(other, Same)
+                } else {
+                    self.differ(other, Intrinsic)
+                }
+            }
+        }
     };
 }
 
@@ -334,36 +350,7 @@ mod gvalues {
             }
         }
     }
-    impl Diff for Bool {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Class {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Date {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Double {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Float {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Integer {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
+
     impl<T> Diff for List<T>
     where
         T: Diff + Debug,
@@ -413,140 +400,31 @@ mod gvalues {
             self.differ(other, Same)
         }
     }
-    impl Diff for Set {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for String {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Timestamp {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Uuid {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Edge {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            if self.id != other.id {
-                return self.differ(other, Field("id".to_string()));
-            }
-
-            if self.label != other.label {
-                return self.differ(other, Field("label".to_string()));
-            }
-
-            self.properties.diff(&other.properties)
-        }
-    }
-    impl Diff for Path {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            match self.labels.diff(&other.labels).diff {
-                Same => {}
-                _ => return self.differ(other, Field("labels".into())),
-            }
-
-            self.objects.diff(&other.objects)
-        }
-    }
-    impl Diff for Property {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, key);
-            branch!(self, other, value);
-            branch!(self, other, element);
-            same!(self, other)
-        }
-    }
-    impl Diff for StarGraph {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, id);
-            branch!(self, other, label);
-            branch!(self, other, properties);
-            same!(self, other)
-        }
-    }
-    impl Diff for TinkerGraph {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, edges);
-            branch!(self, other, vertices);
-            same!(self, other)
-        }
-    }
-    impl Diff for Tree {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, branches);
-            same!(self, other)
-        }
-    }
-    impl Diff for Branch {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, key);
-            branch!(self, other, value);
-            same!(self, other)
-        }
-    }
-    impl Diff for Vertex {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, id);
-            branch!(self, other, label);
-            branch!(self, other, properties);
-            same!(self, other)
-        }
-    }
-    impl Diff for VertexProperty {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            branch!(self, other, id);
-            branch!(self, other, value);
-            branch!(self, other, vertex);
-            branch!(self, other, label);
-            same!(self, other)
-        }
-    }
-    impl Diff for Bytecode {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            self.source_instructions.diff(&other.source_instructions)
-        }
-    }
-    impl Diff for Instruction {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            if self.operator.diff(&other.operator).diff != Same {
-                return self.differ(other, Field("operator".into()));
-            }
-
-            if self.args.diff(&other.args).diff != Same {
-                return self.differ(other, Field("args".into()));
-            }
-
-            self.differ(other, Same)
-        }
-    }
-    impl Diff for Cardinality {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Column {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Direction {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
-    impl Diff for Order {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            basic!(self, other)
-        }
-    }
+    basic!(Bool);
+    basic!(Class);
+    basic!(Date);
+    basic!(Double);
+    basic!(Float);
+    basic!(Integer);
+    basic!(Set);
+    basic!(String);
+    basic!(Timestamp);
+    basic!(Uuid);
+    diff!(Edge, id, label, properties);
+    diff!(Path, labels, objects);
+    diff!(Property, key, value, element);
+    diff!(StarGraph, id, label, properties);
+    diff!(TinkerGraph, edges, vertices);
+    diff!(Tree, branches);
+    diff!(Branch, key, value);
+    diff!(Vertex, id, label, properties);
+    diff!(VertexProperty, id, value, vertex, label);
+    diff!(Bytecode, source_instructions);
+    diff!(Instruction, operator, args);
+    basic!(Cardinality);
+    basic!(Column);
+    basic!(Direction);
+    basic!(Order);
     impl Diff for Pop {
         fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
             todo!()
@@ -710,3 +588,27 @@ mod serde {
         }
     }
 }
+
+impl Diff for &'static str {
+    fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        if self == other {
+            self.differ(other, Same)
+        } else {
+            self.differ(other, Intrinsic)
+        }
+    }
+}
+impl Diff for Args {
+    fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        self.0.diff(&other.0)
+    }
+}
+
+diff!(Response, id, data, status, meta);
+diff!(Request, id, op, proc, args);
+diff!(Status, code, message, attributes);
+basic!(i16);
+basic!(i32);
+basic!(i64);
+basic!(f32);
+basic!(f64);
