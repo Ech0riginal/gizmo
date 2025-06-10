@@ -1,6 +1,5 @@
 [workspace]
 members = [
     "gizmo",
-    "process",
-    "structure",
+    "io",
 ]

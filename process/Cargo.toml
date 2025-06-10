@@ -1,7 +1,0 @@
-[package]
-authors = ["Ech0riginal <samwatkins94@me.com>"]
-name = "process"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]

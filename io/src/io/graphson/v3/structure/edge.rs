@@ -1,5 +1,4 @@
 use crate::io::graphson::prelude::*;
-
 use std::collections::HashMap;
 
 impl Deserializer<Edge> for V3 {
