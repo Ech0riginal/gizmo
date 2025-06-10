@@ -1,5 +1,4 @@
 use crate::{GValue, Map};
-use std::collections::HashMap;
 use std::hash::Hasher;
 
 #[derive(Debug)]
