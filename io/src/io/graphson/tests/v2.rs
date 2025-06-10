@@ -1129,425 +1129,425 @@ mod process {
         }
     );
 }
-// mod request {
-//     use super::*;
-//
-//     request_test!(
-//         authentication_response,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "authentication", "processor" : "", "args" : { "saslMechanism" : "PLAIN", "sasl" : "AHN0ZXBocGhlbgBwYXNzd29yZA==" }}),
-//             object: Request {
-//                 id: ::uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "authentication",
-//                 proc: "",
-//                 args: Args::new()
-//                     .arg("saslMechanism", "PLAIN")
-//                     .arg("sasl", "AHN0ZXBocGhlbgBwYXNzd29yZA=="),
-//             },
-//         }
-//     );
-//     request_test!(
-//         session_eval,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-//             object: Request {
-//                 id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "eval",
-//                 proc: "session",
-//                 args: Args::new()
-//                     .arg("gremlin", "g.V(x)")
-//                     .arg("language", "gremlin-groovy")
-//                     .arg(
-//                         "session",
-//                         GValue::Uuid(
-//                             ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
-//                         )
-//                     )
-//                     .arg("bindings", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("x", GValue::Integer(1.into()));
-//                         tmp
-//                     }),
-//             },
-//         }
-//     );
-//     request_test!(
-//         session_eval_aliased,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-//             object: Request {
-//                 id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "eval",
-//                 proc: "session",
-//                 args: Args::new()
-//                     .arg("gremlin", "social.V(x)")
-//                     .arg("language", "gremlin-groovy")
-//                     .arg("aliases", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("g", GValue::String("social".into()));
-//                         GValue::Map(Map::from(tmp))
-//                     })
-//                     .arg(
-//                         "session",
-//                         GValue::Uuid(
-//                             ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
-//                         )
-//                     )
-//                     .arg("bindings", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("x", GValue::Integer(1.into()));
-//                         GValue::Map(Map::from(tmp))
-//                     }),
-//             },
-//         }
-//     );
-//     request_test!(
-//         session_close,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "close", "processor" : "session", "args" : { "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" } }}),
-//             object: Request {
-//                 id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "close",
-//                 proc: "session",
-//                 args: Args::new().arg(
-//                     "session",
-//                     GValue::Uuid(
-//                         ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
-//                     )
-//                 )
-//             },
-//         }
-//     );
-//     request_test!(
-//         sessionless_eval,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-//             object: Request {
-//                 id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "eval",
-//                 proc: "",
-//                 args: Args::new()
-//                     .arg("gremlin", "g.V(x)")
-//                     .arg("language", "gremlin-groovy")
-//                     .arg("bindings", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("x", GValue::Integer(1.into()));
-//                         GValue::Map(Map::from(tmp))
-//                     }),
-//             },
-//         }
-//     );
-//     request_test!(
-//         sessionless_eval_aliased,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
-//             object: Request {
-//                 id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
-//                 op: "eval",
-//                 proc: "",
-//                 args: Args::new()
-//                     .arg("gremlin", "social.V(x)")
-//                     .arg("language", "gremlin-groovy")
-//                     .arg("aliases", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("g", GValue::from("social"));
-//                         GValue::Map(Map::from(tmp))
-//                     })
-//                     .arg("bindings", {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert("x", GValue::Integer(1.into()));
-//                         GValue::Map(Map::from(tmp))
-//                     }),
-//             },
-//         }
-//     );
-// }
-// mod response {
-//     use super::*;
-//
-//     response_test!(
-//         authentication_challenge,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { } }, "result" : { "data" : null, "meta" : { } }}),
-//             object: crate::Response {
-//                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
-//                 status: crate::Status {
-//                     code: 407,
-//                     message: Default::default(),
-//                     attributes: serde_json::Value::Object(serde_json::Map::new()),
-//                 },
-//                 data: GValue::Null,
-//                 meta: Map::<String, GValue>::new(),
-//             },
-//         }
-//     );
-//     response_test!(
-//         standard_result,
-//         V2,
-//         Test {
-//             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 200, "attributes" : { } }, "result" : { "data" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } ], "meta" : { } }}),
-//             object: crate::Response {
-//                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
-//                 status: crate::Status {
-//                     code: 200,
-//                     message: None,
-//                     attributes: serde_json::Value::Object(serde_json::Map::new()),
-//                 },
-//                 meta: Map::<String, GValue>::new(),
-//                 data: GValue::List(List(list![GValue::Vertex(Vertex {
-//                     id: GID::Integer(1.into()),
-//                     label: "person".into(),
-//                     properties: {
-//                         let mut tmp = Map::<String, GValue>::new();
-//                         tmp.insert(
-//                             "name".into(),
-//                             list![VertexProperty {
-//                                 id: GID::Long(0.into()),
-//                                 label: "name".into(),
-//                                 value: Box::new(GValue::String("marko".into())),
-//                                 vertex: Some(GID::Integer(1.into())),
-//                                 properties: Map::new(),
-//                             }],
-//                         );
-//                         tmp.insert(
-//                             "location".into(),
-//                             list![
-//                                 VertexProperty {
-//                                     id: GID::Long(6.into()),
-//                                     value: Box::new(GValue::String("san diego".into())),
-//                                     label: "location".into(),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = Map::<String, GValue>::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(1997.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(7.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("santa cruz".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = Map::<String, GValue>::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2001.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(8.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("brussels".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = Map::<String, GValue>::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2004.into()),
-//                                         );
-//                                         tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
-//                                         tmp2
-//                                     }),
-//                                 },
-//                                 VertexProperty {
-//                                     id: GID::Long(9.into()),
-//                                     label: "location".into(),
-//                                     value: Box::new(GValue::String("santa fe".into())),
-//                                     vertex: Some(GID::Integer(1.into())),
-//                                     properties: Some({
-//                                         let mut tmp2 = Map::<String, GValue>::new();
-//                                         tmp2.insert(
-//                                             "startTime".into(),
-//                                             GValue::Integer(2005.into()),
-//                                         );
-//                                         tmp2
-//                                     }),
-//                                 },
-//                             ],
-//                         );
-//                         tmp
-//                     },
-//                 })]))
-//             },
-//         }
-//     );
-// }
-mod extended {
+mod request {
     use super::*;
 
-    gvalue_test!(
-        bigdecimal,
+    request_test!(
+        authentication_response,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:BigDecimal", "@value" : 123456789987654321123456789987654321u128}),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "authentication", "processor" : "", "args" : { "saslMechanism" : "PLAIN", "sasl" : "AHN0ZXBocGhlbgBwYXNzd29yZA==" }}),
+            object: Request {
+                id: ::uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "authentication",
+                proc: "",
+                args: Args::new()
+                    .arg("saslMechanism", "PLAIN")
+                    .arg("sasl", "AHN0ZXBocGhlbgBwYXNzd29yZA=="),
+            },
         }
     );
-    gvalue_test!(
-        biginteger,
+    request_test!(
+        session_eval,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:BigInteger", "@value" : 123456789987654321123456789987654321u128 }),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "session",
+                args: Args::new()
+                    .arg("gremlin", "g.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg(
+                        "session",
+                        GValue::Uuid(
+                            ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                        )
+                    )
+                    .arg("bindings", {
+                        let mut tmp = Map::new();
+                        tmp.insert("x".into(), GValue::Integer(1.into()));
+                        GValue::Map(tmp)
+                    }),
+            },
         }
     );
-    gvalue_test!(
-        byte,
+    request_test!(
+        session_eval_aliased,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:Byte", "@value" : 1}),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "session",
+                args: Args::new()
+                    .arg("gremlin", "social.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("aliases", {
+                        let mut tmp = Map::<GValue, GValue>::new();
+                        tmp.insert("g".into(), GValue::String("social".into()));
+                        GValue::Map(tmp)
+                    })
+                    .arg(
+                        "session",
+                        GValue::Uuid(
+                            ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                        )
+                    )
+                    .arg("bindings", {
+                        let mut tmp = Map::<GValue, GValue>::new();
+                        tmp.insert("x".into(), GValue::Integer(1.into()));
+                        GValue::Map(tmp)
+                    }),
+            },
         }
     );
-    gvalue_test!(
-        bytebuffer,
+    request_test!(
+        session_close,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:ByteBuffer", "@value" : "c29tZSBieXRlcyBmb3IgeW91"}),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "close", "processor" : "session", "args" : { "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" } }}),
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "close",
+                proc: "session",
+                args: Args::new().arg(
+                    "session",
+                    GValue::Uuid(
+                        ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
+                    )
+                )
+            },
         }
     );
-    gvalue_test!(
-        char,
+    request_test!(
+        sessionless_eval,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:Char", "@value" : "x"}),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "",
+                args: Args::new()
+                    .arg("gremlin", "g.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("bindings", {
+                        let mut tmp = Map::<GValue, GValue>::new();
+                        tmp.insert("x".into(), GValue::Integer(1.into()));
+                        GValue::Map(tmp)
+                    }),
+            },
         }
     );
-    gvalue_test!(
-        duration,
+    request_test!(
+        sessionless_eval_aliased,
         V2,
         Test {
-            serial: json!({ "@type" : "gx:Duration", "@value" : "PT120H"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        inetaddress,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:InetAddress", "@value" : "localhost"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        instant,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:Instant", "@value" : "2016-12-14T16:39:19.349Z"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        localdate,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:LocalDate", "@value" : "2016-01-01"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        localdatetime,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:LocalDateTime", "@value" : "2016-01-01T12:30"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        localtime,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:LocalTime", "@value" : "12:30:45"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        monthday,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:MonthDay", "@value" : "--01-01"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        offsetdatetime,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:OffsetDateTime", "@value" : "2007-12-03T10:15:30+01:00"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        offsettime,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:OffsetTime", "@value" : "10:15:30+01:00"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        period,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:Period", "@value" : "P1Y6M15D"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        short,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:Int16", "@value" : 100}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        year,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:Year", "@value" : "2016"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        yearmonth,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:YearMonth", "@value" : "2016-06"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        zoneddatetime,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:ZonedDateTime", "@value" : "2016-12-23T12:12:24.000000036+02:00[GMT+02:00]"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        zoneoffset,
-        V2,
-        Test {
-            serial: json!({ "@type" : "gx:ZoneOffset", "@value" : "+03:06:09"}),
-            object: GValue::Null,
+            serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
+            object: Request {
+                id: uuid::Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
+                op: "eval",
+                proc: "",
+                args: Args::new()
+                    .arg("gremlin", "social.V(x)")
+                    .arg("language", "gremlin-groovy")
+                    .arg("aliases", {
+                        let mut tmp = Map::<GValue, GValue>::new();
+                        tmp.insert("g".into(), GValue::from("social"));
+                        GValue::Map(tmp)
+                    })
+                    .arg("bindings", {
+                        let mut tmp = Map::<GValue, GValue>::new();
+                        tmp.insert("x".into(), GValue::Integer(1.into()));
+                        GValue::Map(tmp)
+                    }),
+            },
         }
     );
 }
+mod response {
+    use super::*;
+
+    response_test!(
+        authentication_challenge,
+        V2,
+        Test {
+            serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { } }, "result" : { "data" : null, "meta" : { } }}),
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 407,
+                    message: Default::default(),
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
+                },
+                data: GValue::Null,
+                meta: Map::<String, GValue>::new(),
+            },
+        }
+    );
+    response_test!(
+        standard_result,
+        V2,
+        Test {
+            serial: json!({"requestId":"41d2e28a-20a4-4ab0-b379-d810dede3786","status":{"message":"","code":200,"attributes":{}},"result":{"data":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","vertex":{"@type":"g:Int32","@value":1},"label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}}],"meta":{}}}),
+            object: crate::Response {
+                id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
+                status: crate::Status {
+                    code: 200,
+                    message: None,
+                    attributes: serde_json::Value::Object(serde_json::Map::new()),
+                },
+                meta: Map::<String, GValue>::new(),
+                data: GValue::List(list![GValue::Vertex(Vertex {
+                    id: GID::Integer(1.into()),
+                    label: "person".into(),
+                    properties: {
+                        let mut tmp = Map::new();
+                        tmp.insert(
+                            "name".into(),
+                            list![VertexProperty {
+                                id: GID::Long(0.into()),
+                                label: "name".into(),
+                                value: Box::new(GValue::String("marko".into())),
+                                vertex: Some(GID::Integer(1.into())),
+                                properties: None,
+                            }],
+                        );
+                        tmp.insert(
+                            "location".into(),
+                            list![
+                                VertexProperty {
+                                    id: GID::Long(6.into()),
+                                    value: Box::new(GValue::String("san diego".into())),
+                                    label: "location".into(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(1997.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2001.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(7.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa cruz".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2001.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2004.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(8.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("brussels".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2004.into()),
+                                        );
+                                        tmp2.insert("endTime".into(), GValue::Integer(2005.into()));
+                                        tmp2
+                                    }),
+                                },
+                                VertexProperty {
+                                    id: GID::Long(9.into()),
+                                    label: "location".into(),
+                                    value: Box::new(GValue::String("santa fe".into())),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    properties: Some({
+                                        let mut tmp2 = Map::new();
+                                        tmp2.insert(
+                                            "startTime".into(),
+                                            GValue::Integer(2005.into()),
+                                        );
+                                        tmp2
+                                    }),
+                                },
+                            ],
+                        );
+                        tmp
+                    },
+                })])
+            },
+        }
+    );
+}
+// mod extended {
+//     use super::*;
+//
+//     gvalue_test!(
+//         bigdecimal,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:BigDecimal", "@value" : 123456789987654321123456789987654321u128}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         biginteger,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:BigInteger", "@value" : 123456789987654321123456789987654321u128 }),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         byte,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Byte", "@value" : 1}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         bytebuffer,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:ByteBuffer", "@value" : "c29tZSBieXRlcyBmb3IgeW91"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         char,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Char", "@value" : "x"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         duration,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Duration", "@value" : "PT120H"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         inetaddress,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:InetAddress", "@value" : "localhost"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         instant,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Instant", "@value" : "2016-12-14T16:39:19.349Z"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         localdate,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:LocalDate", "@value" : "2016-01-01"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         localdatetime,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:LocalDateTime", "@value" : "2016-01-01T12:30"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         localtime,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:LocalTime", "@value" : "12:30:45"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         monthday,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:MonthDay", "@value" : "--01-01"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         offsetdatetime,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:OffsetDateTime", "@value" : "2007-12-03T10:15:30+01:00"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         offsettime,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:OffsetTime", "@value" : "10:15:30+01:00"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         period,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Period", "@value" : "P1Y6M15D"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         short,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Int16", "@value" : 100}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         year,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:Year", "@value" : "2016"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         yearmonth,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:YearMonth", "@value" : "2016-06"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         zoneddatetime,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:ZonedDateTime", "@value" : "2016-12-23T12:12:24.000000036+02:00[GMT+02:00]"}),
+//             object: GValue::Null,
+//         }
+//     );
+//     gvalue_test!(
+//         zoneoffset,
+//         V2,
+//         Test {
+//             serial: json!({ "@type" : "gx:ZoneOffset", "@value" : "+03:06:09"}),
+//             object: GValue::Null,
+//         }
+//     );
+// }
