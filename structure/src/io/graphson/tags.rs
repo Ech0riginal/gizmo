@@ -2,6 +2,7 @@
 
 use crate::io::error::Missing;
 use crate::io::macros::get_value;
+use crate::io::utils::Ensure;
 use crate::io::{Deserialize, Deserializer, Error, Serialize, Serializer};
 use serde_json::Value;
 use std::fmt::{Debug, Display, Formatter};
@@ -26,7 +27,7 @@ impl Typed for Value {
             .ok_or(TYPE_TAG.missing())
             .map(|v| v.as_str().unwrap())?;
         let tag = Tag::try_from(tagd)?;
-        let value = self.get(VALUE_TAG).ok_or(VALUE_TAG.missing())?;
+        let value = self.ensure(VALUE_TAG)?;
 
         Ok(Type { tag, value })
     }
@@ -93,6 +94,7 @@ macro_rules! enom {
 }
 
 enom!(
+    // Core
     Class("g:Class"),
     Date("g:Date"),
     Double("g:Double"),
@@ -104,6 +106,7 @@ enom!(
     Set("g:Set"),
     Timestamp("g:Timestamp"),
     Uuid("g:UUID"),
+    // Structure
     Edge("g:Edge"),
     Path("g:Path"),
     Property("g:Property"),
@@ -112,6 +115,7 @@ enom!(
     Tree("g:Tree"),
     Vertex("g:Vertex"),
     VertexProperty("g:VertexProperty"),
+    // Process
     Barrier("g:Barrier"),
     Binding("g:Binding"),
     BulkSet("g:BulkSet"),
@@ -133,5 +137,12 @@ enom!(
     TextP("g:TextP"),
     TraversalExplanation("g:TraversalExplanation"),
     TraversalMetrics("g:TraversalMetrics"),
-    Traverser("g:Traverser")
+    Traverser("g:Traverser"),
+    // Extended
+
+    // Custom
+    // The geometric type value emitted by SQLg
+    Geometry("g:Geometry"),
+    // The geometric type value emitted by Janusgraph
+    Geoshape("g:Geoshape")
 );

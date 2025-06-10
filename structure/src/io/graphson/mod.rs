@@ -1,8 +1,5 @@
 mod id;
-// mod request;
-// mod response;
 mod tags;
-mod value;
 mod versions;
 
 mod key;
@@ -12,13 +9,14 @@ mod v2;
 mod v3;
 
 pub use tags::{Tag, Type};
-pub use versions::*;
+pub use v2::V2;
+pub use v3::V3;
 
 pub(self) mod prelude {
     pub use serde_json::{Value, json};
     pub use std::collections::HashMap;
 
-    pub use super::versions::*;
+    pub use super::*;
 
     pub use crate::io::error::{Error, Missing};
     pub use crate::io::graphson::tags::*;

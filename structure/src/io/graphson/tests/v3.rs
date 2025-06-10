@@ -183,60 +183,31 @@ mod structure {
         path,
         V3,
         Test {
-            serial: json!({ "@type" : "g:Path", "@value" : { "labels" : { "@type" : "g:List", "@value" : [ { "@type" : "g:Set", "@value" : [ ] }, { "@type" : "g:Set", "@value" : [ ] }, { "@type" : "g:Set", "@value" : [ ] } ] }, "objects" : { "@type" : "g:List", "@value" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person" } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "software" } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "software" } } ] } }}),
-            object: GValue::Path(
-                Path::new(
-                    GValue::List(list![
-                        GValue::List(list![]),
-                        GValue::List(list![]),
-                        GValue::List(list![])
-                    ]),
-                    GValue::List(list![
-                        GValue::Vertex(Vertex {
-                            id: 1i32.into(),
-                            label: "person".to_string(),
-                            properties: Default::default(),
-                        }),
-                        GValue::Vertex(Vertex {
-                            id: 10i32.into(),
-                            label: "software".to_string(),
-                            properties: {
-                                let mut tmp = Map::<String, List<VertexProperty>>::new();
-                                tmp.insert(
-                                    "name".into(),
-                                    list![VertexProperty {
-                                        label: "name".to_string(),
-                                        id: 4i64.into(),
-                                        value: Box::new(GValue::String("gremlin".into())),
-                                        vertex: Some(GID::Integer(10.into())),
-                                        properties: Default::default(),
-                                    }],
-                                );
-                                tmp
-                            },
-                        }),
-                        GValue::Vertex(Vertex {
-                            id: 11i32.into(),
-                            label: "software".to_string(),
-                            properties: {
-                                let mut tmp = Map::<String, List<VertexProperty>>::new();
-                                tmp.insert(
-                                    "name".into(),
-                                    list![VertexProperty {
-                                        id: 5i64.into(),
-                                        value: Box::new(GValue::String("tinkergraph".into())),
-                                        vertex: Some(GID::Integer(11.into())),
-                                        label: "name".to_string(),
-                                        properties: Default::default(),
-                                    }],
-                                );
-                                tmp
-                            },
-                        }),
-                    ])
-                )
-                .into(),
-            ),
+            serial: json!({"@type":"g:Path","@value":{"labels":{"@type":"g:List","@value":[{"@type":"g:Set","@value":[]},{"@type":"g:Set","@value":[]},{"@type":"g:Set","@value":[]}]},"objects":{"@type":"g:List","@value":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person"}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":10},"label":"software"}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":11},"label":"software"}}]}}}),
+            object: GValue::Path(Path {
+                labels: Box::new(GValue::List(list![
+                    GValue::Set(Set::new()),
+                    GValue::Set(Set::new()),
+                    GValue::Set(Set::new())
+                ])),
+                objects: Box::new(GValue::List(list![
+                    GValue::Vertex(Vertex {
+                        id: 1i32.into(),
+                        label: "person".to_string(),
+                        properties: Default::default(),
+                    }),
+                    GValue::Vertex(Vertex {
+                        id: 10i32.into(),
+                        label: "software".to_string(),
+                        properties: Default::default(),
+                    }),
+                    GValue::Vertex(Vertex {
+                        id: 11i32.into(),
+                        label: "software".to_string(),
+                        properties: Default::default(),
+                    }),
+                ]))
+            })
         }
     );
     gvalue_test!(

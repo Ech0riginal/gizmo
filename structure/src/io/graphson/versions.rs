@@ -16,8 +16,8 @@ macro_rules! io {
     };
 }
 
-io!(V2, "application/vnd.gremlin-v2.0+json");
-io!(V3, "application/vnd.gremlin-v3.0+json;types=true");
+// io!(V2, "application/vnd.gremlin-v2.0+json");
+// io!(V3, "application/vnd.gremlin-v3.0+json;types=true");
 // io!(V3g, V3::mime);
 
 io!(Undefined, "n/a");
@@ -25,9 +25,9 @@ io!(Undefined, "n/a");
 mod undefined {
     //! A virtual placeholder for when we initialize the client.
 
+    use super::Undefined;
     use crate::GID;
     use crate::GValue;
-    use crate::io::graphson::Undefined;
     use crate::io::{Deserializer, Error, Request, Response, Serializer};
     use serde_json::Value;
 

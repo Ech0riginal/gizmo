@@ -1,3 +1,5 @@
+//! A lot of our tests get thrown off by out-of-order items. I don't care about order, thus:
+
 use crate::io::graphson::tests::diff::Diffd::*;
 use crate::*;
 use std::fmt::Debug;
@@ -38,7 +40,7 @@ struct Field {
 fn field(str: &'static str) -> Diffd {
     Field(str.to_string())
 }
-fn diff<A: std::fmt::Debug, B: std::fmt::Debug>(a: A, b: B) -> Diffd {
+fn diff<A: Debug, B: Debug>(a: A, b: B) -> Diffd {
     Different(format!("{:?}", a), format!("{:?}", b))
 }
 
@@ -231,32 +233,32 @@ impl Diff for Box<GValue> {
 }
 
 impl Diff for Bool {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Class {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Date {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Double {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Float {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Integer {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
@@ -277,7 +279,7 @@ where
     }
 }
 impl Diff for Long {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
@@ -309,7 +311,7 @@ where
     }
 }
 impl Diff for Set {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
@@ -323,7 +325,7 @@ impl Diff for String {
     }
 }
 impl Diff for Timestamp {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
@@ -450,92 +452,92 @@ impl Diff for Cardinality {
     }
 }
 impl Diff for Column {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Direction {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Order {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Pop {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for P {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Scope {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for T {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for TraversalMetrics {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Traverser {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for i128 {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Token {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Metrics {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for TraversalExplanation {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for IntermediateRepr {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for TextP {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Geometry {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for Merge {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }
 impl Diff for BulkSet {
-    fn diff(&self, other: &Self) -> Diffd {
+    fn diff(&self, _other: &Self) -> Diffd {
         todo!()
     }
 }

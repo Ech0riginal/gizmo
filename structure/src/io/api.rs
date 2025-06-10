@@ -64,22 +64,4 @@ mod blankets {
             V::deserialize(&self).map(|a| a.into())
         }
     }
-
-    // impl<T, G> Serializer<Box<T>> for G
-    // where
-    //     G: Serializer<T>,
-    // {
-    //     fn serialize(val: &Box<T>) -> Result<Value, Error> {
-    //         (*val).serialize::<G>()
-    //     }
-    // }
-    //
-    // impl<T, G> Deserializer<Box<T>> for G
-    // where
-    //     G: Deserializer<T>,
-    // {
-    //     fn deserialize(val: &Value) -> Result<Box<T>, Error> {
-    //         val.deserialize::<G, T>().map(Box::new)
-    //     }
-    // }
 }

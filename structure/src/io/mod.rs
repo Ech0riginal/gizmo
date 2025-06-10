@@ -8,7 +8,6 @@ pub(crate) mod graphson;
 mod macros;
 mod request;
 mod response;
-mod seal;
 mod utils;
 
 pub use api::*;

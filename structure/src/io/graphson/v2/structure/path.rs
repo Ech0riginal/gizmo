@@ -2,9 +2,15 @@ use crate::io::graphson::prelude::*;
 
 impl Deserializer<Path> for V2 {
     fn deserialize(val: &Value) -> Result<Path, Error> {
-        let labels = val["labels"].deserialize::<Self, GValue>()?;
-        let objects = val["objects"].deserialize::<Self, GValue>()?;
-        Ok(Path::new(labels, objects).into())
+        let labels = {
+            let tmp = val.ensure("labels")?.deserialize::<Self, GValue>()?;
+            Box::new(tmp)
+        };
+        let objects = {
+            let tmp = val.ensure("objects")?.deserialize::<Self, GValue>()?;
+            Box::new(tmp)
+        };
+        Ok(Path { labels, objects })
     }
 }
 
