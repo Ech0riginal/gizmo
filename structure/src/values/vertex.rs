@@ -1,5 +1,5 @@
 use crate::{GID, List, Map};
-use crate::{Primitive, VertexProperty, primitive};
+use crate::{Primitive, VertexProperty};
 use indexmap::map::{IntoIter, Iter};
 use std::hash::Hasher;
 
