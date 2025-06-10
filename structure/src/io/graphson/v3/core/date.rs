@@ -1,5 +1,4 @@
 use crate::io::graphson::prelude::*;
-use chrono::{TimeZone, Utc};
 
 passthrough!(Date, V3 to V2);
 

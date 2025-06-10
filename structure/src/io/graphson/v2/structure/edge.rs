@@ -18,7 +18,7 @@ impl Deserializer<Edge> for V2 {
             .map(|label| get_value!(label, Value::String).map(Clone::clone).unwrap())
             .unwrap_or("Unavailable".into());
 
-        let out_v_id = (&val["outV"]).deserialize::<Self, GID>()?;
+        let out_v_id = val["outV"].deserialize::<Self, GID>()?;
         // If we don't account for it, we can't ser/de Property types.
         let out_v_label = val
             .get("outVLabel")
@@ -67,7 +67,7 @@ where
         let properties = edge
             .properties
             .iter()
-            .map(|(label, property)| (label, (&**property).serialize::<S>()))
+            .map(|(label, property)| (label, (**property).serialize::<S>()))
             .map(|(label, result)| match result {
                 Ok(value) => Ok((label, value)),
                 Err(e) => Err(e),

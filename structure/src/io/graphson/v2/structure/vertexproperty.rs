@@ -11,7 +11,7 @@ impl Deserializer<super::VertexProperties> for V2 {
                     match v {
                         Value::Array(arr) => {
                             let list = arr
-                                .into_iter()
+                                .iter()
                                 .map(|e| e.typed())
                                 .collect::<Result<List<_>, Error>>()?
                                 .into_iter()
@@ -85,7 +85,7 @@ impl Serializer<VertexProperty> for V2 {
         let mut value = HashMap::<&'static str, Value>::new();
 
         value.insert("id", val.id().serialize::<Self>()?);
-        value.insert("value", (&*val.value).serialize::<Self>()?);
+        value.insert("value", (*val.value).serialize::<Self>()?);
         value.insert("label", serde_json::to_value(&val.label)?);
         if let Some(id) = &val.vertex {
             value.insert("vertex", id.serialize::<Self>()?);

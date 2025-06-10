@@ -6,7 +6,7 @@ impl Serializer<P> for V2 {
             "@type": Tag::P,
             "@value": {
                 "predicate": val.operator,
-                "value": (&*val.value).serialize::<Self>()?
+                "value": (*val.value).serialize::<Self>()?
             }
         }))
     }

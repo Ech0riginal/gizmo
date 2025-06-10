@@ -1,5 +1,3 @@
-use crate::io::graphson::{Tag, Type};
-use crate::io::{Deserialize, Error};
 use crate::*;
 
 mod core;

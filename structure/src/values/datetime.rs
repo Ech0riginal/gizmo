@@ -2,9 +2,9 @@ crate::primitive_prelude!();
 crate::very_primitive!(Date, chrono::DateTime<chrono::Utc>);
 crate::hash!(Date);
 
-impl Into<crate::GValue> for chrono::DateTime<chrono::Utc> {
-    fn into(self) -> crate::GValue {
-        crate::GValue::Date(Date(self))
+impl From<chrono::DateTime<chrono::Utc>> for crate::GValue {
+    fn from(val: chrono::DateTime<chrono::Utc>) -> Self {
+        crate::GValue::Date(Date(val))
     }
 }
 

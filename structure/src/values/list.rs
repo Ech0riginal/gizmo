@@ -32,9 +32,9 @@ impl<T: fmt::Display> fmt::Display for List<T> {
     }
 }
 
-impl<T> Into<List<T>> for Vec<T> {
-    fn into(self) -> List<T> {
-        List(self)
+impl<T> From<Vec<T>> for List<T> {
+    fn from(val: Vec<T>) -> Self {
+        List(val)
     }
 }
 

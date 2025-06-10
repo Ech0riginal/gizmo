@@ -4,7 +4,7 @@ impl Deserializer<Tree> for V2 {
     fn deserialize(val: &Value) -> Result<Tree, Error> {
         let array = get_value!(val, Value::Array)?;
         let branches = array
-            .into_iter()
+            .iter()
             .map(|val| val.deserialize::<Self, Branch>())
             .collect::<Result<List<_>, Error>>()?;
         Ok(Tree { branches })
@@ -54,8 +54,8 @@ impl Serializer<Tree> for V2 {
 impl Serializer<Branch> for V2 {
     fn serialize(val: &Branch) -> Result<serde_json::Value, Error> {
         Ok(json!({
-            "key": (&*val.key).serialize::<Self>()?,
-            "value": (&*val.value).serialize::<Self>()?,
+            "key": (*val.key).serialize::<Self>()?,
+            "value": (*val.value).serialize::<Self>()?,
         }))
     }
 }

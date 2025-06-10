@@ -33,7 +33,7 @@ impl Serializer<Property> for V3 {
             "@type": Tag::Property,
             "@value": {
               "key" : val.key.serialize::<Self>()?,
-              "value" : (&*val.value).serialize::<Self>()?,
+              "value" : (*val.value).serialize::<Self>()?,
             }
         }))
     }

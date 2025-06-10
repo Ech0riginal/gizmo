@@ -12,11 +12,11 @@ impl Deserializer<TraversalMetrics> for V2 {
             metrics.get("metrics").ok_or("metrics".missing())?,
             Value::Array
         )?
-        .into_iter()
+        .iter()
         .map(|val| val.deserialize::<Self, Metrics>())
         .collect::<Result<List<_>, Error>>()?;
 
-        Ok(TraversalMetrics::new(duration, metrics).into())
+        Ok(TraversalMetrics::new(duration, metrics))
     }
 }
 

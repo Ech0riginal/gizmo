@@ -36,7 +36,7 @@ impl Serializer<Property> for V2 {
             "@type": Tag::Property,
             "@value": {
                 "key": val.key,
-                "value": (&*val.value).serialize::<Self>()?,
+                "value": (*val.value).serialize::<Self>()?,
                 "element": match &*val.element {
                     GValue::Edge(edge) => super::edge::serialize_edge::<Self>(edge, false)?,
                     element => element.serialize::<Self>()?,

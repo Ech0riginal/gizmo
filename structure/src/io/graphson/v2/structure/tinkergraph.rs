@@ -18,14 +18,14 @@ impl Deserializer<TinkerGraph> for V2 {
             Value::Array
         )?;
         let vertices = vertex_values
-            .into_iter()
+            .iter()
             .map(|val| match val.typed() {
                 Ok(type_) => type_.value.deserialize::<Self, Vertex>(),
                 Err(e) => Err(e),
             })
             .collect::<Result<List<_>, Error>>()?;
         let edges = edge_values
-            .into_iter()
+            .iter()
             .map(|val| match val.typed() {
                 Ok(type_) => type_.value.deserialize::<Self, Edge>(),
                 Err(e) => Err(e),

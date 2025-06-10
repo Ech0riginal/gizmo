@@ -6,7 +6,7 @@ use indexmap::IndexSet;
 impl Deserializer<Set> for V3 {
     fn deserialize(val: &Value) -> Result<Set, Error> {
         let set = get_value!(val, Value::Array)?
-            .into_iter()
+            .iter()
             .map(|v| v.deserialize::<Self, GValue>())
             .collect::<Result<Vec<_>, _>>()?
             .into_iter()

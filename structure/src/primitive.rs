@@ -16,13 +16,13 @@ macro_rules! primitive {
         #[derive(Clone)]
         pub struct $name(pub(crate) $inner);
 
-        impl crate::Primitive for $name {
+        impl $crate::Primitive for $name {
             const name: &'static str = stringify!($name);
         }
 
-        crate::debug!($name);
+        $crate::debug!($name);
 
-        crate::display!($name);
+        $crate::display!($name);
 
         impl Into<$inner> for $name {
             fn into(self) -> $inner {
@@ -40,11 +40,11 @@ macro_rules! primitive {
 #[macro_export]
 macro_rules! very_primitive {
     ($name:ident, $inner:ty) => {
-        crate::primitive!($name, $inner);
-        crate::partial_eq!($name);
-        crate::eq!($name);
-        crate::deref!($name, $inner);
-        crate::deref_mut!($name);
+        $crate::primitive!($name, $inner);
+        $crate::partial_eq!($name);
+        $crate::eq!($name);
+        $crate::deref!($name, $inner);
+        $crate::deref_mut!($name);
     };
 }
 
@@ -58,6 +58,12 @@ macro_rules! getters {
 #[macro_export]
 macro_rules! new {
     ($name:ident, $inner:ident) => {
+        impl Default for $name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
         impl $name {
             pub fn new() -> Self {
                 Self($inner::new())
@@ -144,7 +150,7 @@ macro_rules! iter {
 macro_rules! into_iter {
     ($variant:ident) => {
         impl IntoIterator for $variant {
-            type Item = crate::GValue;
+            type Item = $crate::GValue;
             type IntoIter = impl Iterator<Item = GValue>;
 
             fn into_iter(self) -> Self::IntoIter {

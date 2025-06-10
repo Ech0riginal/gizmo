@@ -17,13 +17,13 @@ impl Hash for Set {
     }
 }
 
-impl<T> Into<Set> for Vec<T>
+impl<T> From<Vec<T>> for Set
 where
     GValue: From<T>,
 {
-    fn into(self) -> Set {
+    fn from(val: Vec<T>) -> Self {
         let mut tmp = IndexSet::new();
-        tmp.extend(self.into_iter().map(GValue::from));
+        tmp.extend(val.into_iter().map(GValue::from));
         Set(tmp)
     }
 }

@@ -93,7 +93,7 @@ macro_rules! serialize_shim {
 #[macro_export]
 macro_rules! passthrough {
     ($class:ident, $overlay:ident to $og:ident) => {
-        crate::deserialize_shim!($overlay, $og, $class);
-        crate::serialize_shim!($overlay, $og, $class);
+        $crate::deserialize_shim!($overlay, $og, $class);
+        $crate::serialize_shim!($overlay, $og, $class);
     };
 }

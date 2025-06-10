@@ -2,7 +2,6 @@ use crate::io::graphson::prelude::*;
 use crate::io::{Response, Status};
 
 use serde_json::Value;
-use std::collections::HashMap;
 
 impl Deserializer<Response> for V3 {
     fn deserialize(value: &Value) -> Result<Response, Error> {

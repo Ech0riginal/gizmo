@@ -82,7 +82,7 @@ where
         let properties = edge
             .properties
             .iter()
-            .map(|(label, property)| (label, (&**property).serialize::<S>()))
+            .map(|(label, property)| (label, (**property).serialize::<S>()))
             .map(|(label, result)| match result {
                 Ok(value) => Ok((label, value)),
                 Err(e) => Err(e),

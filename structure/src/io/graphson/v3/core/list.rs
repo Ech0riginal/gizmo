@@ -27,7 +27,7 @@ where
             return Ok(list![]);
         }
         let val = get_value!(val, Value::Array)?;
-        let _debug_val = val.iter().map(|v| format!("{:?}", v)).collect::<Vec<_>>();
+        let _debug_val = val.iter().map(|v| format!("{v:?}")).collect::<Vec<_>>();
 
         let mut elements = List::with_capacity(val.len());
         for item in val {

@@ -4,8 +4,8 @@ pub enum Scope {
     Local,
 }
 
-impl Into<Scope> for () {
-    fn into(self) -> Scope {
+impl From<()> for Scope {
+    fn from(val: ()) -> Self {
         Scope::Global
     }
 }

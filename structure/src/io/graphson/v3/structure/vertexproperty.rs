@@ -46,7 +46,7 @@ impl Serializer<VertexProperty> for V3 {
     fn serialize(val: &VertexProperty) -> Result<Value, Error> {
         let mut tmp = IndexMap::new();
         tmp.insert("id", val.id.serialize::<Self>()?);
-        tmp.insert("value", (&*val.value).serialize::<Self>()?);
+        tmp.insert("value", (*val.value).serialize::<Self>()?);
 
         if let Some(v) = &val.vertex {
             tmp.insert("vertex", v.serialize::<Self>()?);

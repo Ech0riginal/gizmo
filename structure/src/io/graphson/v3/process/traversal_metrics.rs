@@ -13,6 +13,6 @@ impl Deserializer<TraversalMetrics> for V3 {
             .filter_map(Result::ok)
             .collect::<List<_>>();
 
-        Ok(TraversalMetrics::new(duration, m).into())
+        Ok(TraversalMetrics::new(duration, m))
     }
 }

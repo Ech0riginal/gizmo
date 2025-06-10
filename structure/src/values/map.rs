@@ -1,6 +1,5 @@
 use crate::*;
 use indexmap::IndexMap;
-use std::convert::{TryFrom, TryInto};
 use std::hash::{Hash, Hasher};
 // Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 // TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
@@ -27,14 +26,14 @@ impl<K: fmt::Display, V: fmt::Display> fmt::Display for Map<K, V> {
         f.write_fmt(::core::format_args!(stringify!(Map)))
     }
 }
-impl<K, V> Into<IndexMap<K, V>> for Map<K, V> {
-    fn into(self) -> IndexMap<K, V> {
-        self.0
+impl<K, V> From<Map<K, V>> for IndexMap<K, V> {
+    fn from(val: Map<K, V>) -> Self {
+        val.0
     }
 }
-impl<K, V> Into<Map<K, V>> for IndexMap<K, V> {
-    fn into(self) -> Map<K, V> {
-        Map(self)
+impl<K, V> From<IndexMap<K, V>> for Map<K, V> {
+    fn from(val: IndexMap<K, V>) -> Self {
+        Map(val)
     }
 }
 
@@ -107,7 +106,7 @@ where
         self.0
             .swap_remove(&key)
             .map(|item| item.into())
-            .ok_or(io::Error::Missing(format!("{}", key)))
+            .ok_or(io::Error::Missing(format!("{key}")))
     }
 }
 

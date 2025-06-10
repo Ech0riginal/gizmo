@@ -61,7 +61,7 @@ mod blankets {
         where
             V: Deserializer<T>,
         {
-            V::deserialize(&self).map(|a| a.into())
+            V::deserialize(self)
         }
     }
 }

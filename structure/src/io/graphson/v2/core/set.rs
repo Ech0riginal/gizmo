@@ -1,7 +1,6 @@
 //! https://tinkerpop.apache.org/docs/3.7.3/dev/io/#_set
 
 use crate::io::graphson::prelude::*;
-use std::collections::HashSet;
 
 impl Serializer<Set> for V2 {
     fn serialize(val: &Set) -> Result<Value, Error> {

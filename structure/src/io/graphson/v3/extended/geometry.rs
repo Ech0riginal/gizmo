@@ -31,7 +31,7 @@ impl Deserializer<Geometry> for V3 {
                         .map(|c| Coord { x: c[0], y: c[1] })
                         .collect()
                 })
-                .map(|coords| LineString::new(coords))
+                .map(LineString::new)
                 .collect::<Vec<LineString>>();
             let exterior = lines.remove(0);
             Ok(GeoTypes::Polygon(Polygon::new(exterior, lines)).into())

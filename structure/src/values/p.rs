@@ -1,7 +1,6 @@
 use crate::Either2;
 use crate::TextP;
 use crate::*;
-use indexmap::{IndexSet, indexset};
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct P {

@@ -93,7 +93,7 @@ impl TryFrom<&GValue> for GID {
                 };
                 Ok(gid)
             }
-            _ => Err(Error::Cast(format!("{:?}", value), "GID".into())),
+            _ => Err(Error::Cast(format!("{value:?}"), "GID".into())),
         }
     }
 }

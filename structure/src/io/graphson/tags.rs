@@ -7,8 +7,8 @@ use crate::io::{Deserialize, Deserializer, Error, Serialize, Serializer};
 use serde_json::Value;
 use std::fmt::{Debug, Display, Formatter};
 
-const TYPE_TAG: &'static str = "@type";
-const VALUE_TAG: &'static str = "@value";
+const TYPE_TAG: &str = "@type";
+const VALUE_TAG: &str = "@value";
 
 pub struct Type<'a> {
     pub tag: Tag,

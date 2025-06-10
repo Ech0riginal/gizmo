@@ -1,5 +1,5 @@
 use crate::*;
-use indexmap::{IndexMap, IndexSet};
+use indexmap::IndexMap;
 use std::convert::Infallible;
 use std::fmt::Formatter;
 
@@ -65,8 +65,10 @@ macro_rules! enom {
         /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
         #[allow(clippy::large_enum_variant)]
         #[derive(Clone, Eq, Hash, PartialEq)]
-        pub enum GValue {
-            Null,
+        #[derive(Default)]
+pub enum GValue {
+            #[default]
+Null,
             $($variant($primitive),)+
         }
 
@@ -164,11 +166,6 @@ impl GValue {
     }
 }
 
-impl Default for GValue {
-    fn default() -> Self {
-        GValue::Null
-    }
-}
 
 impl From<&str> for GValue {
     fn from(v: &str) -> Self {

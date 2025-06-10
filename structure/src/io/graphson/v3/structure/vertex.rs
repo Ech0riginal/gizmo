@@ -17,7 +17,7 @@ impl Deserializer<Vertex> for V3 {
 
             for (key, value) in props.into_iter() {
                 let properties = get_value!(value, Value::Array)?
-                    .into_iter()
+                    .iter()
                     .map(|item| item.typed())
                     .collect::<Result<Vec<Type<'_>>, Error>>()?
                     .into_iter()

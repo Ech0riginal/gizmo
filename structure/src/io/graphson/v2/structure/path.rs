@@ -19,8 +19,8 @@ impl Serializer<Path> for V2 {
         Ok(json!({
             "@type" : Tag::Path,
             "@value": {
-                "labels" : (&*val.labels).serialize::<Self>()?,
-                "objects" : (&*val.objects).serialize::<Self>()?,
+                "labels" : (*val.labels).serialize::<Self>()?,
+                "objects" : (*val.objects).serialize::<Self>()?,
             }
         }))
     }

@@ -44,7 +44,7 @@ impl Deserializer<Metrics> for V2 {
             metric.get("metrics").ok_or("metrics".missing())?,
             Value::Array
         )?
-        .into_iter()
+        .iter()
         .map(|val| val.deserialize::<Self, Metrics>())
         .collect::<Result<List<_>, Error>>()?;
         let metric = Metrics::new(id, name, duration, count, traversers, perc_duration, nested);

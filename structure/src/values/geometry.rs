@@ -27,7 +27,7 @@ impl std::hash::Hash for Geometry {
                     state.write(&c.x.to_be_bytes());
                     state.write(&c.y.to_be_bytes());
                 });
-                polygon.interiors().into_iter().for_each(|linestring| {
+                polygon.interiors().iter().for_each(|linestring| {
                     linestring.points().for_each(|c| {
                         state.write(&c.x().to_be_bytes());
                         state.write(&c.y().to_be_bytes());
@@ -54,7 +54,7 @@ impl std::hash::Hash for Geometry {
                         state.write(&c.x.to_be_bytes());
                         state.write(&c.y.to_be_bytes());
                     });
-                    polygon.interiors().into_iter().for_each(|linestring| {
+                    polygon.interiors().iter().for_each(|linestring| {
                         linestring.points().for_each(|c| {
                             state.write(&c.x().to_be_bytes());
                             state.write(&c.y().to_be_bytes());

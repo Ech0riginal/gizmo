@@ -68,7 +68,7 @@ impl std::fmt::Debug for Instruction {
             }
 
             for arg in self.args.iter().skip(1) {
-                write!(f, ", {:?}", arg)?;
+                write!(f, ", {arg:?}")?;
             }
         }
 

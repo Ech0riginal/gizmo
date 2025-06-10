@@ -35,7 +35,7 @@ impl Deserializer<BulkSet> for V3 {
                 let key_opt = match val {
                     GValue::Map(ref map) => {
                         let key = GValue::from("id");
-                        map.get(&key).map(|v| v.clone())
+                        map.get(&key).cloned()
                     }
                     _ => None,
                 };

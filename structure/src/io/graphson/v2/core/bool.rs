@@ -3,7 +3,7 @@ use crate::io::graphson::prelude::*;
 impl Deserializer<Bool> for V2 {
     fn deserialize(val: &Value) -> Result<Bool, Error> {
         let bool = get_value!(val, Value::Bool)?;
-        Ok(Bool(*bool).into())
+        Ok(Bool(*bool))
     }
 }
 

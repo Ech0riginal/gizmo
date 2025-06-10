@@ -1,7 +1,6 @@
 use crate::VertexProperty;
 use crate::{GID, List, Map};
 use indexmap::map::{IntoIter, Iter};
-use indexmap::{IndexMap, IndexSet};
 use std::hash::Hasher;
 
 #[derive(Debug, Clone)]
@@ -37,7 +36,7 @@ impl Vertex {
 
     pub fn property(&self, key: &str) -> Option<&VertexProperty> {
         let key = key.to_string();
-        self.properties.get(&key).and_then(|v| v.get(0))
+        self.properties.get(&key).and_then(|v| v.first())
     }
 }
 

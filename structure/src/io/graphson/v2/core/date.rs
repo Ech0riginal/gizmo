@@ -6,7 +6,7 @@ impl Deserializer<Date> for V2 {
         let val = expect_i64!(val);
         let datetime = Utc.timestamp_millis_opt(val).unwrap();
         let date = Date(datetime);
-        Ok(date.into())
+        Ok(date)
     }
 }
 

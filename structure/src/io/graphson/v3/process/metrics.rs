@@ -1,6 +1,4 @@
 use crate::io::graphson::prelude::*;
-use indexmap::{IndexSet, indexset};
-use std::fmt;
 
 impl Deserializer<Metrics> for V3 {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
@@ -19,7 +17,7 @@ impl Deserializer<Metrics> for V3 {
             .unwrap_or_else(|_| Map::new());
         let perc_duration = annotations
             .remove_ok::<Double, _>("percentDur")
-            .unwrap_or_else(|_| Double(0.0));
+            .unwrap_or(Double(0.0));
         let nested = metric
             .remove_ok::<List<GValue>, _>(Tag::Metrics)
             .unwrap_or_else(|_| list![])
