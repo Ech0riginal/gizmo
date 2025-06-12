@@ -11,5 +11,3 @@ impl Serializer<Pop> for V3 {
         todo!()
     }
 }
-
-

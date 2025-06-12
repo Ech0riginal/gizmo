@@ -1,4 +1,3 @@
-
 use crate::graphson::prelude::*;
 
 impl Deserializer<Cardinality> for V3 {
@@ -12,4 +11,3 @@ impl Serializer<Cardinality> for V3 {
         todo!()
     }
 }
-

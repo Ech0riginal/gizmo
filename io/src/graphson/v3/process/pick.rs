@@ -11,5 +11,3 @@ impl Serializer<Pick> for V3 {
         todo!()
     }
 }
-
-

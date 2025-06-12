@@ -59,7 +59,7 @@ impl Serializer<GValue> for V2 {
                 tag: "g:Token?".into(),
                 location: location!(),
             }),
-            GValue::Metric(val) => val.serialize::<Self>(),
+            GValue::Metrics(val) => val.serialize::<Self>(),
             // GValue::TraversalExplanation(_) => {
             //     Err(Error::Unsupported { tag: "TraversalExplanation".to_string(), location: location!() })
             // }

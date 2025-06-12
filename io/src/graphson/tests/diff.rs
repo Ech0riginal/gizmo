@@ -277,8 +277,8 @@ mod gvalues {
                     GValue::Token(b) => a.diff(b),
                     _ => self.differ(other, Intrinsic),
                 },
-                GValue::Metric(a) => match other {
-                    GValue::Metric(b) => a.diff(b),
+                GValue::Metrics(a) => match other {
+                    GValue::Metrics(b) => a.diff(b),
                     _ => self.differ(other, Intrinsic),
                 },
                 // GValue::TraversalExplanation(a) => match other {

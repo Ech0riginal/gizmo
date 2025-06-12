@@ -11,4 +11,3 @@ impl Serializer<Traverser> for V3 {
         todo!()
     }
 }
-

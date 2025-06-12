@@ -108,7 +108,10 @@ fn deserialize<'a>(blob: Type<'a>) -> Result<GValue, Error> {
         // Tag::BulkSet => blob.value.deserialize::<V3, BulkSet>().map(GValue::from),
         Tag::Barrier => blob.value.deserialize::<V3, Barrier>().map(GValue::from),
         Tag::Bytecode => blob.value.deserialize::<V3, Bytecode>().map(GValue::from),
-        Tag::Cardinality => blob.value.deserialize::<V3, Cardinality>().map(GValue::from),
+        Tag::Cardinality => blob
+            .value
+            .deserialize::<V3, Cardinality>()
+            .map(GValue::from),
         Tag::Column => blob.value.deserialize::<V3, Column>().map(GValue::from),
         Tag::Direction => blob.value.deserialize::<V3, Direction>().map(GValue::from),
         // Tag::DT => blob.value.deserialize::<V3, DT>().map(GValue::from),
