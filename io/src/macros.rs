@@ -22,6 +22,7 @@ macro_rules! types {
     };
 }
 #[cfg(test)]
+#[allow(dead_code)] // 'tis but a scratch
 pub struct Test<T> {
     pub serial: serde_json::Value,
     pub object: T,

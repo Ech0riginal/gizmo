@@ -1,11 +1,6 @@
 use crate::graphson::prelude::*;
 use crate::{Args, Request};
 
-impl Deserializer<Request> for V3 {
-    fn deserialize(_val: &Value) -> Result<Request, Error> {
-        todo!()
-    }
-}
 impl Serializer<Request> for V3 {
     fn serialize(val: &Request) -> Result<Value, Error> {
         let argh = val.args.serialize::<Self>()?;
