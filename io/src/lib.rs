@@ -1,16 +1,18 @@
 #![feature(impl_trait_in_assoc_type)]
 
+mod api;
 mod error;
-mod graph;
-mod io;
+mod graphson;
+mod macros;
 mod request;
 mod response;
+mod types;
 
+pub use api::GremlinIO;
 pub use error::Error;
-pub use graph::*;
+pub use graphson::V3;
 pub use request::{Args, Request};
 pub use response::{Response, Status};
+pub use types::*;
 
-pub mod graphson {
-    pub use super::io::graphson::{V2, V3};
-}
+pub(crate) use api::Sealed;

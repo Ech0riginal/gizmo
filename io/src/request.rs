@@ -1,6 +1,6 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::{GValue, Map};
+use crate::{GValue, Map, Object};
 use derive_builder::Builder;
 use indexmap::IndexMap;
 use std::hash::Hasher;
@@ -19,6 +19,9 @@ impl Request {
         RequestBuilder::create_empty()
     }
 }
+impl Object for Request {
+    const name: &'static str = "Request";
+}
 impl Eq for Request {}
 impl PartialEq for Request {
     fn eq(&self, other: &Self) -> bool {
@@ -33,6 +36,9 @@ impl std::hash::Hash for Request {
 
 #[derive(Debug, Clone)]
 pub struct Args(pub(crate) Map<&'static str, GValue>);
+impl Object for Args {
+    const name: &'static str = "Args";
+}
 
 impl Default for Args {
     fn default() -> Self {
@@ -49,6 +55,7 @@ impl Args {
         self.0.iter()
     }
 
+    #[allow(private_bounds)]
     pub fn arg<V>(mut self, key: &'static str, value: V) -> Self
     where
         Self: Insert<V>,
