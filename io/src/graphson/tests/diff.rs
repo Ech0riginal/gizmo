@@ -134,178 +134,73 @@ impl<T: Diff + Debug> Diff for Option<T> {
 mod gvalues {
     use super::*;
     impl Diff for GValue {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
-            // Boy do I love a good macro
-            match self {
-                GValue::Null => match other {
-                    GValue::Null => self.differ(other, Same),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Bool(a) => match other {
-                    GValue::Bool(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Class(a) => match other {
-                    GValue::Class(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Date(a) => match other {
-                    GValue::Date(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Double(a) => match other {
-                    GValue::Double(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Float(a) => match other {
-                    GValue::Float(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Integer(a) => match other {
-                    GValue::Integer(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::List(a) => match other {
-                    GValue::List(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Long(a) => match other {
-                    GValue::Long(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Map(a) => match other {
-                    GValue::Map(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Set(a) => match other {
-                    GValue::Set(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::String(a) => match other {
-                    GValue::String(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Timestamp(a) => match other {
-                    GValue::Timestamp(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Uuid(a) => match other {
-                    GValue::Uuid(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Edge(a) => match other {
-                    GValue::Edge(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Path(a) => match other {
-                    GValue::Path(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Property(a) => match other {
-                    GValue::Property(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::StarGraph(a) => match other {
-                    GValue::StarGraph(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::TinkerGraph(a) => match other {
-                    GValue::TinkerGraph(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Tree(a) => match other {
-                    GValue::Tree(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Vertex(a) => match other {
-                    GValue::Vertex(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::VertexProperty(a) => match other {
-                    GValue::VertexProperty(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Bytecode(a) => match other {
-                    GValue::Bytecode(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Cardinality(a) => match other {
-                    GValue::Cardinality(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Column(a) => match other {
-                    GValue::Column(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Direction(a) => match other {
-                    GValue::Direction(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Order(a) => match other {
-                    GValue::Order(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Pop(a) => match other {
-                    GValue::Pop(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::P(a) => match other {
-                    GValue::P(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Scope(a) => match other {
-                    GValue::Scope(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::T(a) => match other {
-                    GValue::T(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::TraversalMetrics(a) => match other {
-                    GValue::TraversalMetrics(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Traverser(a) => match other {
-                    GValue::Traverser(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Int128(a) => match other {
-                    GValue::Int128(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Token(a) => match other {
-                    GValue::Token(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Metrics(a) => match other {
-                    GValue::Metrics(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                // GValue::TraversalExplanation(a) => match other {
-                //     GValue::TraversalExplanation(b) => a.diff(b),
-                //     _ => self.differ(other, Intrinsic),
-                // },
-                // GValue::IntermediateRepr(a) => match other {
-                //     GValue::IntermediateRepr(b) => a.diff(b),
-                //     _ => self.differ(other, Intrinsic),
-                // },
-                GValue::TextP(a) => match other {
-                    GValue::TextP(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Geometry(a) => match other {
-                    GValue::Geometry(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::Merge(a) => match other {
-                    GValue::Merge(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::BulkSet(a) => match other {
-                    GValue::BulkSet(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
+        // Compiler will say it's unused due to macro use
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
+            macro_rules! match_maker {
+                ($($variant:ident,)*$(,)?) => {
+                    match self {
+                        GValue::Null => match _other {
+                            GValue::Null => self.differ(_other, Same),
+                            _ => self.differ(_other, Intrinsic),
+                        },
+                        $(
+                        GValue::$variant(a) => match _other {
+                            GValue::$variant(b) => a.diff(b),
+                            _ => self.differ(_other, Intrinsic),
+                        },
+                        )*
+                    }
+                };
             }
+
+            match_maker!(
+                // Core
+                Bool,
+                Class,
+                Date,
+                Double,
+                Float,
+                Integer,
+                List,
+                Long,
+                Map,
+                Set,
+                String,
+                Timestamp,
+                Uuid,
+                // Structure
+                Edge,
+                Path,
+                Property,
+                StarGraph,
+                TinkerGraph,
+                Tree,
+                Vertex,
+                VertexProperty,
+                // Process
+                Barrier,
+                Binding,
+                BulkSet,
+                Bytecode,
+                Cardinality,
+                Column,
+                Direction,
+                Operator,
+                Order,
+                Lambda,
+                Merge,
+                Metrics,
+                P,
+                Pop,
+                Pick,
+                Scope,
+                T,
+                TextP,
+                TraversalMetrics,
+                Traverser,
+                Geometry,
+                Int128,
+            )
         }
     }
     impl Diff for Box<GValue> {
@@ -366,11 +261,6 @@ mod gvalues {
             self.differ(other, Same)
         }
     }
-    impl Diff for Long {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
     impl<K, V> Diff for Map<K, V>
     where
         K: Diff + Debug + Eq + Hash,
@@ -399,16 +289,19 @@ mod gvalues {
             self.differ(other, Same)
         }
     }
+
     basic!(Bool);
     basic!(Class);
     basic!(Date);
     basic!(Double);
     basic!(Float);
     basic!(Integer);
+    basic!(Long);
     basic!(Set);
     basic!(String);
     basic!(Timestamp);
     basic!(Uuid);
+
     diff!(Edge, id, label, properties);
     diff!(Path, labels, objects);
     diff!(Property, key, value, element);
@@ -418,87 +311,41 @@ mod gvalues {
     diff!(Branch, key, value);
     diff!(Vertex, id, label, properties);
     diff!(VertexProperty, id, value, vertex, label);
-    diff!(Bytecode, source_instructions);
-    diff!(Instruction, operator, args);
+
+    basic!(Barrier);
+    basic!(Binding);
+    basic!(BulkSet);
+    diff!(Bytecode, source_instructions, step_instructions);
     basic!(Cardinality);
     basic!(Column);
     basic!(Direction);
+    diff!(Instruction, operator, args);
+    diff!(Lambda, script, language, arguments);
+    basic!(Merge);
+    diff!(
+        Metrics,
+        id,
+        duration,
+        name,
+        count,
+        traversers,
+        perc_duration,
+        nested
+    );
+    basic!(Operator);
     basic!(Order);
-    impl Diff for Pop {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for P {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Scope {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for T {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for TraversalMetrics {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Traverser {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for i128 {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Token {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Metrics {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    // impl Diff for TraversalExplanation {
-    //     fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-    //         todo!()
-    //     }
-    // }
-    // impl Diff for IntermediateRepr {
-    //     fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-    //         todo!()
-    //     }
-    // }
-    impl Diff for TextP {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Geometry {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for Merge {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for BulkSet {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
+    basic!(P);
+    basic!(Pick);
+    basic!(Pop);
+    basic!(Scope);
+    basic!(T);
+    basic!(TextP);
+    // basic!(Token);  // This is the same a T right?
+    diff!(TraversalMetrics, duration, metrics);
+    diff!(Traverser, bulk, value);
+
+    basic!(Geometry);
+    basic!(i128);
 }
 mod serde {
     use super::*;

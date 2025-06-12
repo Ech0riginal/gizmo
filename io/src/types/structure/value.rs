@@ -62,7 +62,7 @@ macro_rules! primitive_interop {
     };
 }
 macro_rules! enom {
-    ($($variant:ident($primitive:ty)),+) => {
+    ($($variant:ident($primitive:ty)),+$(,)?) => {
         /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
         #[allow(clippy::large_enum_variant)]
         #[derive(Clone, Eq, Hash, PartialEq)]
@@ -125,10 +125,11 @@ enom!(
     Barrier(Barrier),
     Binding(Binding),
     Bytecode(Bytecode),
+    BulkSet(BulkSet),
     Cardinality(Cardinality),
     Column(Column),
     Direction(Direction),
-    // Operator
+    Operator(Operator),
     Order(Order),
     Lambda(Lambda),
     Metrics(Metrics),
@@ -142,12 +143,11 @@ enom!(
     Geometry(Geometry),
     // Request
     Int128(i128),
-    Token(Token),
+    // Token(Token),
     // TraversalExplanation(TraversalExplanation),
     // IntermediateRepr(IntermediateRepr),
     TextP(TextP),
     Merge(Merge),
-    BulkSet(BulkSet)
 );
 
 impl GValue {

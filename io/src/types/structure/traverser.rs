@@ -2,8 +2,8 @@ use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Traverser {
-    bulk: i64,
-    value: Box<GValue>,
+    pub(crate) bulk: i64,
+    pub(crate) value: Box<GValue>,
 }
 
 impl Traverser {

@@ -34,7 +34,7 @@ impl std::hash::Hash for Request {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Args(pub(crate) Map<&'static str, GValue>);
 impl Object for Args {
     const name: &'static str = "Args";

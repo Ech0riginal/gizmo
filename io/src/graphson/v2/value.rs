@@ -55,26 +55,10 @@ impl Serializer<GValue> for V2 {
                 tag: Tag::Int128.to_string(),
                 location: location!(),
             }),
-            GValue::Token(_) => Err(Error::Unsupported {
-                tag: "g:Token?".into(),
-                location: location!(),
-            }),
             GValue::Metrics(val) => val.serialize::<Self>(),
-            // GValue::TraversalExplanation(_) => {
-            //     Err(Error::Unsupported { tag: "TraversalExplanation".to_string(), location: location!() })
-            // }
-            // GValue::IntermediateRepr(_) => Err(Error::Unsupported { tag: "IntermediateRepr".to_string(), location: location!() }),
             GValue::TextP(val) => val.serialize::<Self>(),
-            GValue::Geometry(_) => Err(Error::Unsupported {
-                tag: "Geometry".to_string(),
-                location: location!(),
-            }),
-            GValue::Merge(_) => Err(Error::Unsupported {
-                tag: "Merge".to_string(),
-                location: location!(),
-            }),
-            GValue::BulkSet(_) => Err(Error::Unsupported {
-                tag: "BulkSet".to_string(),
+            value => Err(Error::Unsupported {
+                tag: format!("{}", value),
                 location: location!(),
             }),
         }

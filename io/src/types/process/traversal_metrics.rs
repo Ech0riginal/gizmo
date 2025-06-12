@@ -3,8 +3,8 @@ use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct TraversalMetrics {
-    duration: Double,
-    metrics: List<Metrics>,
+    pub(crate) duration: Double,
+    pub(crate) metrics: List<Metrics>,
 }
 
 impl Object for TraversalMetrics {
