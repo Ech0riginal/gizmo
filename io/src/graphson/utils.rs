@@ -1,7 +1,6 @@
 use crate::graphson::{Leaf, MissingSnafu};
 use serde_json::Value;
 use snafu::OptionExt;
-use std::fmt::Debug;
 
 pub trait Ensure<K: ?Sized, V> {
     #[track_caller]

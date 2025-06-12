@@ -9,7 +9,7 @@ impl Deserializer<GID> for V3 {
             GValue::Long(d) => Ok(GID::Long(d)),
             value => Err(Leaf::Unexpected {
                 expectation: "an eligible GKey".to_string(),
-                actual: format!("{:?}", value),
+                actual: format!("{value:?}"),
                 location: location!(),
             }),
         }

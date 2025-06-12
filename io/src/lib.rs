@@ -15,4 +15,3 @@ pub use response::{Response, Status};
 pub use types::*;
 
 pub(crate) use api::Sealed;
-pub(crate) use macros::*;

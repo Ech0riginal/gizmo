@@ -13,7 +13,7 @@ where
         let mut map = Map::new();
         if !val.is_empty() {
             let mut x = 0;
-            while x + 1 <= val.len() {
+            while x < val.len() {
                 let key = val[x].deserialize::<Self, K>().ctx::<Map<K, V>>()?;
                 let value = val[x + 1].deserialize::<Self, V>().ctx::<Map<K, V>>()?;
                 map.insert(key, value);

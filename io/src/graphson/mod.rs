@@ -9,17 +9,17 @@ mod versions;
 mod error;
 mod v3;
 
-pub use tags::{Tag, Type};
+pub use tags::Tag;
 pub use utils::Ensure;
 // pub use v2::V2;
 pub use error::*;
 pub use v3::V3;
 
 mod prelude {
-    pub use indexmap::{IndexMap, IndexSet};
+    pub use indexmap::IndexMap;
     pub use serde_json::{Value, json};
     pub use snafu::location;
-    pub use snafu::prelude::*;
+    
 
     pub use super::*;
 
@@ -28,6 +28,6 @@ mod prelude {
     // pub use crate::error::Error;
     pub use crate::graphson::tags::*;
     pub use crate::macros::*;
-    pub use crate::passthrough;
+    
     pub use crate::types::*;
 }

@@ -1,5 +1,4 @@
 use crate::graphson::prelude::*;
-use snafu::IntoError;
 
 impl Deserializer<Metrics> for V3 {
     fn deserialize(val: &Value) -> Result<Metrics, Leaf> {

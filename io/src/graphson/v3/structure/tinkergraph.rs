@@ -11,7 +11,7 @@ impl Deserializer<TinkerGraph> for V3 {
             .iter()
             .map(|val| match val.typed() {
                 Ok(type_) => type_.value.deserialize::<Self, Vertex>(),
-                Err(e) => Err(e.into()),
+                Err(e) => Err(e),
             })
             .collect::<Result<List<_>, Leaf>>()
             .ctx::<TinkerGraph>()?;
@@ -19,7 +19,7 @@ impl Deserializer<TinkerGraph> for V3 {
             .iter()
             .map(|val| match val.typed() {
                 Ok(type_) => type_.value.deserialize::<Self, Edge>(),
-                Err(e) => Err(e.into()),
+                Err(e) => Err(e),
             })
             .collect::<Result<List<_>, Leaf>>()
             .ctx::<TinkerGraph>()?;

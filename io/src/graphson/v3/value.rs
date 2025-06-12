@@ -62,7 +62,7 @@ impl Deserializer<GValue> for V3 {
                 .map(GValue::from),
             Value::Object(_obj) => match val.typed() {
                 Ok(blob) => deserialize(blob).ctx::<GValue>(),
-                Err(err) => Err(err.into()),
+                Err(err) => Err(err),
             },
             Value::Array(values) => {
                 let collection = values

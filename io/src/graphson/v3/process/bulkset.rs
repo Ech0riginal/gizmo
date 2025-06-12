@@ -12,7 +12,7 @@ impl Deserializer<BulkSet> for V3 {
         if values.len() % 2 != 0 {
             Err(Leaf::Unexpected {
                 expectation: "An array divisible by 2".to_string(),
-                actual: format!("{:?}", val),
+                actual: format!("{val:?}"),
                 location: location!(),
             })
             .ctx::<BulkSet>()?;

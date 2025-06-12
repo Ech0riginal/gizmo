@@ -11,7 +11,7 @@ impl Deserializer<T> for V3 {
             _ => {
                 return Err(Leaf::Unexpected {
                     expectation: "A valid T value".to_string(),
-                    actual: format!("{:?}", val),
+                    actual: format!("{val:?}"),
                     location: location!(),
                 })
                 .ctx::<T>();
