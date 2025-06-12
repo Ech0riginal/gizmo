@@ -3,6 +3,7 @@ authors = ["Ech0riginal <samwatkins94@me.com>"]
 name = "io"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.87.0"
 
 [dependencies]
 #Avoids bringing in time crate (https://github.com/time-rs/time/issues/293)

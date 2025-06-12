@@ -1,5 +1,10 @@
 [workspace]
+resolver = "3"
 members = [
     "gizmo",
-    "io",
+    "io"
 ]
+
+[profile.release]
+codegen-units = 8
+lto = true
