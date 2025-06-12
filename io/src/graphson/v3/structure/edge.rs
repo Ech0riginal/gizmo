@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 use std::collections::HashMap;
 
 impl Deserializer<Edge> for V3 {
-    fn deserialize(val: &Value) -> Result<Edge, Leaf> {
+    fn deserialize(val: &Value) -> Result<Edge, Error> {
         let map = get_value!(val, Value::Object).ctx::<Edge>()?;
         let id = map.ensure("id")?.deserialize::<Self, GID>().ctx::<Edge>()?;
         let label = map
@@ -58,12 +58,12 @@ impl Deserializer<Edge> for V3 {
 }
 
 impl Serializer<Edge> for V3 {
-    fn serialize(val: &Edge) -> Result<Value, Leaf> {
+    fn serialize(val: &Edge) -> Result<Value, Error> {
         serialize_edge::<Self>(val, true)
     }
 }
 
-pub fn serialize_edge<S>(edge: &Edge, serialize_labels: bool) -> Result<Value, Leaf>
+pub fn serialize_edge<S>(edge: &Edge, serialize_labels: bool) -> Result<Value, Error>
 where
     S: Serializer<GID>,
     S: Serializer<GValue>,
@@ -73,11 +73,11 @@ where
     value.insert("id", edge.id.serialize::<S>()?);
     value.insert("label", edge.label.serialize::<S>()?);
     if serialize_labels {
-        value.insert("inVLabel", edge.in_v.label().serialize::<S>()?);
-        value.insert("outVLabel", edge.out_v.label().serialize::<S>()?);
+        value.insert("inVLabel", edge.in_v.label.serialize::<S>()?);
+        value.insert("outVLabel", edge.out_v.label.serialize::<S>()?);
     }
-    value.insert("inV", edge.in_v.id().serialize::<S>()?);
-    value.insert("outV", edge.out_v.id().serialize::<S>()?);
+    value.insert("inV", edge.in_v.id.serialize::<S>()?);
+    value.insert("outV", edge.out_v.id.serialize::<S>()?);
     if !edge.properties.is_empty() {
         let properties = edge
             .properties

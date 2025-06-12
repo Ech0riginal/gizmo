@@ -5,22 +5,22 @@ use snafu::prelude::*;
 /// Extension trait to use a bit less code wrapping snafus
 pub trait Ctx<A> {
     #[track_caller]
-    fn ctx<T: Object>(self) -> Result<A, Leaf>;
+    fn ctx<T: Object>(self) -> Result<A, Error>;
 }
 
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub(crate)))]
-pub enum Leaf {
-    #[snafu(display("Failed to build a {name} "))]
+pub enum Error {
+    #[snafu(display("Failed to build a {name}"))]
     Structure {
         name: &'static str,
-        #[snafu(source(from(Leaf, Box::new)))]
-        source: Box<Leaf>,
+        #[snafu(source(from(Error, Box::new)))]
+        source: Box<Error>,
     },
-    #[snafu(display("Invalid GraphSON"))]
+    #[snafu(display("{source}"))]
     Invalid {
-        #[snafu(source(from(Leaf, Box::new)))]
-        source: Box<Leaf>,
+        #[snafu(source(from(Error, Box::new)))]
+        source: Box<Error>,
     },
     #[snafu(display("Unsupported type tag"))]
     Unsupported {
@@ -51,7 +51,7 @@ pub enum Leaf {
     Infallible,
 }
 
-impl<T, E> FromIterator<Result<T, E>> for Leaf
+impl<T, E> FromIterator<Result<T, E>> for Error
 where
     Self: From<E>,
 {
@@ -63,14 +63,14 @@ where
     }
 }
 
-impl<A> Ctx<A> for Result<A, Leaf> {
-    fn ctx<T: Object>(self) -> Result<A, Leaf> {
+impl<A> Ctx<A> for Result<A, Error> {
+    fn ctx<T: Object>(self) -> Result<A, Error> {
         self.context(StructureSnafu { name: T::name })
     }
 }
 
 impl<A> Ctx<A> for Result<A, serde_json::Error> {
-    fn ctx<T: Object>(self) -> Result<A, Leaf> {
+    fn ctx<T: Object>(self) -> Result<A, Error> {
         self.context(SerdeSnafu)
             .context(StructureSnafu { name: T::name })
     }

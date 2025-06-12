@@ -1,4 +1,4 @@
-use crate::graphson::Leaf;
+use crate::graphson::Error;
 use crate::*;
 use indexmap::IndexMap;
 use std::convert::Infallible;
@@ -36,12 +36,12 @@ macro_rules! from_gvalue {
 macro_rules! try_from_gvalue {
     ($variant:ident, $primitive:ty) => {
         impl TryFrom<GValue> for $primitive {
-            type Error = Leaf;
+            type Error = Error;
 
             fn try_from(v: GValue) -> Result<Self, Self::Error> {
                 match v {
                     GValue::$variant(v) => Ok(v),
-                    gvalue => Err(Leaf::Cast(
+                    gvalue => Err(Error::Cast(
                         stringify!($variant).to_string(),
                         stringify!($primitive).to_string(),
                     )),
@@ -152,18 +152,18 @@ enom!(
 );
 
 impl GValue {
-    pub fn take<T>(self) -> Result<T, Leaf>
+    pub fn take<T>(self) -> Result<T, Error>
     where
         T: TryFrom<GValue>,
-        Leaf: From<T::Error>,
+        Error: From<T::Error>,
     {
         Ok(T::try_from(self)?)
     }
 
-    pub fn get<'a, T>(&'a self) -> Result<T, Leaf>
+    pub fn get<'a, T>(&'a self) -> Result<T, Error>
     where
         T: TryFrom<&'a GValue>,
-        Leaf: From<T::Error>,
+        Error: From<T::Error>,
     {
         Ok(T::try_from(self)?)
     }
@@ -231,9 +231,9 @@ impl From<LabelType> for GValue {
     }
 }
 
-impl From<Infallible> for Leaf {
+impl From<Infallible> for Error {
     fn from(_: Infallible) -> Self {
-        Leaf::Infallible
+        Error::Infallible
     }
 }
 impl From<GValue> for Vec<String> {

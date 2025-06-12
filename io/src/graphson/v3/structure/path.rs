@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<Path> for V3 {
-    fn deserialize(val: &Value) -> Result<Path, Leaf> {
+    fn deserialize(val: &Value) -> Result<Path, Error> {
         let labels = {
             let tmp = val
                 .ensure("labels")
@@ -22,7 +22,7 @@ impl Deserializer<Path> for V3 {
     }
 }
 impl Serializer<Path> for V3 {
-    fn serialize(val: &Path) -> Result<Value, Leaf> {
+    fn serialize(val: &Path) -> Result<Value, Error> {
         Ok(json!({
             "@type" : Tag::Path,
             "@value": {

@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<TinkerGraph> for V3 {
-    fn deserialize(val: &Value) -> Result<TinkerGraph, Leaf> {
+    fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {
         let _debug = val.to_string();
         let vertex_values = get_value!(val.ensure("vertices").ctx::<TinkerGraph>()?, Value::Array)
             .ctx::<TinkerGraph>()?;
@@ -13,7 +13,7 @@ impl Deserializer<TinkerGraph> for V3 {
                 Ok(type_) => type_.value.deserialize::<Self, Vertex>(),
                 Err(e) => Err(e),
             })
-            .collect::<Result<List<_>, Leaf>>()
+            .collect::<Result<List<_>, Error>>()
             .ctx::<TinkerGraph>()?;
         let edges = edge_values
             .iter()
@@ -21,7 +21,7 @@ impl Deserializer<TinkerGraph> for V3 {
                 Ok(type_) => type_.value.deserialize::<Self, Edge>(),
                 Err(e) => Err(e),
             })
-            .collect::<Result<List<_>, Leaf>>()
+            .collect::<Result<List<_>, Error>>()
             .ctx::<TinkerGraph>()?;
 
         Ok(TinkerGraph { vertices, edges })
@@ -29,7 +29,7 @@ impl Deserializer<TinkerGraph> for V3 {
 }
 
 impl Serializer<TinkerGraph> for V3 {
-    fn serialize(val: &TinkerGraph) -> Result<Value, Leaf> {
+    fn serialize(val: &TinkerGraph) -> Result<Value, Error> {
         let vertices = val
             .vertices
             .iter()

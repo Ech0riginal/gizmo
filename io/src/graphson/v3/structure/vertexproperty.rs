@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 use indexmap::IndexMap;
 use snafu::location;
 impl Deserializer<VertexProperty> for V3 {
-    fn deserialize(val: &Value) -> Result<VertexProperty, Leaf> {
+    fn deserialize(val: &Value) -> Result<VertexProperty, Error> {
         let map = get_value!(val, Value::Object).ctx::<VertexProperty>()?;
         let id = map
             .ensure("id")
@@ -47,7 +47,7 @@ impl Deserializer<VertexProperty> for V3 {
 }
 
 impl Serializer<VertexProperty> for V3 {
-    fn serialize(val: &VertexProperty) -> Result<Value, Leaf> {
+    fn serialize(val: &VertexProperty) -> Result<Value, Error> {
         let mut tmp = IndexMap::new();
         tmp.insert("id", val.id.serialize::<Self>()?);
         tmp.insert("value", (*val.value).serialize::<Self>()?);

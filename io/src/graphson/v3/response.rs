@@ -4,7 +4,7 @@ use crate::{Response, Status};
 use serde_json::Value;
 
 impl Deserializer<Response> for V3 {
-    fn deserialize(value: &Value) -> Result<Response, Leaf> {
+    fn deserialize(value: &Value) -> Result<Response, Error> {
         let map = get_value!(value, Value::Object).ctx::<Response>()?;
         let id = map
             .ensure("requestId")
@@ -25,7 +25,7 @@ impl Deserializer<Response> for V3 {
                 Ok(v) => Ok((k, v)),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Map<String, GValue>, Leaf>>()?;
+            .collect::<Result<Map<String, GValue>, Error>>()?;
         let status = value
             .ensure("status")?
             .deserialize::<Self, Status>()
@@ -40,7 +40,7 @@ impl Deserializer<Response> for V3 {
 }
 
 impl Deserializer<Status> for V3 {
-    fn deserialize(val: &Value) -> Result<Status, Leaf> {
+    fn deserialize(val: &Value) -> Result<Status, Error> {
         let code = val
             .ensure("code")
             .map(|code| code.as_i64().unwrap() as i16)
@@ -65,7 +65,7 @@ impl Deserializer<Status> for V3 {
 }
 
 impl Serializer<Response> for V3 {
-    fn serialize(val: &Response) -> Result<Value, Leaf> {
+    fn serialize(val: &Response) -> Result<Value, Error> {
         let mut meta = IndexMap::new();
 
         for (key, value) in val.meta.iter() {
@@ -85,7 +85,7 @@ impl Serializer<Response> for V3 {
 }
 
 impl Serializer<Status> for V3 {
-    fn serialize(val: &Status) -> Result<Value, Leaf> {
+    fn serialize(val: &Status) -> Result<Value, Error> {
         let message = if let Some(msg) = &val.message {
             msg
         } else {

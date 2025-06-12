@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<Vertex> for V3 {
-    fn deserialize(val: &Value) -> Result<Vertex, Leaf> {
+    fn deserialize(val: &Value) -> Result<Vertex, Error> {
         let map = get_value!(val, Value::Object).ctx::<Vertex>()?;
         let id = map
             .ensure("id")
@@ -20,11 +20,11 @@ impl Deserializer<Vertex> for V3 {
                     .ctx::<Vertex>()?
                     .iter()
                     .map(|item| item.typed())
-                    .collect::<Result<Vec<Type<'_>>, Leaf>>()
+                    .collect::<Result<Vec<Type<'_>>, Error>>()
                     .ctx::<Vertex>()?
                     .into_iter()
                     .map(|typed| typed.value.deserialize::<Self, VertexProperty>())
-                    .collect::<Result<List<VertexProperty>, Leaf>>()
+                    .collect::<Result<List<VertexProperty>, Error>>()
                     .ctx::<Vertex>()?;
                 map.insert(key.to_string(), properties);
             }
@@ -43,7 +43,7 @@ impl Deserializer<Vertex> for V3 {
 }
 
 impl Serializer<Vertex> for V3 {
-    fn serialize(val: &Vertex) -> Result<Value, Leaf> {
+    fn serialize(val: &Vertex) -> Result<Value, Error> {
         // 'embedded' Vertices don't include 'properties'?
         // If I have to refactor this whole thing to
         // include a Context I'm naming this flag is_stupid
@@ -55,7 +55,7 @@ impl Serializer<Vertex> for V3 {
     }
 }
 
-fn serialize_big_vertex(v: &Vertex) -> Result<Value, Leaf> {
+fn serialize_big_vertex(v: &Vertex) -> Result<Value, Error> {
     let mut properties = serde_json::Map::new();
     for (k, v) in v.properties.iter() {
         let mut props = vec![];
@@ -76,7 +76,7 @@ fn serialize_big_vertex(v: &Vertex) -> Result<Value, Leaf> {
     }))
 }
 
-fn serialize_small_vertex(v: &Vertex) -> Result<Value, Leaf> {
+fn serialize_small_vertex(v: &Vertex) -> Result<Value, Error> {
     Ok(json!({
         "@type": Tag::Vertex,
         "@value": {

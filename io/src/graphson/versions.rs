@@ -13,43 +13,43 @@ mod undefined {
 
     use super::Undefined;
     use crate::api::*;
-    use crate::graphson::Leaf;
+    use crate::graphson::Error;
     use crate::{GID, GValue, Request, Response};
     use serde_json::Value;
 
     impl Deserializer<Response> for Undefined {
-        fn deserialize(_: &Value) -> Result<Response, Leaf> {
-            Err(Leaf::Infallible)
+        fn deserialize(_: &Value) -> Result<Response, Error> {
+            Err(Error::Infallible)
         }
     }
 
     impl Deserializer<GValue> for Undefined {
-        fn deserialize(_: &Value) -> Result<GValue, Leaf> {
-            Err(Leaf::Infallible)
+        fn deserialize(_: &Value) -> Result<GValue, Error> {
+            Err(Error::Infallible)
         }
     }
 
     impl Deserializer<GID> for Undefined {
-        fn deserialize(_: &Value) -> Result<GID, Leaf> {
-            Err(Leaf::Infallible)
+        fn deserialize(_: &Value) -> Result<GID, Error> {
+            Err(Error::Infallible)
         }
     }
 
     impl Serializer<Request> for Undefined {
-        fn serialize(_: &Request) -> Result<Value, Leaf> {
-            Err(Leaf::Infallible)
+        fn serialize(_: &Request) -> Result<Value, Error> {
+            Err(Error::Infallible)
         }
     }
 
     impl Serializer<GValue> for Undefined {
-        fn serialize(_: &GValue) -> Result<Value, Leaf> {
-            Err(Leaf::Infallible)
+        fn serialize(_: &GValue) -> Result<Value, Error> {
+            Err(Error::Infallible)
         }
     }
 
     impl Serializer<GID> for Undefined {
-        fn serialize(_: &GID) -> Result<Value, Leaf> {
-            Err(Leaf::Infallible)
+        fn serialize(_: &GID) -> Result<Value, Error> {
+            Err(Error::Infallible)
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::graphson::{Leaf, MissingSnafu};
+use crate::graphson::{Error, MissingSnafu};
 use crate::*;
 use indexmap::IndexMap;
 use snafu::OptionExt;
@@ -99,7 +99,7 @@ where
         let key = key.into();
         self.0.swap_remove(&key)
     }
-    pub fn remove_ok<V_, T: Into<K>>(&mut self, key: T) -> Result<V_, Leaf>
+    pub fn remove_ok<V_, T: Into<K>>(&mut self, key: T) -> Result<V_, Error>
     where
         K: fmt::Display,
         V: Into<V_>,

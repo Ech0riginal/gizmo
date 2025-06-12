@@ -2,12 +2,12 @@ use crate::graphson::prelude::*;
 use crate::{Args, Request};
 
 impl Deserializer<Request> for V3 {
-    fn deserialize(val: &Value) -> Result<Request, Leaf> {
+    fn deserialize(_val: &Value) -> Result<Request, Error> {
         todo!()
     }
 }
 impl Serializer<Request> for V3 {
-    fn serialize(val: &Request) -> Result<Value, Leaf> {
+    fn serialize(val: &Request) -> Result<Value, Error> {
         let argh = val.args.serialize::<Self>().ctx::<Request>()?;
         Ok(json!({
             "requestId": val.id,
@@ -18,7 +18,7 @@ impl Serializer<Request> for V3 {
     }
 }
 impl Serializer<Args> for V3 {
-    fn serialize(value: &Args) -> Result<Value, Leaf> {
+    fn serialize(value: &Args) -> Result<Value, Error> {
         value.0.serialize::<Self>().ctx::<Args>()
     }
 }

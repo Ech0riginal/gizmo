@@ -7,11 +7,11 @@ where
     V3: Serializer<T>,
     T: Object,
 {
-    fn serialize(val: &List<T>) -> Result<Value, Leaf> {
+    fn serialize(val: &List<T>) -> Result<Value, Error> {
         let value = val
             .iter()
             .map(|v| v.serialize::<Self>())
-            .collect::<Result<Vec<Value>, Leaf>>()
+            .collect::<Result<Vec<Value>, Error>>()
             .ctx::<List<T>>()?;
         Ok(json!({
             "@type" : Tag::List,
@@ -25,7 +25,7 @@ where
     V3: Deserializer<T>,
     T: Object,
 {
-    fn deserialize(val: &Value) -> Result<List<T>, Leaf> {
+    fn deserialize(val: &Value) -> Result<List<T>, Error> {
         if val.to_string().contains("[null]") {
             return Ok(list![]);
         }

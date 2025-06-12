@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<BulkSet> for V3 {
-    fn deserialize(val: &Value) -> Result<BulkSet, Leaf> {
+    fn deserialize(val: &Value) -> Result<BulkSet, Error> {
         if val.to_string().contains("[null]") {
             // TODO Gremlin docs!
             return Ok(BulkSet::default());
@@ -10,7 +10,7 @@ impl Deserializer<BulkSet> for V3 {
         let values = get_value!(val, Value::Array).ctx::<BulkSet>()?;
 
         if values.len() % 2 != 0 {
-            Err(Leaf::Unexpected {
+            Err(Error::Unexpected {
                 expectation: "An array divisible by 2".to_string(),
                 actual: format!("{val:?}"),
                 location: location!(),

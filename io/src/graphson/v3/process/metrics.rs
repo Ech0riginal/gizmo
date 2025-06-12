@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<Metrics> for V3 {
-    fn deserialize(val: &Value) -> Result<Metrics, Leaf> {
+    fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metrics = get_value!(val, Value::Object).ctx::<Metrics>()?;
         let mut metric = val
             .deserialize::<Self, Map<GValue, GValue>>()
@@ -13,7 +13,7 @@ impl Deserializer<Metrics> for V3 {
                 $val.ensure($key)
                     .ctx::<Metrics>()?
                     .deserialize::<Self, $ty>()
-                    .ctx::<Metrics>()?;
+                    .ctx::<Metrics>()?
             };
         }
 
@@ -42,7 +42,7 @@ impl Deserializer<Metrics> for V3 {
             .unwrap_or_else(|_| list![])
             .into_iter()
             .map(|v| get_value!(v, GValue::Metric))
-            .collect::<Result<List<Metrics>, Leaf>>()
+            .collect::<Result<List<Metrics>, Error>>()
             .unwrap_or_else(|e| {
                 tracing::warn!("Deserializing nested metrics signaled an error.");
                 tracing::warn!("{:?}", e);

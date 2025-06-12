@@ -4,7 +4,7 @@ use crate::graphson::prelude::*;
 use indexmap::IndexSet;
 
 impl Deserializer<Set> for V3 {
-    fn deserialize(val: &Value) -> Result<Set, Leaf> {
+    fn deserialize(val: &Value) -> Result<Set, Error> {
         let set = get_value!(val, Value::Array)
             .ctx::<Set>()?
             .iter()
@@ -21,7 +21,7 @@ impl Deserializer<Set> for V3 {
 }
 
 impl Serializer<Set> for V3 {
-    fn serialize(val: &Set) -> Result<Value, Leaf> {
+    fn serialize(val: &Set) -> Result<Value, Error> {
         let elements = val
             .iter()
             .map(|v| v.serialize::<Self>())

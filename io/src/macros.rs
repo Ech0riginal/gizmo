@@ -187,7 +187,7 @@ macro_rules! get_value {
     ($value:expr,Value::$v:ident) => {
         match $value {
             Value::$v(e) => Ok(e),
-            _ => Err($crate::graphson::Leaf::Unexpected {
+            _ => Err($crate::graphson::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
                 location: location!(),
@@ -198,7 +198,7 @@ macro_rules! get_value {
     ($value:expr,GValue::$v:ident) => {
         match $value {
             GValue::$v(e) => Ok(e),
-            _ => Err($crate::graphson::Leaf::Unexpected {
+            _ => Err($crate::graphson::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
                 location: location!(),
@@ -211,7 +211,7 @@ macro_rules! expect_i32 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v as i32),
-            None => Err($crate::graphson::Leaf::Unexpected {
+            None => Err($crate::graphson::Error::Unexpected {
                 expectation: "An i32".into(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -224,7 +224,7 @@ macro_rules! expect_i64 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v),
-            None => Err($crate::graphson::Leaf::Unexpected {
+            None => Err($crate::graphson::Error::Unexpected {
                 expectation: "An i64".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -237,7 +237,7 @@ macro_rules! expect_i128 {
     ($value:expr) => {
         match $value.as_i128() {
             Some(v) => Ok(v),
-            None => Err($crate::graphson::Leaf::Unexpected {
+            None => Err($crate::graphson::Error::Unexpected {
                 expectation: "An i128".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -250,7 +250,7 @@ macro_rules! expect_f32 {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v as f32),
-            None => Err($crate::graphson::Leaf::Unexpected {
+            None => Err($crate::graphson::Error::Unexpected {
                 expectation: "An f32".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -263,7 +263,7 @@ macro_rules! expect_f64 {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v),
-            None => Err($crate::graphson::Leaf::Unexpected {
+            None => Err($crate::graphson::Error::Unexpected {
                 expectation: "An f64".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),

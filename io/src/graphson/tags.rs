@@ -12,7 +12,7 @@ const TYPE_TAG: &str = "@type";
 const VALUE_TAG: &str = "@value";
 
 pub trait Typed {
-    fn typed<'a>(&'a self) -> Result<Type<'a>, Leaf>;
+    fn typed<'a>(&'a self) -> Result<Type<'a>, Error>;
 }
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ pub struct Type<'a> {
 
 impl Typed for Value {
     /// Validates a type against the expected { `@type`: ..., `@value`: ... } format
-    fn typed<'a>(&'a self) -> Result<Type<'a>, Leaf> {
+    fn typed<'a>(&'a self) -> Result<Type<'a>, Error> {
         let tag = match self.ensure(TYPE_TAG).context(InvalidSnafu) {
             Ok(v) => {
                 let tagd = v.as_str().unwrap().to_string();
@@ -87,13 +87,13 @@ macro_rules! enom {
         }
 
         impl<'a> TryFrom<&'a str> for Tag {
-            type Error = Leaf;
+            type Error = Error;
 
             #[track_caller]
             fn try_from(value: &'a str) -> Result<Self, Self::Error> {
                 match value {
                     $($repr => Ok(Self::$variant),)+
-                    unsupported_tag => Err(Leaf::Unsupported {
+                    unsupported_tag => Err(Error::Unsupported {
                         tag: unsupported_tag.to_string(),
                         location: location!(),
                     }),

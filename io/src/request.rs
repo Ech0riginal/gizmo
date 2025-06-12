@@ -55,6 +55,7 @@ impl Args {
         self.0.iter()
     }
 
+    #[allow(private_bounds)]
     pub fn arg<V>(mut self, key: &'static str, value: V) -> Self
     where
         Self: Insert<V>,

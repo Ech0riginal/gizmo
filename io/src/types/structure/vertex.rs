@@ -1,6 +1,6 @@
 use crate::{GID, List, Map};
 use crate::{Object, VertexProperty};
-use indexmap::map::{IntoIter, Iter};
+use indexmap::map::IntoIter;
 use std::hash::Hasher;
 
 #[derive(Debug, Clone)]
@@ -12,35 +12,6 @@ pub struct Vertex {
 
 impl Object for Vertex {
     const name: &'static str = "Vertex";
-}
-impl Vertex {
-    pub(crate) fn new<T>(id: GID, label: T, properties: Map<String, List<VertexProperty>>) -> Vertex
-    where
-        T: Into<String>,
-    {
-        Vertex {
-            id,
-            label: label.into(),
-            properties,
-        }
-    }
-
-    pub fn id(&self) -> &GID {
-        &self.id
-    }
-
-    pub fn label(&self) -> &String {
-        &self.label
-    }
-
-    pub fn iter(&self) -> Iter<String, List<VertexProperty>> {
-        self.properties.iter()
-    }
-
-    pub fn property(&self, key: &str) -> Option<&VertexProperty> {
-        let key = key.to_string();
-        self.properties.get(&key).and_then(|v| v.first())
-    }
 }
 
 impl IntoIterator for Vertex {
@@ -55,7 +26,7 @@ impl Eq for Vertex {}
 
 impl PartialEq for Vertex {
     fn eq(&self, other: &Vertex) -> bool {
-        &self.id == other.id()
+        self.id == other.id
     }
 }
 

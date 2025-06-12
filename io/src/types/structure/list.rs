@@ -3,10 +3,6 @@ use crate::*;
 primitive_prelude!();
 
 pub struct List<T>(pub(crate) Vec<T>);
-impl<T: Object> List<T> {
-    const inner: &'static str = T::name;
-}
-
 impl<T: Object> Object for List<T> {
     const name: &'static str = "List";
 }

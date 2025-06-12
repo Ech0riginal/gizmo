@@ -2,7 +2,7 @@ use crate::graphson::Tag;
 use crate::graphson::prelude::*;
 
 impl Deserializer<Property> for V3 {
-    fn deserialize(val: &Value) -> Result<Property, Leaf> {
+    fn deserialize(val: &Value) -> Result<Property, Error> {
         let val = get_value!(val, Value::Object).ctx::<Property>()?;
         let key = val
             .ensure("key")
@@ -30,7 +30,7 @@ impl Deserializer<Property> for V3 {
 }
 
 impl Serializer<Property> for V3 {
-    fn serialize(val: &Property) -> Result<Value, Leaf> {
+    fn serialize(val: &Property) -> Result<Value, Error> {
         Ok(json!({
             "@type": Tag::Property,
             "@value": {

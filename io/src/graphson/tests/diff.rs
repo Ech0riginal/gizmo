@@ -44,17 +44,17 @@ impl<'a> Display for Debuggery<'a> {
         match &self.diff {
             Same => write!(f, "Same\n"),
             Intrinsic => {
-                write!(f, "Intrinsic\n");
-                write!(f, "-------------------\n");
-                write!(f, "{:?}\n", self.a);
-                write!(f, "-------------------\n");
+                _ = write!(f, "Intrinsic\n");
+                _ = write!(f, "-------------------\n");
+                _ = write!(f, "{:?}\n", self.a);
+                _ = write!(f, "-------------------\n");
                 write!(f, "{:?}\n", self.b)
             }
             Field(field) => {
-                write!(f, "{}\n", field);
-                write!(f, "-------------------\n");
-                write!(f, "{:?}\n", self.a);
-                write!(f, "-------------------\n");
+                _ = write!(f, "{}\n", field);
+                _ = write!(f, "-------------------\n");
+                _ = write!(f, "{:?}\n", self.a);
+                _ = write!(f, "-------------------\n");
                 write!(f, "{:?}\n", self.b)
             }
         }
@@ -305,7 +305,6 @@ mod gvalues {
                     GValue::BulkSet(b) => a.diff(b),
                     _ => self.differ(other, Intrinsic),
                 },
-                _ => self.differ(other, Intrinsic),
             }
         }
     }
@@ -368,7 +367,7 @@ mod gvalues {
         }
     }
     impl Diff for Long {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
@@ -426,77 +425,77 @@ mod gvalues {
     basic!(Direction);
     basic!(Order);
     impl Diff for Pop {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for P {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Scope {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for T {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for TraversalMetrics {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Traverser {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for i128 {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Token {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Metrics {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for TraversalExplanation {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for IntermediateRepr {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for TextP {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Geometry {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for Merge {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }
     impl Diff for BulkSet {
-        fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {
+        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()
         }
     }

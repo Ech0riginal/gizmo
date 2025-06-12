@@ -8,7 +8,7 @@ type LineStringType = Vec<PointType>;
 type PolygonType = Vec<Vec<PointType>>;
 
 impl Deserializer<Geometry> for V3 {
-    fn deserialize(val: &Value) -> Result<Geometry, Leaf> {
+    fn deserialize(val: &Value) -> Result<Geometry, Error> {
         let coordinates = val.ensure("coordinates").ctx::<Geometry>()?;
 
         // There must be a better way to do this
@@ -36,7 +36,7 @@ impl Deserializer<Geometry> for V3 {
             let exterior = lines.remove(0);
             Ok(GeoTypes::Polygon(Polygon::new(exterior, lines)).into())
         } else {
-            Err(Leaf::Unsupported {
+            Err(Error::Unsupported {
                 tag: "Non-trivial geometry".into(),
                 location: location!(),
             })
@@ -45,7 +45,7 @@ impl Deserializer<Geometry> for V3 {
 }
 
 impl Serializer<Geometry> for V3 {
-    fn serialize(val: &Geometry) -> Result<Value, Leaf> {
+    fn serialize(val: &Geometry) -> Result<Value, Error> {
         Ok(json!({
             "@type": Tag::Geometry,
             "@value": geojson::Value::from(&val.0)

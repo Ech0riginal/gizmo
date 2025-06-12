@@ -1,4 +1,4 @@
-use crate::graphson::Leaf;
+use crate::graphson::Error;
 use crate::{GID, GValue, Object, Request, Response};
 use serde_json::Value;
 
@@ -22,24 +22,24 @@ where
 pub trait Sealed {}
 
 pub trait Deserialize: Sized {
-    fn deserialize<V, T>(&self) -> Result<T, Leaf>
+    fn deserialize<V, T>(&self) -> Result<T, Error>
     where
         V: Deserializer<T>,
         T: Object;
 }
 
 pub trait Deserializer<T>: Sealed {
-    fn deserialize(val: &Value) -> Result<T, Leaf>;
+    fn deserialize(val: &Value) -> Result<T, Error>;
 }
 
 pub trait Serialize: Sized {
-    fn serialize<S>(&self) -> Result<Value, Leaf>
+    fn serialize<S>(&self) -> Result<Value, Error>
     where
         S: Serializer<Self>;
 }
 
 pub trait Serializer<T>: Sealed {
-    fn serialize(val: &T) -> Result<Value, Leaf>;
+    fn serialize(val: &T) -> Result<Value, Error>;
 }
 
 mod blankets {
@@ -52,7 +52,7 @@ mod blankets {
     where
         T: Object,
     {
-        fn serialize<S>(&self) -> Result<Value, Leaf>
+        fn serialize<S>(&self) -> Result<Value, Error>
         where
             S: Serializer<Self>,
         {
@@ -61,7 +61,7 @@ mod blankets {
     }
 
     impl Deserialize for Value {
-        fn deserialize<V, T>(&self) -> Result<T, Leaf>
+        fn deserialize<V, T>(&self) -> Result<T, Error>
         where
             V: Deserializer<T>,
             T: Object,

@@ -1,13 +1,13 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<GID> for V3 {
-    fn deserialize(val: &Value) -> Result<GID, Leaf> {
+    fn deserialize(val: &Value) -> Result<GID, Error> {
         let gvalue = val.deserialize::<Self, GValue>().ctx::<GID>()?;
         match gvalue {
             GValue::String(d) => Ok(GID::String(d)),
             GValue::Integer(d) => Ok(GID::Integer(d)),
             GValue::Long(d) => Ok(GID::Long(d)),
-            value => Err(Leaf::Unexpected {
+            value => Err(Error::Unexpected {
                 expectation: "an eligible GKey".to_string(),
                 actual: format!("{value:?}"),
                 location: location!(),
@@ -17,7 +17,7 @@ impl Deserializer<GID> for V3 {
 }
 
 impl Serializer<GID> for V3 {
-    fn serialize(val: &GID) -> Result<Value, Leaf> {
+    fn serialize(val: &GID) -> Result<Value, Error> {
         let val: GValue = val.into();
         val.serialize::<Self>()
     }

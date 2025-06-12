@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Serializer<GValue> for V3 {
-    fn serialize(val: &GValue) -> Result<Value, Leaf> {
+    fn serialize(val: &GValue) -> Result<Value, Error> {
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(v) => v.serialize::<Self>(),
@@ -43,7 +43,7 @@ impl Serializer<GValue> for V3 {
             // GValue::Geometry(v) => v.serialize::<Self>(),
             // GValue::Merge(v) => v.serialize::<Self>(),
             // GValue::BulkSet(v) => v.serialize::<Self>(),
-            gvalue => Err(Leaf::Unexpected {
+            gvalue => Err(Error::Unexpected {
                 expectation: "a supported GValue".to_string(),
                 actual: format!("{gvalue}"),
                 location: location!(),
@@ -53,7 +53,7 @@ impl Serializer<GValue> for V3 {
 }
 
 impl Deserializer<GValue> for V3 {
-    fn deserialize(val: &Value) -> Result<GValue, Leaf> {
+    fn deserialize(val: &Value) -> Result<GValue, Error> {
         match val {
             Value::String(string) => Ok(GValue::from(string)),
             Value::Number(_) => val
@@ -68,7 +68,7 @@ impl Deserializer<GValue> for V3 {
                 let collection = values
                     .iter()
                     .map(Self::deserialize)
-                    .collect::<Result<Vec<_>, Leaf>>()
+                    .collect::<Result<Vec<_>, Error>>()
                     .ctx::<GValue>()?
                     .into();
                 Ok(GValue::List(collection))
@@ -79,7 +79,7 @@ impl Deserializer<GValue> for V3 {
     }
 }
 
-fn deserialize<'a>(blob: Type<'a>) -> Result<GValue, Leaf> {
+fn deserialize<'a>(blob: Type<'a>) -> Result<GValue, Error> {
     match blob.tag {
         Tag::Class => blob.value.deserialize::<V3, Class>().map(GValue::from),
         Tag::Date => blob.value.deserialize::<V3, Date>().map(GValue::from),
@@ -130,7 +130,7 @@ fn deserialize<'a>(blob: Type<'a>) -> Result<GValue, Leaf> {
             .deserialize::<V3, TraversalMetrics>()
             .map(GValue::from),
         // Tag::Traverser => blob.value.deserialize::<Self, Traverser>().map(GValue::from),
-        type_tag => Err(Leaf::Unsupported {
+        type_tag => Err(Error::Unsupported {
             tag: type_tag.to_string(),
             location: location!(),
         }),

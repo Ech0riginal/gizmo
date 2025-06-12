@@ -5,7 +5,7 @@ pub enum Scope {
 }
 
 impl From<()> for Scope {
-    fn from(val: ()) -> Self {
+    fn from(_val: ()) -> Self {
         Scope::Global
     }
 }

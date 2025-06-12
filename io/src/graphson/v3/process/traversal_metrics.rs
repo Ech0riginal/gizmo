@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 use crate::{GValue, List};
 
 impl Deserializer<TraversalMetrics> for V3 {
-    fn deserialize(val: &Value) -> Result<TraversalMetrics, Leaf> {
+    fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
         let mut metrics = val.deserialize::<Self, Map<GValue, GValue>>()?;
 
         let duration = metrics

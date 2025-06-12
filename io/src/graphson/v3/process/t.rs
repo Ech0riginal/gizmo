@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Deserializer<T> for V3 {
-    fn deserialize(val: &Value) -> Result<T, Leaf> {
+    fn deserialize(val: &Value) -> Result<T, Error> {
         let string = get_value!(val, Value::String).ctx::<T>()?;
         let t = match string.as_str() {
             "id" => T::Id,
@@ -9,7 +9,7 @@ impl Deserializer<T> for V3 {
             "label" => T::Label,
             "value" => T::Value,
             _ => {
-                return Err(Leaf::Unexpected {
+                return Err(Error::Unexpected {
                     expectation: "A valid T value".to_string(),
                     actual: format!("{val:?}"),
                     location: location!(),
@@ -22,7 +22,7 @@ impl Deserializer<T> for V3 {
 }
 
 impl Serializer<T> for V3 {
-    fn serialize(val: &T) -> Result<Value, Leaf> {
+    fn serialize(val: &T) -> Result<Value, Error> {
         Ok(json!({
             "@type": Tag::T,
             "@value": match val {

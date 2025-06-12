@@ -8,7 +8,7 @@ where
     K: Object,
     V: Object,
 {
-    fn deserialize(val: &Value) -> Result<Map<K, V>, Leaf> {
+    fn deserialize(val: &Value) -> Result<Map<K, V>, Error> {
         let val = get_value!(val, Value::Array).ctx::<Map<K, V>>()?;
         let mut map = Map::new();
         if !val.is_empty() {
@@ -30,7 +30,7 @@ where
     K: Object,
     V: Object,
 {
-    fn serialize(val: &Map<K, V>) -> Result<Value, Leaf> {
+    fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mut values = vec![];
         for (k, v) in val.iter() {
             values.push(k.serialize::<Self>()?);
