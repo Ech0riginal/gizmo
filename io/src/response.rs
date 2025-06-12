@@ -1,4 +1,4 @@
-use crate::{GValue, Map};
+use crate::{GValue, Map, Object};
 use std::hash::Hasher;
 
 #[derive(Debug)]
@@ -7,6 +7,10 @@ pub struct Response {
     pub data: GValue,
     pub status: Status,
     pub meta: Map<String, GValue>,
+}
+
+impl Object for Response {
+    const name: &'static str = "Response";
 }
 
 impl Eq for Response {}
@@ -26,4 +30,8 @@ pub struct Status {
     pub code: i16,
     pub message: Option<String>,
     pub attributes: serde_json::Value,
+}
+
+impl Object for Status {
+    const name: &'static str = "Status";
 }

@@ -1,0 +1,16 @@
+use crate::graphson::prelude::*;
+
+impl Serializer<Pop> for V2 {
+    fn serialize(val: &Pop) -> Result<Value, Leaf> {
+        let str = match val {
+            Pop::All => "all",
+            Pop::First => "first",
+            Pop::Last => "last",
+            Pop::Mixed => "mixed",
+        };
+        Ok(json!({
+            "@type": Tag::Pop,
+            "@value": str,
+        }))
+    }
+}
