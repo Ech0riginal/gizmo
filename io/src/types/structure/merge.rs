@@ -15,6 +15,8 @@ pub enum Merge {
     InV,
 }
 
+crate::obj!(Merge);
+
 impl std::ops::Deref for MergeBuilder {
     type Target = Merge;
 

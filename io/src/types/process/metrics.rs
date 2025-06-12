@@ -13,9 +13,7 @@ pub struct Metrics {
     pub(crate) nested: List<Metrics>,
 }
 
-impl Object for Metrics {
-    const name: &'static str = "Metrics";
-}
+crate::obj!(Metrics);
 
 impl Hash for Metrics {
     fn hash<H: Hasher>(&self, state: &mut H) {

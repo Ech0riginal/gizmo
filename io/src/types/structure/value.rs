@@ -122,19 +122,19 @@ enom!(
     Vertex(Vertex),
     VertexProperty(VertexProperty),
     // Process
-    // Barrier(Barrier),
-    // Binding,
+    Barrier(Barrier),
+    Binding(Binding),
     Bytecode(Bytecode),
     Cardinality(Cardinality),
     Column(Column),
     Direction(Direction),
     // Operator
     Order(Order),
-    // Pick(String),
-    Pop(Pop),
-    // Lambda
-    // Metrics
+    Lambda(Lambda),
+    Metrics(Metrics),
     P(P),
+    Pop(Pop),
+    Pick(Pick),
     Scope(Scope),
     T(T),
     TraversalMetrics(TraversalMetrics),
@@ -143,7 +143,6 @@ enom!(
     // Request
     Int128(i128),
     Token(Token),
-    Metric(Metrics),
     // TraversalExplanation(TraversalExplanation),
     // IntermediateRepr(IntermediateRepr),
     TextP(TextP),
