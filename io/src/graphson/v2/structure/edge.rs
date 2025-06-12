@@ -43,12 +43,12 @@ impl Deserializer<Edge> for V2 {
 }
 
 impl Serializer<Edge> for V2 {
-    fn serialize(val: &Edge) -> Result<Value, Leaf> {
+    fn serialize(val: &Edge) -> Result<Value, Error> {
         serialize_edge::<Self>(val, true)
     }
 }
 
-pub fn serialize_edge<S>(edge: &Edge, serialize_labels: bool) -> Result<Value, Leaf>
+pub fn serialize_edge<S>(edge: &Edge, serialize_labels: bool) -> Result<Value, Error>
 where
     S: Serializer<GID>,
     S: Serializer<GValue>,
@@ -58,11 +58,11 @@ where
     value.insert("id", edge.id.serialize::<S>()?);
     value.insert("label", edge.label.serialize::<S>()?);
     if serialize_labels {
-        value.insert("inVLabel", edge.in_v.label().serialize::<S>()?);
-        value.insert("outVLabel", edge.out_v.label().serialize::<S>()?);
+        value.insert("inVLabel", edge.in_v.label.serialize::<S>()?);
+        value.insert("outVLabel", edge.out_v.label.serialize::<S>()?);
     }
-    value.insert("inV", edge.in_v.id().serialize::<S>()?);
-    value.insert("outV", edge.out_v.id().serialize::<S>()?);
+    value.insert("inV", edge.in_v.id.serialize::<S>()?);
+    value.insert("outV", edge.out_v.id.serialize::<S>()?);
     if !edge.properties.is_empty() {
         let properties = edge
             .properties
@@ -74,7 +74,7 @@ where
             })
             .collect::<Result<Vec<_>, Error>>()?
             .into_iter()
-            .collect::<HashMap<&String, Value>>();
+            .collect::<IndexMap<&String, Value>>();
         value.insert("properties", serde_json::to_value(&properties)?);
     }
 

@@ -1,3 +1,4 @@
+use crate::Object;
 use std::fmt::Display;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -6,6 +7,10 @@ pub enum Pop {
     First,
     Last,
     Mixed,
+}
+
+impl Object for Pop {
+    const name: &'static str = "Pop";
 }
 
 impl Display for Pop {

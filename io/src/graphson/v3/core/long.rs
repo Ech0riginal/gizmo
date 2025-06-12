@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Long> for V3 {
     fn deserialize(val: &Value) -> Result<Long, Error> {
-        let val = expect_i64!(val).ctx::<Long>()?;
+        let val = expect_i64!(val)?;
         Ok(Long(val))
     }
 }

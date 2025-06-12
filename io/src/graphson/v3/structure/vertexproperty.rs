@@ -3,34 +3,20 @@ use indexmap::IndexMap;
 use snafu::location;
 impl Deserializer<VertexProperty> for V3 {
     fn deserialize(val: &Value) -> Result<VertexProperty, Error> {
-        let map = get_value!(val, Value::Object).ctx::<VertexProperty>()?;
-        let id = map
-            .ensure("id")
-            .ctx::<VertexProperty>()?
-            .deserialize::<Self, GID>()
-            .ctx::<VertexProperty>()?;
-        let label = map
-            .ensure("label")
-            .ctx::<VertexProperty>()?
-            .deserialize::<Self, String>()
-            .ctx::<VertexProperty>()?;
-        let value = {
-            let tmp = map
-                .ensure("value")
-                .ctx::<VertexProperty>()?
-                .deserialize::<Self, GValue>()
-                .ctx::<VertexProperty>()?;
-            Box::new(tmp)
-        };
+        let map = get_value!(val, Value::Object)?;
+        let id = map.ensure("id")?.deserialize::<Self, GID>()?;
+        let label = map.ensure("label")?.deserialize::<Self, String>()?;
+        let value = map
+            .ensure("value")?
+            .deserialize::<Self, GValue>()
+            .map(Box::new)?;
         let mut properties = None;
 
         if let Some(props) = map.get("properties") {
             let mut tmp = Map::new();
-            let prop_map = get_value!(props, Value::Object).ctx::<VertexProperty>()?;
+            let prop_map = get_value!(props, Value::Object)?;
             for (key, value) in prop_map.into_iter() {
-                let value = value
-                    .deserialize::<Self, GValue>()
-                    .ctx::<VertexProperty>()?;
+                let value = value.deserialize::<Self, GValue>()?;
                 tmp.insert(key.to_string(), value);
             }
             properties = Some(tmp);

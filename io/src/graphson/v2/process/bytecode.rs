@@ -7,7 +7,7 @@ impl Deserializer<Bytecode> for V2 {
 }
 
 impl Serializer<Bytecode> for V2 {
-    fn serialize(val: &Bytecode) -> Result<Value, Leaf> {
+    fn serialize(val: &Bytecode) -> Result<Value, Error> {
         let steps = val
             .steps()
             .iter()

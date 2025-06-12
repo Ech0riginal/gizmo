@@ -8,7 +8,7 @@ impl Deserializer<String> for V2 {
 }
 
 impl Serializer<String> for V2 {
-    fn serialize(val: &String) -> Result<Value, Leaf> {
+    fn serialize(val: &String) -> Result<Value, Error> {
         Ok(json!(val))
     }
 }

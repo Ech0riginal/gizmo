@@ -6,7 +6,7 @@ impl Deserializer<Tree> for V2 {
         let branches = array
             .iter()
             .map(|val| val.deserialize::<Self, Branch>())
-            .collect::<Result<List<_>, Error>>()?;
+            .collect::<Result<List<_>, _>>()?;
         Ok(Tree { branches })
     }
 }
@@ -14,23 +14,12 @@ impl Deserializer<Tree> for V2 {
 impl Deserializer<Branch> for V2 {
     fn deserialize(val: &Value) -> Result<Branch, Error> {
         let obj = get_value!(val, Value::Object)?;
-
         let key = obj
-            .get("key")
-            .ok_or(Error::UnexpectedJson {
-                msg: "Missing 'key' key".to_string(),
-                value: val.clone(),
-            })
+            .ensure("key")
             .map(|value| value.deserialize::<Self, GValue>())??;
-
         let value = obj
-            .get("value")
-            .ok_or(Error::UnexpectedJson {
-                msg: "Missing 'value' key".to_string(),
-                value: val.clone(),
-            })
+            .ensure("value")
             .map(|value| value.deserialize::<Self, GValue>())??;
-
         Ok(Branch {
             key: Box::new(key),
             value: Box::new(value),
@@ -39,7 +28,7 @@ impl Deserializer<Branch> for V2 {
 }
 
 impl Serializer<Tree> for V2 {
-    fn serialize(val: &Tree) -> Result<Value, Leaf> {
+    fn serialize(val: &Tree) -> Result<Value, Error> {
         let branches = val
             .branches
             .iter()
@@ -52,7 +41,7 @@ impl Serializer<Tree> for V2 {
     }
 }
 impl Serializer<Branch> for V2 {
-    fn serialize(val: &Branch) -> Result<Value, Leaf> {
+    fn serialize(val: &Branch) -> Result<Value, Error> {
         Ok(json!({
             "key": (*val.key).serialize::<Self>()?,
             "value": (*val.value).serialize::<Self>()?,

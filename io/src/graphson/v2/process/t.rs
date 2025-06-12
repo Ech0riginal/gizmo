@@ -9,9 +9,10 @@ impl Deserializer<T> for V2 {
             "label" => T::Label,
             "value" => T::Value,
             _ => {
-                return Err(Error::UnexpectedJson {
-                    msg: "A valid T value was expected".to_string(),
-                    value: val.clone(),
+                return Err(Error::Unexpected {
+                    expectation: "A valid T value".to_string(),
+                    actual: format!("{val}"),
+                    location: location!(),
                 });
             }
         };
@@ -20,7 +21,7 @@ impl Deserializer<T> for V2 {
 }
 
 impl Serializer<T> for V2 {
-    fn serialize(val: &T) -> Result<Value, Leaf> {
+    fn serialize(val: &T) -> Result<Value, Error> {
         Ok(json!({
             "@type": Tag::T,
             "@value": match val {

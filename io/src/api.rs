@@ -1,5 +1,4 @@
-use crate::graphson::Error;
-use crate::{GID, GValue, Object, Request, Response};
+use crate::{Error, GID, GValue, Object, Request, Response};
 use serde_json::Value;
 
 #[allow(private_bounds)]
@@ -45,8 +44,9 @@ pub trait Serializer<T>: Sealed {
 mod blankets {
     use crate::Object;
     use crate::api::*;
-    use crate::graphson::Ctx;
+    use crate::error::{Obj, ObjectSnafu};
     use serde_json::Value;
+    use snafu::ResultExt;
 
     impl<T> Serialize for T
     where
@@ -67,6 +67,12 @@ mod blankets {
             T: Object,
         {
             V::deserialize(self).ctx::<T>()
+        }
+    }
+
+    impl<A> Obj<A> for Result<A, Error> {
+        fn ctx<T: Object>(self) -> Result<A, Error> {
+            self.context(ObjectSnafu { name: T::name })
         }
     }
 }

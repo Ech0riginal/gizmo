@@ -8,7 +8,7 @@ impl Deserializer<Class> for V2 {
 }
 
 impl Serializer<Class> for V2 {
-    fn serialize(val: &Class) -> Result<Value, Leaf> {
+    fn serialize(val: &Class) -> Result<Value, Error> {
         Ok(json!({
             "@type" : Tag::Class,
             "@value" : **val,

@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<T> for V3 {
     fn deserialize(val: &Value) -> Result<T, Error> {
-        let string = get_value!(val, Value::String).ctx::<T>()?;
+        let string = get_value!(val, Value::String)?;
         let t = match string.as_str() {
             "id" => T::Id,
             "key" => T::Key,
@@ -13,8 +13,7 @@ impl Deserializer<T> for V3 {
                     expectation: "A valid T value".to_string(),
                     actual: format!("{val:?}"),
                     location: location!(),
-                })
-                .ctx::<T>();
+                });
             }
         };
         Ok(t)

@@ -2,30 +2,21 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Vertex> for V3 {
     fn deserialize(val: &Value) -> Result<Vertex, Error> {
-        let map = get_value!(val, Value::Object).ctx::<Vertex>()?;
-        let id = map
-            .ensure("id")
-            .ctx::<Vertex>()?
-            .deserialize::<Self, GID>()?;
-        let label = map
-            .ensure("label")
-            .ctx::<Vertex>()?
-            .deserialize::<Self, String>()?;
+        let map = get_value!(val, Value::Object)?;
+        let id = map.ensure("id")?.deserialize::<Self, GID>()?;
+        let label = map.ensure("label")?.deserialize::<Self, String>()?;
         let properties = if let Some(properties_val) = map.get("properties") {
-            let props = get_value!(properties_val, Value::Object).ctx::<Vertex>()?;
+            let props = get_value!(properties_val, Value::Object)?;
             let mut map = Map::new();
 
             for (key, value) in props.into_iter() {
-                let properties = get_value!(value, Value::Array)
-                    .ctx::<Vertex>()?
+                let properties = get_value!(value, Value::Array)?
                     .iter()
                     .map(|item| item.typed())
-                    .collect::<Result<Vec<Type<'_>>, Error>>()
-                    .ctx::<Vertex>()?
+                    .collect::<Result<List<_>, _>>()?
                     .into_iter()
                     .map(|typed| typed.value.deserialize::<Self, VertexProperty>())
-                    .collect::<Result<List<VertexProperty>, Error>>()
-                    .ctx::<Vertex>()?;
+                    .collect::<Result<List<_>, _>>()?;
                 map.insert(key.to_string(), properties);
             }
 

@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Serializer<Pop> for V2 {
-    fn serialize(val: &Pop) -> Result<Value, Leaf> {
+    fn serialize(val: &Pop) -> Result<Value, Error> {
         let str = match val {
             Pop::All => "all",
             Pop::First => "first",

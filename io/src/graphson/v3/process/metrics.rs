@@ -2,18 +2,13 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Metrics> for V3 {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
-        let metrics = get_value!(val, Value::Object).ctx::<Metrics>()?;
-        let mut metric = val
-            .deserialize::<Self, Map<GValue, GValue>>()
-            .ctx::<Metrics>()?;
+        let metrics = get_value!(val, Value::Object)?;
+        let mut metric = val.deserialize::<Self, Map<GValue, GValue>>()?;
 
         // Honestly this is a pretty unacceptable amount of boilerplate
         macro_rules! gotta_be_a_better_way {
             ($val:ident, $key:expr, $ty:ty) => {
-                $val.ensure($key)
-                    .ctx::<Metrics>()?
-                    .deserialize::<Self, $ty>()
-                    .ctx::<Metrics>()?
+                $val.ensure($key)?.deserialize::<Self, $ty>()?
             };
         }
 
@@ -21,15 +16,9 @@ impl Deserializer<Metrics> for V3 {
         let id = gotta_be_a_better_way!(metrics, "id", String);
         let name = gotta_be_a_better_way!(metrics, "name", String);
 
-        let mut counts = metric
-            .remove_ok::<Map<GValue, GValue>, _>("counts")
-            .ctx::<Metrics>()?;
-        let traversers = counts
-            .remove_ok::<Long, _>("traverserCount")
-            .ctx::<Metrics>()?;
-        let count = counts
-            .remove_ok::<Long, _>("elementCount")
-            .ctx::<Metrics>()?;
+        let mut counts = metric.remove_ok::<Map<GValue, GValue>, _>("counts")?;
+        let traversers = counts.remove_ok::<Long, _>("traverserCount")?;
+        let count = counts.remove_ok::<Long, _>("elementCount")?;
 
         let mut annotations = counts
             .remove_ok::<Map<GValue, GValue>, _>("annotations")

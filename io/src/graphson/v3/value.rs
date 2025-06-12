@@ -56,21 +56,16 @@ impl Deserializer<GValue> for V3 {
     fn deserialize(val: &Value) -> Result<GValue, Error> {
         match val {
             Value::String(string) => Ok(GValue::from(string)),
-            Value::Number(_) => val
-                .deserialize::<Self, Integer>()
-                .ctx::<GValue>()
-                .map(GValue::from),
+            Value::Number(_) => val.deserialize::<Self, Integer>().map(GValue::from),
             Value::Object(_obj) => match val.typed() {
-                Ok(blob) => deserialize(blob).ctx::<GValue>(),
+                Ok(blob) => deserialize(blob),
                 Err(err) => Err(err),
             },
             Value::Array(values) => {
                 let collection = values
                     .iter()
                     .map(Self::deserialize)
-                    .collect::<Result<Vec<_>, Error>>()
-                    .ctx::<GValue>()?
-                    .into();
+                    .collect::<Result<List<_>, _>>()?;
                 Ok(GValue::List(collection))
             }
             Value::Bool(bool) => Ok(Bool(*bool).into()),

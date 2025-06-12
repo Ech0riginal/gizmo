@@ -1,4 +1,4 @@
-use crate::graphson::Error;
+use crate::Error;
 use crate::*;
 use indexmap::IndexMap;
 use std::convert::Infallible;
@@ -144,8 +144,8 @@ enom!(
     Int128(i128),
     Token(Token),
     Metric(Metrics),
-    TraversalExplanation(TraversalExplanation),
-    IntermediateRepr(IntermediateRepr),
+    // TraversalExplanation(TraversalExplanation),
+    // IntermediateRepr(IntermediateRepr),
     TextP(TextP),
     Merge(Merge),
     BulkSet(BulkSet)

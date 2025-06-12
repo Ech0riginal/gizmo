@@ -2,22 +2,14 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Path> for V3 {
     fn deserialize(val: &Value) -> Result<Path, Error> {
-        let labels = {
-            let tmp = val
-                .ensure("labels")
-                .ctx::<Path>()?
-                .deserialize::<Self, GValue>()
-                .ctx::<Path>()?;
-            Box::new(tmp)
-        };
-        let objects = {
-            let tmp = val
-                .ensure("objects")
-                .ctx::<Path>()?
-                .deserialize::<Self, GValue>()
-                .ctx::<Path>()?;
-            Box::new(tmp)
-        };
+        let labels = val
+            .ensure("labels")?
+            .deserialize::<Self, GValue>()
+            .map(Box::new)?;
+        let objects = val
+            .ensure("objects")?
+            .deserialize::<Self, GValue>()
+            .map(Box::new)?;
         Ok(Path { labels, objects })
     }
 }

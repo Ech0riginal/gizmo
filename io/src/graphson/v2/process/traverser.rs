@@ -6,7 +6,7 @@ impl Deserializer<Traverser> for V2 {
     }
 }
 impl Serializer<Traverser> for V2 {
-    fn serialize(val: &Traverser) -> Result<Value, Leaf> {
+    fn serialize(val: &Traverser) -> Result<Value, Error> {
         todo!()
     }
 }

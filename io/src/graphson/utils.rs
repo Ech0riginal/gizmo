@@ -1,6 +1,6 @@
-use crate::graphson::{Error, MissingSnafu};
+use crate::error::Error;
 use serde_json::Value;
-use snafu::OptionExt;
+use snafu::Location;
 
 pub trait Ensure<K: ?Sized, V> {
     #[track_caller]
@@ -14,7 +14,13 @@ where
     #[track_caller]
     fn ensure(&self, key: &K) -> Result<&Value, Error> {
         let key = key.as_ref().to_string();
-        self.get(&key).context(MissingSnafu { key })
+        self.get(&key).ok_or({
+            let caller = std::panic::Location::caller();
+            Error::Missing {
+                key,
+                location: Location::new(caller.file(), caller.line(), caller.column()),
+            }
+        })
     }
 }
 
@@ -25,23 +31,12 @@ where
     #[track_caller]
     fn ensure(&self, key: &K) -> Result<&Value, Error> {
         let key = key.as_ref().to_string();
-        self.get(&key).context(MissingSnafu { key })
+        self.get(&key).ok_or({
+            let caller = std::panic::Location::caller();
+            Error::Missing {
+                key,
+                location: Location::new(caller.file(), caller.line(), caller.column()),
+            }
+        })
     }
 }
-
-// #[derive(std::fmt::Debug, Snafu)]
-// #[snafu(visibility(pub))]
-// pub enum IoError {
-//     Io {
-//         #[snafu(source)]
-//         source: std::io::Error,
-//         #[snafu(implicit)]
-//         location: Location,
-//     },
-//     Serde {
-//         #[snafu(source)]
-//         source: serde_json::Error,
-//         #[snafu(implicit)]
-//         location: Location,
-//     }
-// }

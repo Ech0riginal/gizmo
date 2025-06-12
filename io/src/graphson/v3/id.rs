@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<GID> for V3 {
     fn deserialize(val: &Value) -> Result<GID, Error> {
-        let gvalue = val.deserialize::<Self, GValue>().ctx::<GID>()?;
+        let gvalue = val.deserialize::<Self, GValue>()?;
         match gvalue {
             GValue::String(d) => Ok(GID::String(d)),
             GValue::Integer(d) => Ok(GID::Integer(d)),

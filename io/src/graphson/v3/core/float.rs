@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Float> for V3 {
     fn deserialize(val: &Value) -> Result<Float, Error> {
-        let val = expect_f32!(val).ctx::<Float>()?;
+        let val = expect_f32!(val)?;
         Ok(Float(val))
     }
 }

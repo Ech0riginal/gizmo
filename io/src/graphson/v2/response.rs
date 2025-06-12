@@ -30,7 +30,7 @@ impl Deserializer<Response> for V2 {
     }
 }
 impl Serializer<Response> for V2 {
-    fn serialize(val: &Response) -> Result<Value, Leaf> {
+    fn serialize(val: &Response) -> Result<Value, Error> {
         let mut meta = HashMap::new();
 
         for (key, value) in val.meta.iter() {
@@ -73,7 +73,7 @@ impl Deserializer<Status> for V2 {
     }
 }
 impl Serializer<Status> for V2 {
-    fn serialize(val: &Status) -> Result<Value, Leaf> {
+    fn serialize(val: &Status) -> Result<Value, Error> {
         let message = if let Some(msg) = &val.message {
             msg
         } else {

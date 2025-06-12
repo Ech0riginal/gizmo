@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<String> for V3 {
     fn deserialize(val: &Value) -> Result<String, Error> {
-        let string = get_value!(val, Value::String).ctx::<String>()?;
+        let string = get_value!(val, Value::String)?;
         Ok(string.clone())
     }
 }

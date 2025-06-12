@@ -6,6 +6,9 @@ pub struct TextP {
     pub(crate) value: Box<GValue>,
 }
 
+impl Object for TextP {
+    const name: &'static str = "TextP";
+}
 impl TextP {
     pub fn operator(&self) -> &String {
         &self.operator

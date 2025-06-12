@@ -15,7 +15,7 @@ impl Deserializer<Path> for V2 {
 }
 
 impl Serializer<Path> for V2 {
-    fn serialize(val: &Path) -> Result<Value, Leaf> {
+    fn serialize(val: &Path) -> Result<Value, Error> {
         Ok(json!({
             "@type" : Tag::Path,
             "@value": {

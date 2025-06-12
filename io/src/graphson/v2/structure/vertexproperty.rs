@@ -13,16 +13,17 @@ impl Deserializer<super::VertexProperties> for V2 {
                             let list = arr
                                 .iter()
                                 .map(|e| e.typed())
-                                .collect::<Result<List<_>, EdgeError>>()?
+                                .collect::<Result<List<_>, _>>()?
                                 .into_iter()
                                 .map(|tt| tt.value.deserialize::<Self, VertexProperty>())
-                                .collect::<Result<List<_>, Error>>()?;
+                                .collect::<Result<List<_>, _>>()?;
                             p.insert(k.clone(), list);
                         }
                         value => {
-                            return Err(Error::UnexpectedJson {
-                                msg: "Expected array for properties".into(),
-                                value: value.clone(),
+                            return Err(Error::Unexpected {
+                                expectation: "array for properties".to_string(),
+                                actual: format!("{value}"),
+                                location: location!(),
                             });
                         }
                     };
@@ -30,9 +31,10 @@ impl Deserializer<super::VertexProperties> for V2 {
                 Ok(p)
             }
             Value::Null => Ok(Map::new()),
-            value => Err(Error::UnexpectedJson {
-                msg: "Expected object or null for properties".into(),
-                value: value.clone(),
+            value => Err(Error::Unexpected {
+                expectation: "object or null for properties".into(),
+                actual: format!("{value}"),
+                location: location!(),
             }),
         }
     }
@@ -49,9 +51,10 @@ impl Deserializer<VertexProperty> for V2 {
                 .get("label")
                 .map(|f| get_value!(f, Value::String).map(Clone::clone))
                 .unwrap_or_else(|| {
-                    Err(Error::UnexpectedJson {
-                        msg: "Missing VertexProperty label".into(),
-                        value: val.clone(),
+                    Err(Error::Unexpected {
+                        expectation: "VertexProperty label".into(),
+                        actual: format!("{val:?}"),
+                        location: location!(),
                     })
                 })?,
             properties: None,
@@ -80,13 +83,13 @@ impl Deserializer<VertexProperty> for V2 {
 }
 
 impl Serializer<VertexProperty> for V2 {
-    fn serialize(val: &VertexProperty) -> Result<Value, Leaf> {
+    fn serialize(val: &VertexProperty) -> Result<Value, Error> {
         let mut root = HashMap::<&'static str, Value>::new();
         let mut value = HashMap::<&'static str, Value>::new();
 
         value.insert("id", val.id().serialize::<Self>()?);
         value.insert("value", (*val.value).serialize::<Self>()?);
-        value.insert("label", serde_json::to_value(&val.label)?);
+        value.insert("label", val.label.serialize::<Self>()?);
         if let Some(id) = &val.vertex {
             value.insert("vertex", id.serialize::<Self>()?);
         }

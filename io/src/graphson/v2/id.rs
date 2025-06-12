@@ -7,16 +7,17 @@ impl Deserializer<GID> for V2 {
             GValue::String(d) => Ok(GID::String(d)),
             GValue::Integer(d) => Ok(GID::Integer(d)),
             GValue::Long(d) => Ok(GID::Long(d)),
-            value => Err(Error::UnexpectedGValue {
-                msg: "Ineligible for GKey".into(),
-                value,
+            value => Err(Error::Unexpected {
+                expectation: "eligible for GKey".into(),
+                actual: format!("{value:?}"),
+                location: location!(),
             }),
         }
     }
 }
 
 impl Serializer<GID> for V2 {
-    fn serialize(val: &GID) -> Result<Value, Leaf> {
+    fn serialize(val: &GID) -> Result<Value, Error> {
         let val: GValue = val.into();
         val.serialize::<Self>()
     }

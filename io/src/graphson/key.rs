@@ -4,7 +4,7 @@
 //     }
 // }
 // impl Serializer<GKey> for V2 {
-//     fn serialize(val: &GKey) -> Result<Value, Leaf> {
+//     fn serialize(val: &GKey) -> Result<Value, Error> {
 //         todo!()
 //     }
 // }
@@ -15,7 +15,7 @@
 //     }
 // }
 // impl Serializer<GKey> for V3 {
-//     fn serialize(val: &GKey) -> Result<Value, Leaf> {
+//     fn serialize(val: &GKey) -> Result<Value, Error> {
 //         todo!()
 //     }
 // }

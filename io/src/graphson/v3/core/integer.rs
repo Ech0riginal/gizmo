@@ -2,7 +2,7 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Integer> for V3 {
     fn deserialize(val: &Value) -> Result<Integer, Error> {
-        let val = expect_i32!(val).ctx::<Integer>()?;
+        let val = expect_i32!(val)?;
         Ok(Integer(val))
     }
 }

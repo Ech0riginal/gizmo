@@ -3,36 +3,18 @@ use std::collections::HashMap;
 
 impl Deserializer<Edge> for V3 {
     fn deserialize(val: &Value) -> Result<Edge, Error> {
-        let map = get_value!(val, Value::Object).ctx::<Edge>()?;
-        let id = map.ensure("id")?.deserialize::<Self, GID>().ctx::<Edge>()?;
-        let label = map
-            .ensure("label")?
-            .deserialize::<Self, String>()
-            .ctx::<Edge>()?;
-        let in_v = map
-            .ensure("inV")?
-            .deserialize::<Self, GID>()
-            .ctx::<Edge>()?;
-        let in_v_label = map
-            .ensure("inVLabel")?
-            .deserialize::<Self, String>()
-            .ctx::<Edge>()?;
-        let out_v = map
-            .ensure("outV")?
-            .deserialize::<Self, GID>()
-            .ctx::<Edge>()?;
-        let out_v_label = map
-            .ensure("outVLabel")?
-            .deserialize::<Self, String>()
-            .ctx::<Edge>()?;
+        let map = get_value!(val, Value::Object)?;
+        let id = map.ensure("id")?.deserialize::<Self, GID>()?;
+        let label = map.ensure("label")?.deserialize::<Self, String>()?;
+        let in_v = map.ensure("inV")?.deserialize::<Self, GID>()?;
+        let in_v_label = map.ensure("inVLabel")?.deserialize::<Self, String>()?;
+        let out_v = map.ensure("outV")?.deserialize::<Self, GID>()?;
+        let out_v_label = map.ensure("outVLabel")?.deserialize::<Self, String>()?;
         let properties = if let Some(properties_val) = map.get("properties") {
-            let map = get_value!(properties_val, Value::Object).ctx::<Edge>()?;
+            let map = get_value!(properties_val, Value::Object)?;
             let mut indexed = Map::new();
             for (k, v) in map.iter() {
-                indexed.insert(
-                    k.to_string(),
-                    Box::new(v.deserialize::<Self, GValue>().ctx::<Edge>()?),
-                );
+                indexed.insert(k.to_string(), Box::new(v.deserialize::<Self, GValue>()?));
             }
             indexed
         } else {
@@ -87,15 +69,11 @@ where
                 Ok(value) => Ok((label, value)),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Vec<_>, _>>()
-            .ctx::<Edge>()?
+            .collect::<Result<Vec<_>, _>>()?
             .into_iter()
             .collect::<HashMap<&String, Value>>();
-        // let debug = format!("{:?}", &properties);
-        value.insert(
-            "properties",
-            serde_json::to_value(&properties).ctx::<Edge>()?,
-        );
+
+        value.insert("properties", serde_json::to_value(&properties).unwrap());
     }
 
     Ok(json!({

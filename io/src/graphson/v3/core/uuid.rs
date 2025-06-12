@@ -2,14 +2,12 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Uuid> for V3 {
     fn deserialize(val: &Value) -> Result<Uuid, Error> {
-        let string = get_value!(val, Value::String).ctx::<Uuid>()?;
-        let uuid = Uuid::parse_str(string)
-            .map_err(|_| Error::Unexpected {
-                expectation: "A valid Uuid".to_string(),
-                actual: format!("{:?}", val.clone()),
-                location: location!(),
-            })
-            .ctx::<Uuid>()?;
+        let string = get_value!(val, Value::String)?;
+        let uuid = Uuid::parse_str(string).map_err(|_| Error::Unexpected {
+            expectation: "A valid Uuid".to_string(),
+            actual: format!("{:?}", val.clone()),
+            location: location!(),
+        })?;
         Ok(uuid)
     }
 }

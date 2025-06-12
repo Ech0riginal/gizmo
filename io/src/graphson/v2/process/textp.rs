@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Serializer<TextP> for V2 {
-    fn serialize(val: &TextP) -> Result<Value, Leaf> {
+    fn serialize(val: &TextP) -> Result<Value, Error> {
         Ok(json!({
             "@type" : Tag::TextP,
             "@value" : {

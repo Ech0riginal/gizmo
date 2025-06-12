@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl Serializer<Scope> for V2 {
-    fn serialize(val: &Scope) -> Result<Value, Leaf> {
+    fn serialize(val: &Scope) -> Result<Value, Error> {
         let v = match val {
             Scope::Global => "global",
             Scope::Local => "local",

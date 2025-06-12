@@ -9,7 +9,7 @@ impl Deserializer<Uuid> for V2 {
 }
 
 impl Serializer<Uuid> for V2 {
-    fn serialize(val: &Uuid) -> Result<Value, Leaf> {
+    fn serialize(val: &Uuid) -> Result<Value, Error> {
         Ok(json!({
             "@type" : Tag::Uuid,
             "@value" : val.to_string()

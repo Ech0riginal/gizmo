@@ -3,7 +3,7 @@ use chrono::{TimeZone, Utc};
 
 impl Deserializer<Date> for V3 {
     fn deserialize(val: &Value) -> Result<Date, Error> {
-        let val = expect_i64!(val).ctx::<Class>()?;
+        let val = expect_i64!(val)?;
         let datetime = Utc.timestamp_millis_opt(val).unwrap();
         let date = Date(datetime);
         Ok(date)

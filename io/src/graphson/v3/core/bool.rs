@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 impl Deserializer<Bool> for V3 {
     fn deserialize(val: &Value) -> Result<Bool, Error> {
-        let bool = get_value!(val, Value::Bool).ctx::<Bool>()?;
+        let bool = get_value!(val, Value::Bool)?;
         Ok(Bool(*bool))
     }
 }

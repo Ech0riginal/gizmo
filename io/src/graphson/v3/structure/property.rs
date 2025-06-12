@@ -3,18 +3,9 @@ use crate::graphson::prelude::*;
 
 impl Deserializer<Property> for V3 {
     fn deserialize(val: &Value) -> Result<Property, Error> {
-        let val = get_value!(val, Value::Object).ctx::<Property>()?;
-        let key = val
-            .ensure("key")
-            .ctx::<Property>()?
-            .deserialize::<Self, String>()
-            .ctx::<Property>()?;
-        let value = Box::new(
-            val.ensure("value")
-                .ctx::<Property>()?
-                .deserialize::<Self, GValue>()
-                .ctx::<Property>()?,
-        );
+        let val = get_value!(val, Value::Object)?;
+        let key = val.ensure("key")?.deserialize::<Self, String>()?;
+        let value = Box::new(val.ensure("value")?.deserialize::<Self, GValue>()?);
         let mut element = Box::new(GValue::Null);
 
         if let Some(el) = val.get("element") {

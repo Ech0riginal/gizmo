@@ -11,8 +11,7 @@ where
         let value = val
             .iter()
             .map(|v| v.serialize::<Self>())
-            .collect::<Result<Vec<Value>, Error>>()
-            .ctx::<List<T>>()?;
+            .collect::<Result<Vec<Value>, Error>>()?;
         Ok(json!({
             "@type" : Tag::List,
             "@value" : value
@@ -29,7 +28,7 @@ where
         if val.to_string().contains("[null]") {
             return Ok(list![]);
         }
-        let val = get_value!(val, Value::Array).ctx::<List<T>>()?;
+        let val = get_value!(val, Value::Array)?;
         let _debug_val = val.iter().map(|v| format!("{v:?}")).collect::<Vec<_>>();
 
         let mut elements = List::with_capacity(val.len());

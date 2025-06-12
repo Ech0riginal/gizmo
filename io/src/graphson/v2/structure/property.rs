@@ -3,21 +3,10 @@ use crate::graphson::prelude::*;
 impl Deserializer<Property> for V2 {
     fn deserialize(val: &Value) -> Result<Property, Error> {
         let key = val
-            .get("key")
-            .map(|v| get_value!(v, Value::String).map(Clone::clone))
-            .ok_or(Error::UnexpectedJson {
-                msg: "Missing Property 'key' key".into(),
-                value: val.clone(),
-            })??;
-        let value = val.get("value").ok_or(Error::UnexpectedJson {
-            msg: "Missing Property 'value' key".into(),
-            value: val.clone(),
-        })?;
-        let element = val.get("element").ok_or(Error::UnexpectedJson {
-            msg: "Missing Property 'element' key".into(),
-            value: val.clone(),
-        })?;
-
+            .ensure("key")
+            .map(|v| get_value!(v, Value::String).map(Clone::clone))??;
+        let value = val.ensure("value")?;
+        let element = val.ensure("element")?;
         let value_obj = value.deserialize::<Self, GValue>()?;
         let element_obj = element.deserialize::<Self, GValue>()?;
         let property = Property {
@@ -31,7 +20,7 @@ impl Deserializer<Property> for V2 {
 }
 
 impl Serializer<Property> for V2 {
-    fn serialize(val: &Property) -> Result<Value, Leaf> {
+    fn serialize(val: &Property) -> Result<Value, Error> {
         Ok(json!({
             "@type": Tag::Property,
             "@value": {

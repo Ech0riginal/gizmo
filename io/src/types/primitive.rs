@@ -56,6 +56,14 @@ macro_rules! getters {
 }
 
 #[macro_export]
+macro_rules! obj {
+    ($id:ident) => {
+        impl $crate::Object for $id {
+            const name: &'static str = stringify!($id);
+        }
+    };
+}
+#[macro_export]
 macro_rules! new {
     ($name:ident, $inner:ident) => {
         impl Default for $name {

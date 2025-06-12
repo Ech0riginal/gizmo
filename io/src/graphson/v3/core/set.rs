@@ -5,12 +5,10 @@ use indexmap::IndexSet;
 
 impl Deserializer<Set> for V3 {
     fn deserialize(val: &Value) -> Result<Set, Error> {
-        let set = get_value!(val, Value::Array)
-            .ctx::<Set>()?
+        let set = get_value!(val, Value::Array)?
             .iter()
             .map(|v| v.deserialize::<Self, GValue>())
-            .collect::<Result<Vec<_>, _>>()
-            .ctx::<Set>()?
+            .collect::<Result<Vec<_>, _>>()?
             .into_iter()
             .fold(IndexSet::new(), |mut set, item| {
                 set.insert(item);
@@ -25,8 +23,7 @@ impl Serializer<Set> for V3 {
         let elements = val
             .iter()
             .map(|v| v.serialize::<Self>())
-            .collect::<Result<Vec<Value>, _>>()
-            .ctx::<Set>()?;
+            .collect::<Result<Vec<Value>, _>>()?;
 
         if elements.is_empty() {
             // Why.

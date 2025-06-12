@@ -14,3 +14,7 @@ impl Traverser {
         }
     }
 }
+
+impl Object for Traverser {
+    const name: &'static str = "Traverser";
+}

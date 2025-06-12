@@ -10,7 +10,7 @@ impl Deserializer<StarGraph> for V2 {
 }
 
 impl Serializer<StarGraph> for V2 {
-    fn serialize(val: &StarGraph) -> Result<Value, Leaf> {
+    fn serialize(val: &StarGraph) -> Result<Value, Error> {
         let binding = GValue::Vertex(val.into());
         Ok(json!({"starVertex": binding.serialize::<Self>()?,}))
     }

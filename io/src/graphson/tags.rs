@@ -1,7 +1,7 @@
 #![allow(unused)]
 
+use crate::error::*;
 use crate::graphson::Ensure;
-use crate::graphson::error::*;
 use crate::macros::get_value;
 use serde_json::Value;
 use snafu::prelude::*;
@@ -24,15 +24,15 @@ pub struct Type<'a> {
 impl Typed for Value {
     /// Validates a type against the expected { `@type`: ..., `@value`: ... } format
     fn typed<'a>(&'a self) -> Result<Type<'a>, Error> {
-        let tag = match self.ensure(TYPE_TAG).context(InvalidSnafu) {
+        let tag = match self.ensure(TYPE_TAG) {
             Ok(v) => {
                 let tagd = v.as_str().unwrap().to_string();
-                Tag::try_from(tagd.as_str()).context(InvalidSnafu)?
+                Tag::try_from(tagd.as_str())?
             }
             Err(e) => return Err(e),
         };
 
-        match self.ensure(VALUE_TAG).context(InvalidSnafu) {
+        match self.ensure(VALUE_TAG) {
             Ok(value) => Ok(Type { tag, value }),
             Err(e) => Err(e),
         }
@@ -149,7 +149,7 @@ enom!(
     TraversalMetrics("g:TraversalMetrics"),
     Traverser("g:Traverser"),
     // Extended
-
+    Int128("gx:i128"),
     // Custom
     // The geometric type value emitted by SQLg
     Geometry("g:Geometry"),

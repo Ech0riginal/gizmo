@@ -1,4 +1,4 @@
-use crate::graphson::{Error, MissingSnafu};
+use crate::error::{Error, MissingSnafu};
 use crate::*;
 use indexmap::IndexMap;
 use snafu::OptionExt;

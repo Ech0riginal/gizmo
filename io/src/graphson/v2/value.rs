@@ -5,8 +5,9 @@ use serde_json::Value;
 impl<T> Serializer<Option<T>> for V2
 where
     V2: Serializer<T>,
+    T: Object,
 {
-    fn serialize(val: &Option<T>) -> Result<Value, Leaf> {
+    fn serialize(val: &Option<T>) -> Result<Value, Error> {
         match val {
             None => Ok(Value::Null),
             Some(inner) => inner.serialize::<Self>(),
@@ -15,7 +16,7 @@ where
 }
 
 impl Serializer<GValue> for V2 {
-    fn serialize(val: &GValue) -> Result<Value, Leaf> {
+    fn serialize(val: &GValue) -> Result<Value, Error> {
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => val.serialize::<Self>(),
@@ -50,17 +51,32 @@ impl Serializer<GValue> for V2 {
             GValue::T(val) => val.serialize::<Self>(),
             GValue::TraversalMetrics(val) => val.serialize::<Self>(),
             GValue::Traverser(val) => val.serialize::<Self>(),
-            GValue::Int128(_) => Err(Error::Unsupported("Int128".into())),
-            GValue::Token(_) => Err(Error::Unsupported("Token".into())),
+            GValue::Int128(_) => Err(Error::Unsupported {
+                tag: Tag::Int128.to_string(),
+                location: location!(),
+            }),
+            GValue::Token(_) => Err(Error::Unsupported {
+                tag: "g:Token?".into(),
+                location: location!(),
+            }),
             GValue::Metric(val) => val.serialize::<Self>(),
-            GValue::TraversalExplanation(_) => {
-                Err(Error::Unsupported("wat TraversalExplanation".into()))
-            }
-            GValue::IntermediateRepr(_) => Err(Error::Unsupported("IntermediateRepr".into())),
+            // GValue::TraversalExplanation(_) => {
+            //     Err(Error::Unsupported { tag: "TraversalExplanation".to_string(), location: location!() })
+            // }
+            // GValue::IntermediateRepr(_) => Err(Error::Unsupported { tag: "IntermediateRepr".to_string(), location: location!() }),
             GValue::TextP(val) => val.serialize::<Self>(),
-            GValue::Geometry(_) => Err(Error::Unsupported("Geometry".into())),
-            GValue::Merge(_) => Err(Error::Unsupported("Merge".into())),
-            GValue::BulkSet(_) => Err(Error::Unsupported("BulkSet".into())),
+            GValue::Geometry(_) => Err(Error::Unsupported {
+                tag: "Geometry".to_string(),
+                location: location!(),
+            }),
+            GValue::Merge(_) => Err(Error::Unsupported {
+                tag: "Merge".to_string(),
+                location: location!(),
+            }),
+            GValue::BulkSet(_) => Err(Error::Unsupported {
+                tag: "BulkSet".to_string(),
+                location: location!(),
+            }),
         }
     }
 }
@@ -73,7 +89,7 @@ impl Deserializer<GValue> for V2 {
             Value::Object(_obj) => match value.typed() {
                 Ok(blob) => deserialize(blob),
                 Err(err) => match err {
-                    TypeError::Invalid { .. } => deserialize_variant(value),
+                    Error::Missing { .. } => deserialize_variant(value),
                     _ => panic!(),
                 },
             },
@@ -144,16 +160,20 @@ fn deserialize<'a>(blob: Type<'a>) -> Result<GValue, Error> {
             .deserialize::<V2, TraversalMetrics>()
             .map(GValue::from),
         Tag::Traverser => blob.value.deserialize::<V2, Traverser>().map(GValue::from),
-        type_tag => Err(Error::Unsupported(type_tag.to_string())),
+        type_tag => Err(Error::Unsupported {
+            tag: type_tag.to_string(),
+            location: location!(),
+        }),
     }
 }
 
 fn deserialize_variant<'a>(value: &Value) -> Result<GValue, Error> {
     match value {
         val if is_stargraph(val) => value.deserialize::<V2, StarGraph>().map(GValue::from),
-        _ => Err(Error::UnexpectedJson {
-            msg: "Special case".into(),
-            value: value.clone(),
+        _ => Err(Error::Unexpected {
+            expectation: "Special case".into(),
+            actual: format!("{value}"),
+            location: location!(),
         }),
     }
 }

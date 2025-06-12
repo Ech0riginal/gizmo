@@ -7,16 +7,17 @@ impl Deserializer<Cardinality> for V2 {
             "list" => Ok(Cardinality::List),
             "set" => Ok(Cardinality::Set),
             "single" => Ok(Cardinality::Single),
-            _ => Err(Error::UnexpectedJson {
-                msg: "".into(),
-                value: val.clone(),
+            _ => Err(Error::Unexpected {
+                actual: string.to_string(),
+                expectation: "'list', 'set', or 'single'".to_string(),
+                location: location!(),
             }),
         }
     }
 }
 
 impl Serializer<Cardinality> for V2 {
-    fn serialize(val: &Cardinality) -> Result<Value, Leaf> {
+    fn serialize(val: &Cardinality) -> Result<Value, Error> {
         let str = match val {
             Cardinality::List => "list",
             Cardinality::Set => "set",

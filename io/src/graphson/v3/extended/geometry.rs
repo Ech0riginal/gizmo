@@ -9,7 +9,7 @@ type PolygonType = Vec<Vec<PointType>>;
 
 impl Deserializer<Geometry> for V3 {
     fn deserialize(val: &Value) -> Result<Geometry, Error> {
-        let coordinates = val.ensure("coordinates").ctx::<Geometry>()?;
+        let coordinates = val.ensure("coordinates")?;
 
         // There must be a better way to do this
         if let Ok(coords) = from_value::<PointType>(coordinates.clone()) {

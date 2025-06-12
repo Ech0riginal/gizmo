@@ -281,14 +281,14 @@ mod gvalues {
                     GValue::Metric(b) => a.diff(b),
                     _ => self.differ(other, Intrinsic),
                 },
-                GValue::TraversalExplanation(a) => match other {
-                    GValue::TraversalExplanation(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
-                GValue::IntermediateRepr(a) => match other {
-                    GValue::IntermediateRepr(b) => a.diff(b),
-                    _ => self.differ(other, Intrinsic),
-                },
+                // GValue::TraversalExplanation(a) => match other {
+                //     GValue::TraversalExplanation(b) => a.diff(b),
+                //     _ => self.differ(other, Intrinsic),
+                // },
+                // GValue::IntermediateRepr(a) => match other {
+                //     GValue::IntermediateRepr(b) => a.diff(b),
+                //     _ => self.differ(other, Intrinsic),
+                // },
                 GValue::TextP(a) => match other {
                     GValue::TextP(b) => a.diff(b),
                     _ => self.differ(other, Intrinsic),
@@ -469,16 +469,16 @@ mod gvalues {
             todo!()
         }
     }
-    impl Diff for TraversalExplanation {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
-    impl Diff for IntermediateRepr {
-        fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
-            todo!()
-        }
-    }
+    // impl Diff for TraversalExplanation {
+    //     fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
+    //         todo!()
+    //     }
+    // }
+    // impl Diff for IntermediateRepr {
+    //     fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
+    //         todo!()
+    //     }
+    // }
     impl Diff for TextP {
         fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             todo!()

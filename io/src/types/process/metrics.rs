@@ -2,89 +2,6 @@ use crate::{Double, List, Long, Object};
 
 use std::hash::{Hash, Hasher};
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub struct TraversalExplanation {
-    final_t: Vec<String>,
-    original: Vec<String>,
-    intermediate: Vec<IntermediateRepr>,
-}
-
-impl TraversalExplanation {
-    pub fn final_t(&self) -> &Vec<String> {
-        &self.final_t
-    }
-    pub fn original(&self) -> &Vec<String> {
-        &self.original
-    }
-
-    pub fn intermediate(&self) -> &Vec<IntermediateRepr> {
-        &self.intermediate
-    }
-}
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub struct IntermediateRepr {
-    traversal: Vec<String>,
-    strategy: String,
-    category: String,
-}
-
-impl IntermediateRepr {
-    pub fn new(traversal: Vec<String>, strategy: String, category: String) -> IntermediateRepr {
-        IntermediateRepr {
-            traversal,
-            strategy,
-            category,
-        }
-    }
-}
-impl TraversalExplanation {
-    pub fn new(
-        original: Vec<String>,
-        final_t: Vec<String>,
-        intermediate: Vec<IntermediateRepr>,
-    ) -> TraversalExplanation {
-        TraversalExplanation {
-            final_t,
-            original,
-            intermediate,
-        }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone)]
-pub struct TraversalMetrics {
-    duration: Double,
-    metrics: List<Metrics>,
-}
-
-impl Object for TraversalMetrics {
-    const name: &'static str = "TraversalMetrics";
-}
-
-impl Hash for TraversalMetrics {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        for m in self.metrics.iter() {
-            m.hash(state);
-        }
-    }
-}
-
-impl TraversalMetrics {
-    pub fn duration(&self) -> &f64 {
-        &self.duration.0
-    }
-
-    pub fn metrics(&self) -> &List<Metrics> {
-        &self.metrics
-    }
-}
-
-impl TraversalMetrics {
-    pub fn new(duration: Double, metrics: List<Metrics>) -> Self {
-        TraversalMetrics { duration, metrics }
-    }
-}
-
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Metrics {
     pub(crate) id: String,
@@ -147,3 +64,53 @@ impl Metrics {
         }
     }
 }
+/*
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct TraversalExplanation {
+    final_t: Vec<String>,
+    original: Vec<String>,
+    intermediate: Vec<IntermediateRepr>,
+}
+
+impl TraversalExplanation {
+    pub fn final_t(&self) -> &Vec<String> {
+        &self.final_t
+    }
+    pub fn original(&self) -> &Vec<String> {
+        &self.original
+    }
+
+    pub fn intermediate(&self) -> &Vec<IntermediateRepr> {
+        &self.intermediate
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct IntermediateRepr {
+    traversal: Vec<String>,
+    strategy: String,
+    category: String,
+}
+
+impl IntermediateRepr {
+    pub fn new(traversal: Vec<String>, strategy: String, category: String) -> IntermediateRepr {
+        IntermediateRepr {
+            traversal,
+            strategy,
+            category,
+        }
+    }
+}
+impl TraversalExplanation {
+    pub fn new(
+        original: Vec<String>,
+        final_t: Vec<String>,
+        intermediate: Vec<IntermediateRepr>,
+    ) -> TraversalExplanation {
+        TraversalExplanation {
+            final_t,
+            original,
+            intermediate,
+        }
+    }
+}
+*/

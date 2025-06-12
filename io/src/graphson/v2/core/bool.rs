@@ -8,7 +8,7 @@ impl Deserializer<Bool> for V2 {
 }
 
 impl Serializer<Bool> for V2 {
-    fn serialize(val: &Bool) -> Result<Value, Leaf> {
+    fn serialize(val: &Bool) -> Result<Value, Error> {
         Ok(Value::Bool(**val))
     }
 }

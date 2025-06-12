@@ -9,6 +9,10 @@ pub struct P {
     pub(crate) value: Box<GValue>,
 }
 
+impl Object for P {
+    const name: &'static str = "P";
+}
+
 impl P {
     pub fn operator(&self) -> &String {
         &self.operator

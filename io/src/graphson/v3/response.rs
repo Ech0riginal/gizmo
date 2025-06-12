@@ -5,31 +5,20 @@ use serde_json::Value;
 
 impl Deserializer<Response> for V3 {
     fn deserialize(value: &Value) -> Result<Response, Error> {
-        let map = get_value!(value, Value::Object).ctx::<Response>()?;
-        let id = map
-            .ensure("requestId")
-            .ctx::<Response>()?
-            .deserialize::<Self, uuid::Uuid>()
-            .ctx::<Response>()?;
-        let result = map.ensure("result").ctx::<Response>()?;
-        let data = result
-            .ensure("data")?
-            .deserialize::<Self, GValue>()
-            .ctx::<Response>()?;
-        let meta = result.ensure("meta").ctx::<Response>()?;
-        let meta = get_value!(meta, Value::Object)
-            .ctx::<Response>()?
+        let map = get_value!(value, Value::Object)?;
+        let id = map.ensure("requestId")?.deserialize::<Self, uuid::Uuid>()?;
+        let result = map.ensure("result")?;
+        let data = result.ensure("data")?.deserialize::<Self, GValue>()?;
+        let meta = result.ensure("meta")?;
+        let meta = get_value!(meta, Value::Object)?
             .into_iter()
-            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>().ctx::<Response>()))
+            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
             .map(|(k, result)| match result {
                 Ok(v) => Ok((k, v)),
                 Err(e) => Err(e),
             })
-            .collect::<Result<Map<String, GValue>, Error>>()?;
-        let status = value
-            .ensure("status")?
-            .deserialize::<Self, Status>()
-            .ctx::<Response>()?;
+            .collect::<Result<Map<String, GValue>, _>>()?;
+        let status = value.ensure("status")?.deserialize::<Self, Status>()?;
         Ok(Response {
             id,
             status,
@@ -43,18 +32,17 @@ impl Deserializer<Status> for V3 {
     fn deserialize(val: &Value) -> Result<Status, Error> {
         let code = val
             .ensure("code")
-            .map(|code| code.as_i64().unwrap() as i16)
-            .ctx::<Status>()?;
+            .map(|code| code.as_i64().unwrap() as i16)?;
         let message = {
-            let tmp = val.ensure("message").ctx::<Status>()?;
-            let str = get_value!(tmp, Value::String).ctx::<Status>()?;
+            let tmp = val.ensure("message")?;
+            let str = get_value!(tmp, Value::String)?;
             if str.is_empty() {
                 None
             } else {
                 Some(str.clone())
             }
         };
-        let attributes = val.ensure("attributes").ctx::<Status>()?.clone();
+        let attributes = val.ensure("attributes")?.clone();
 
         Ok(Status {
             code,

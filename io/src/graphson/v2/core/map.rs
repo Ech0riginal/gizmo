@@ -4,8 +4,10 @@ use indexmap::IndexMap;
 impl<K, V> Serializer<Map<K, V>> for V2
 where
     Self: Serializer<K> + Serializer<V>,
+    K: Object,
+    V: Object,
 {
-    fn serialize(val: &Map<K, V>) -> Result<Value, Leaf> {
+    fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mapd = val
             .iter()
             .map(|(k, v)| (k.serialize::<Self>(), v.serialize::<Self>()))

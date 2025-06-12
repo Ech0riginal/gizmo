@@ -1474,7 +1474,7 @@ mod response {
         authentication_challenge,
         V3,
         Test {
-            serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { "@type" : "g:Map", "@value" : [ ] } }, "result" : { "data" : null, "meta" : { "@type" : "g:Map", "@value" : [ ] } }}),
+            serial: json!({"requestId":"41d2e28a-20a4-4ab0-b379-d810dede3786","status":{"message":"","code":407,"attributes":{"@type":"g:Map","@value":[]}},"result":{"data":null,"meta":{"@type":"g:Map","@value":[]}}}),
             object: crate::Response {
                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
                 status: crate::Status {

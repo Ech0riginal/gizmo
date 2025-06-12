@@ -19,14 +19,15 @@ impl Deserializer<Vertex> for V2 {
 }
 
 impl Serializer<Vertex> for V2 {
-    fn serialize(val: &Vertex) -> Result<Value, Leaf> {
+    fn serialize(val: &Vertex) -> Result<Value, Error> {
         let mut root = IndexMap::<&'static str, Value>::new();
         let mut value = IndexMap::<&'static str, Value>::new();
 
-        value.insert("id", val.id().serialize::<Self>()?);
-        value.insert("label", serde_json::to_value(val.label())?);
+        value.insert("id", val.id.serialize::<Self>()?);
+        value.insert("label", serde_json::to_value(&val.label)?);
         if !val.properties.is_empty() {
             let properties = val
+                .properties
                 .iter()
                 .map(|(label, properties)| {
                     (

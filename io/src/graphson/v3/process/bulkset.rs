@@ -7,22 +7,21 @@ impl Deserializer<BulkSet> for V3 {
             return Ok(BulkSet::default());
         }
 
-        let values = get_value!(val, Value::Array).ctx::<BulkSet>()?;
+        let values = get_value!(val, Value::Array)?;
 
         if values.len() % 2 != 0 {
             Err(Error::Unexpected {
                 expectation: "An array divisible by 2".to_string(),
                 actual: format!("{val:?}"),
                 location: location!(),
-            })
-            .ctx::<BulkSet>()?;
+            })?;
         }
 
         let mut data = vec![];
         let mut counts = vec![];
 
         for json in values.clone().into_iter() {
-            let gval = json.deserialize::<Self, GValue>().ctx::<BulkSet>()?;
+            let gval = json.deserialize::<Self, GValue>()?;
             if data.len() > counts.len() {
                 counts.push(gval);
             } else {

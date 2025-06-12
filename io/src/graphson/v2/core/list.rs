@@ -7,12 +7,13 @@ use crate::graphson::prelude::*;
 impl<T> Serializer<List<T>> for V2
 where
     V2: Serializer<T>,
+    T: Object,
 {
-    fn serialize(val: &List<T>) -> Result<Value, Leaf> {
+    fn serialize(val: &List<T>) -> Result<Value, Error> {
         let value = val
             .iter()
             .map(|v| v.serialize::<Self>())
-            .collect::<Result<Vec<Value>, Error>>()?;
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(json!(value))
     }
 }

@@ -9,13 +9,13 @@ where
     V: Object,
 {
     fn deserialize(val: &Value) -> Result<Map<K, V>, Error> {
-        let val = get_value!(val, Value::Array).ctx::<Map<K, V>>()?;
+        let val = get_value!(val, Value::Array)?;
         let mut map = Map::new();
         if !val.is_empty() {
             let mut x = 0;
             while x < val.len() {
-                let key = val[x].deserialize::<Self, K>().ctx::<Map<K, V>>()?;
-                let value = val[x + 1].deserialize::<Self, V>().ctx::<Map<K, V>>()?;
+                let key = val[x].deserialize::<Self, K>()?;
+                let value = val[x + 1].deserialize::<Self, V>()?;
                 map.insert(key, value);
                 x += 2;
             }

@@ -3,11 +3,11 @@
 use crate::graphson::prelude::*;
 
 impl Serializer<Set> for V2 {
-    fn serialize(val: &Set) -> Result<Value, Leaf> {
+    fn serialize(val: &Set) -> Result<Value, Error> {
         let elements = val
             .iter()
             .map(|v| v.serialize::<Self>())
-            .collect::<Result<Vec<Value>, Error>>()?;
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(json!(elements))
     }
 }
