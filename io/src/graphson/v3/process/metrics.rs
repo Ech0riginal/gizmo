@@ -30,7 +30,7 @@ impl Deserializer<Metrics> for V3 {
             .remove_ok::<List<GValue>, _>(Tag::Metrics)
             .unwrap_or_else(|_| list![])
             .into_iter()
-            .map(|v| get_value!(v, GValue::Metric))
+            .map(|v| get_value!(v, GValue::Metrics))
             .collect::<Result<List<Metrics>, Error>>()
             .unwrap_or_else(|e| {
                 tracing::warn!("Deserializing nested metrics signaled an error.");

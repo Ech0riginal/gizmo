@@ -9,7 +9,7 @@ impl Deserializer<TraversalMetrics> for V3 {
         let m = metrics
             .remove_ok::<List<GValue>, _>("metrics")?
             .drain(..)
-            .map(|value| get_value!(value, GValue::Metric))
+            .map(|value| get_value!(value, GValue::Metrics))
             .filter_map(Result::ok)
             .collect::<List<_>>();
 
