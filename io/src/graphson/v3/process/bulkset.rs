@@ -50,9 +50,16 @@ impl Deserializer<BulkSet> for V3 {
 
         // TODO populate BulkSet occurrences
 
+        let occurrences = hashmap.len();
         Ok(BulkSet {
             map: hashmap,
-            occurrences: 0,
+            occurrences,
         })
+    }
+}
+
+impl Serializer<BulkSet> for V3 {
+    fn serialize(val: &BulkSet) -> Result<Value, Error> {
+        todo!()
     }
 }

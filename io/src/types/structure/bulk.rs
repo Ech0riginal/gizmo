@@ -3,8 +3,8 @@ use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct BulkSet {
-    pub map: Map<GValue, GValue>,
-    pub occurrences: usize,
+    pub(crate) map: Map<GValue, GValue>,
+    pub(crate) occurrences: usize,
 }
 
 impl Object for BulkSet {

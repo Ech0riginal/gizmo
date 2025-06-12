@@ -24,6 +24,20 @@ where
     }
 }
 
+impl Ensure<str, crate::GValue> for crate::Map<crate::GValue, crate::GValue> {
+    #[track_caller]
+    fn ensure(&self, key: &str) -> Result<&crate::GValue, Error> {
+        let key = crate::GValue::from(key);
+        self.get(&key).ok_or({
+            let caller = std::panic::Location::caller();
+            Error::Missing {
+                key: format!("{:?}", key),
+                location: Location::new(caller.file(), caller.line(), caller.column()),
+            }
+        })
+    }
+}
+
 impl<K> Ensure<K, Value> for Value
 where
     K: ?Sized + AsRef<str>,

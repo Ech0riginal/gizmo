@@ -7,6 +7,18 @@ impl<T: Object> Object for List<T> {
     const name: &'static str = "List";
 }
 
+// impl<T> From<GValue> for List<T>
+// where
+//     GValue: Into<T>,
+// {
+//     fn from(value: GValue) -> List<T> {
+//         match value {
+//             GValue::List(list) => list.into_iter().map(|g| g.into()).collect::<List<T>>(),
+//             _ => list![],
+//         }
+//     }
+// }
+
 impl<T> Default for List<T> {
     fn default() -> Self {
         list![]
@@ -93,13 +105,13 @@ impl<T> IntoIterator for List<T> {
 }
 
 macro_rules! list {
-    () => (
+    [] => (
         $crate::List(std::vec::Vec::new())
     );
-    ($elem:expr; $n:expr) => (
+    [$elem:expr; $n:expr] => (
         $crate::List(std::vec::Vec::from_elem($elem, $n))
     );
-    ($($x:expr),+ $(,)?) => (
+    [$($x:expr),+ $(,)?] => (
         // Massage liballoc
         $crate::List(vec![$($x),+])
     );

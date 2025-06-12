@@ -97,6 +97,12 @@ Null,
 impl Object for GValue {
     const name: &'static str = "GValue";
 }
+impl GValue {
+    pub(crate) fn boxed(self) -> Box<Self> {
+        Box::new(self)
+    }
+}
+
 enom!(
     // Core
     Bool(Bool),

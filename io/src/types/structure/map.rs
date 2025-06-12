@@ -101,11 +101,11 @@ where
     }
     pub fn remove_ok<V_, T: Into<K>>(&mut self, key: T) -> Result<V_, Error>
     where
-        K: fmt::Display,
+        K: fmt::Debug,
         V: Into<V_>,
     {
         let key = key.into();
-        let key_debug = format!("{}", &key);
+        let key_debug = format!("{:?}", &key);
         self.0
             .swap_remove(&key)
             .map(|item| item.into())

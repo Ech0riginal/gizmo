@@ -134,7 +134,7 @@ impl<T: Diff + Debug> Diff for Option<T> {
 mod gvalues {
     use super::*;
     impl Diff for GValue {
-        // Compiler will say it's unused due to macro use
+        // Compiler will say _other's unused due to macro use
         fn diff<'a>(&'a self, _other: &'a Self) -> Debuggery<'a> {
             macro_rules! match_maker {
                 ($($variant:ident,)*$(,)?) => {

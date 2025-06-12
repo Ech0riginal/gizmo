@@ -1116,7 +1116,7 @@ mod process {
         V3,
         Test {
             serial: json!({ "@type" : "g:Barrier", "@value" : "normSack"}),
-            object: GValue::Null,
+            object: GValue::Barrier(Barrier::NormSack),
         }
     );
     gvalue_test!(
@@ -1124,15 +1124,26 @@ mod process {
         V3,
         Test {
             serial: json!({ "@type" : "g:Binding", "@value" : { "key" : "x", "value" : { "@type" : "g:Int32", "@value" : 1 } }}),
-            object: GValue::Null,
+            object: GValue::Binding(Binding {
+                key: "x".into(),
+                value: GValue::Integer(1.into()).boxed()
+            }),
         }
     );
     gvalue_test!(
         bulkset,
         V3,
         Test {
-            serial: json!({ "@type" : "g:BulkSet", "@value" : [ "marko", { "@type" : "g:Int64", "@value" : 1 }, "josh", { "@type" : "g:Int64", "@value" : 2 } ]}),
-            object: GValue::Null,
+            serial: json!({ "@type" : "g:BulkSet", "@value" : [ "drake", { "@type" : "g:Int64", "@value" : 1 }, "josh", { "@type" : "g:Int64", "@value" : 2 } ]}),
+            object: GValue::BulkSet(BulkSet {
+                map: {
+                    let mut tmp = Map::new();
+                    tmp.insert("drake".into(), GValue::Long(1.into()));
+                    tmp.insert("josh".into(), GValue::Long(2.into()));
+                    tmp
+                },
+                occurrences: 2, // i guess? TODO look into how to populate while deserializing
+            }),
         }
     );
     gvalue_test!(
@@ -1140,7 +1151,13 @@ mod process {
         V3,
         Test {
             serial: json!({ "@type" : "g:Bytecode", "@value" : { "step" : [ [ "V" ], [ "hasLabel", "person" ], [ "out" ], [ "in" ], [ "tree" ] ] }}),
-            object: GValue::Null,
+            object: GValue::Bytecode(Bytecode {
+                source_instructions: list![Instruction {
+                    operator: "V".into(),
+                    args: list!["hasLabel".into(), "person".into()],
+                }],
+                step_instructions: list![],
+            }),
         }
     );
     gvalue_test!(
@@ -1211,7 +1228,7 @@ mod process {
         metrics,
         V3,
         Test {
-            serial: json!({ "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 4 }, "elementCount", { "@type" : "g:Int64", "@value" : 4 } ] }, "name", "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "7.0.0()", "metrics", { "@type" : "g:List", "@value" : [ { "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 7 }, "elementCount", { "@type" : "g:Int64", "@value" : 7 } ] }, "name", "VertexStep(OUT,vertex)", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "3.0.0()" ] } } ] } ] }}),
+            serial: json!({"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":4},"elementCount",{"@type":"g:Int64","@value":4}]},"name","TinkerGraphStep(vertex,[~label.eq(person)])","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","7.0.0()","metrics",{"@type":"g:List","@value":[{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":7},"elementCount",{"@type":"g:Int64","@value":7}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","3.0.0()"]}}]}]}}),
             object: GValue::Null,
         }
     );

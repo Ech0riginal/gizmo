@@ -16,3 +16,9 @@ impl Deserializer<TraversalMetrics> for V3 {
         Ok(TraversalMetrics::new(duration, m))
     }
 }
+
+impl Serializer<TraversalMetrics> for V3 {
+    fn serialize(val: &TraversalMetrics) -> Result<Value, Error> {
+        todo!()
+    }
+}
