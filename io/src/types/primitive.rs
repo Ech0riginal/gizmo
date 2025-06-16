@@ -1,6 +1,7 @@
 pub trait Object {
     #[allow(nonstandard_style)]
     const name: &'static str;
+    const __id: u32 = const_random::const_random!(u32) & 0xFFFF4FFF | 0x40008000; // Realistically we only have 50-ish types
 }
 
 #[macro_export]
