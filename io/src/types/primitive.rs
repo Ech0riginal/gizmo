@@ -3,6 +3,10 @@ pub trait Object {
     const name: &'static str;
 }
 
+pub trait Tag_<D> {
+    const tag: &'static str;
+}
+
 #[macro_export]
 macro_rules! primitive_prelude {
     () => {
@@ -63,6 +67,30 @@ macro_rules! obj {
         }
     };
 }
+
+
+#[macro_export]
+macro_rules! tag {
+    ($id:ident) => {
+        $crate::tag!($id, const_format::concatp!("g:", stringify!($id)));
+    };
+    ($id:ident $tag:expr) => {
+        impl<D: $crate::Dialect> $crate::Tag_<D> for $id {
+            const name: &'static str = $tag;
+        }
+    };
+    ($id:ident, $dialect:ident) => {
+        $crate::tag!($id, $dialect, const_format::concatp!("g:", stringify!($id)));
+    };
+    ($id:ident, $dialect:ident, $tag:expr) => {
+        impl $crate::Tag_<$dialect> for $id {
+            const name: &'static str = $tag;
+        }
+    };
+}
+
+
+
 #[macro_export]
 macro_rules! new {
     ($name:ident, $inner:ident) => {
