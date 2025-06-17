@@ -1,6 +1,8 @@
 use crate::{Error, GID, GValue, Object, Request, Response};
 use serde_json::Value;
 
+pub trait Dialect {}
+
 #[allow(private_bounds)]
 pub trait GremlinIO
 where

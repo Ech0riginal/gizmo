@@ -8,6 +8,7 @@ rust-version = "1.87.0"
 [dependencies]
 #Avoids bringing in time crate (https://github.com/time-rs/time/issues/293)
 chrono              = { version = "0.4.41", default-features = false, features = ["serde"] }
+const_format        = "0.2.34"
 derive_builder      = { version = "0.20.2" }
 geo-types           = { version = "0.7.16" }
 geojson             = { version = "0.24.2", features = ["geo-types"] }
