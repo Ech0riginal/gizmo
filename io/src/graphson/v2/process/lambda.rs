@@ -1,4 +1,4 @@
-use crate::{List, obj};
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Lambda {
@@ -8,3 +8,4 @@ pub struct Lambda {
 }
 
 obj!(Lambda);
+tag!(Lambda);

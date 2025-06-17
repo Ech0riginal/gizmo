@@ -9,7 +9,7 @@ mod request;
 mod response;
 mod types;
 
-pub use api::GremlinIO;
+pub use api::*;
 pub use error::Error;
 pub use graphson::V3;
 pub use request::{Args, Request};
