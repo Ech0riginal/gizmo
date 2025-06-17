@@ -1,4 +1,4 @@
-use crate::{Double, List, Metrics, Object};
+use crate::*;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -7,9 +7,8 @@ pub struct TraversalMetrics {
     pub(crate) metrics: List<Metrics>,
 }
 
-impl Object for TraversalMetrics {
-    const name: &'static str = "TraversalMetrics";
-}
+obj!(TraversalMetrics);
+tag!(TraversalMetrics);
 
 impl Hash for TraversalMetrics {
     fn hash<H: Hasher>(&self, state: &mut H) {

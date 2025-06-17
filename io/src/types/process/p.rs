@@ -1,5 +1,3 @@
-use crate::Either2;
-use crate::TextP;
 use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -9,9 +7,8 @@ pub struct P {
     pub(crate) value: Box<GValue>,
 }
 
-impl Object for P {
-    const name: &'static str = "P";
-}
+obj!(P);
+tag!(P);
 
 impl P {
     pub fn operator(&self) -> &String {

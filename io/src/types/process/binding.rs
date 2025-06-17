@@ -1,4 +1,4 @@
-use crate::GValue;
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Binding {
@@ -6,4 +6,5 @@ pub struct Binding {
     pub(crate) value: Box<GValue>,
 }
 
-crate::obj!(Binding);
+obj!(Binding);
+tag!(Binding);

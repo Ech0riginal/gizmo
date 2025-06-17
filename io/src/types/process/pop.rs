@@ -1,5 +1,4 @@
-use crate::Object;
-use std::fmt::Display;
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Pop {
@@ -9,11 +8,10 @@ pub enum Pop {
     Mixed,
 }
 
-impl Object for Pop {
-    const name: &'static str = "Pop";
-}
+obj!(Pop);
+tag!(Pop);
 
-impl Display for Pop {
+impl std::fmt::Display for Pop {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Pop::All => write!(f, "all"),
