@@ -1,20 +1,17 @@
-mod core;
-mod id;
-mod process;
-mod request;
-mod response;
-mod structure;
-mod value;
+// mod core;
+// mod id;
+// mod process;
+// mod request;
+// mod response;
+// mod structure;
+// mod value;
 
-#[derive(Clone, Debug, Default)]
-pub struct V2;
+use crate::{Format, GValue};
+use crate::graphson::GraphSON;
+use crate::versions::V2;
 
-impl crate::Sealed for V2 {}
-
-impl crate::GremlinIO for V2 {
-    const version: &'static str = "v2";
+impl Format for GraphSON<V2> {
     const mime: &'static str = "application/vnd.gremlin-v2.0+json";
+    type Serial = serde_json::Value;
+    type Object = GValue;
 }
-
-unsafe impl Send for V2 {}
-unsafe impl Sync for V2 {}

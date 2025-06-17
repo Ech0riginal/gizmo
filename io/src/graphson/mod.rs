@@ -1,16 +1,47 @@
 // mod id;
 mod key;
 mod tags;
-#[cfg(test)]
-pub(crate) mod tests;
+// #[cfg(test)]
+// pub(crate) mod tests;
 mod utils;
 mod v2;
 mod v3;
 
-pub use tags::Tag;
+// pub use tags::Tag;
 pub use utils::Ensure;
-pub use v2::V2;
-pub use v3::V3;
+
+pub struct GraphSON<V> {
+    _version: std::marker::PhantomData<V>,
+}
+
+pub trait GraphsonDeserializer<T, D> {
+    fn deserialize(val: &serde_json::Value) -> Result<T, crate::Error>;
+}
+
+pub trait GraphsonSerializer<T, D> where T: crate::Tag_<D> {
+    fn serialize(val: &T) -> Result<serde_json::Value, crate::Error>;
+}
+
+impl<O, D, T> crate::Deserializer<O, serde_json::Value, D> for T
+where
+    O: crate::Tag_<D>,
+    T: GraphsonDeserializer<O, D>
+{
+    fn do_deserialize(serial: &serde_json::Value) -> Result<O, crate::Error> {
+        <T as GraphsonDeserializer<O, D>>::deserialize(serial)
+    }
+}
+
+impl<O, D, T> crate::Serializer<O, serde_json::Value, D> for T
+where
+    O: crate::Tag_<D>,
+    T: GraphsonSerializer<O, D>
+{
+    fn do_serialize(object: &O) -> Result<serde_json::Value, crate::Error> {
+        <T as GraphsonSerializer<O, D>>::serialize(object)
+    }
+}
+
 
 mod prelude {
     pub use indexmap::IndexMap;
@@ -19,10 +50,8 @@ mod prelude {
 
     pub use super::*;
 
-    pub use crate::api::{Deserialize, Deserializer};
-    pub use crate::api::{Serialize, Serializer};
+    pub use crate::api::{Deserializer, Serializer};
     pub use crate::error::Error;
-    pub use crate::graphson::tags::*;
     pub use crate::macros::*;
     pub use crate::types::*;
 }
