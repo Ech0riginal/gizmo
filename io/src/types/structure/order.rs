@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Order {
@@ -7,6 +7,5 @@ pub enum Order {
     Shuffle,
 }
 
-impl Object for Order {
-    const name: &'static str = "Order";
-}
+obj!(Order);
+tag!(Order);

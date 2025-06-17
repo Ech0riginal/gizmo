@@ -1,4 +1,4 @@
-use crate::{GValue, Object};
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Path {
@@ -6,6 +6,5 @@ pub struct Path {
     pub(crate) objects: Box<GValue>,
 }
 
-impl Object for Path {
-    const name: &'static str = "Path";
-}
+obj!(Path);
+tag!(Path);

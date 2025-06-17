@@ -1,6 +1,9 @@
-crate::primitive_prelude!();
-crate::very_primitive!(Date, chrono::DateTime<chrono::Utc>);
-crate::hash!(Date);
+use crate::*;
+
+primitive_prelude!();
+very_primitive!(Date, chrono::DateTime<chrono::Utc>);
+hash!(Date);
+tag!(Date);
 
 impl From<chrono::DateTime<chrono::Utc>> for crate::GValue {
     fn from(val: chrono::DateTime<chrono::Utc>) -> Self {
@@ -8,10 +11,11 @@ impl From<chrono::DateTime<chrono::Utc>> for crate::GValue {
     }
 }
 
-crate::primitive!(Timestamp, i64);
-crate::partial_eq!(Timestamp);
-crate::eq!(Timestamp);
-crate::hash!(Timestamp);
+primitive!(Timestamp, i64);
+partial_eq!(Timestamp);
+eq!(Timestamp);
+hash!(Timestamp);
+tag!(Timestamp);
 
 macro_rules! from {
     ($ty:ty) => {

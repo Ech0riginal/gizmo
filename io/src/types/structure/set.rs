@@ -8,6 +8,7 @@ crate::very_primitive!(Set, IndexSet<GValue>);
 crate::new!(Set, IndexSet);
 crate::iter!(Set);
 crate::into_iter!(Set);
+crate::tag!(Set);
 
 impl Hash for Set {
     fn hash<H: Hasher>(&self, state: &mut H) {

@@ -1,9 +1,12 @@
-use crate::{primitive_prelude, very_primitive};
+use crate::*;
 use geo_types::Geometry::*;
 use std::hash::Hasher;
 
 primitive_prelude!();
 very_primitive!(Geometry, geo_types::Geometry<f64>);
+
+// TODO impl for backends once available
+tag!(Geometry);
 
 impl std::hash::Hash for Geometry {
     fn hash<H: Hasher>(&self, state: &mut H) {

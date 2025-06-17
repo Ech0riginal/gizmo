@@ -1,5 +1,4 @@
 use crate::*;
-use crate::{GID, Vertex};
 
 use indexmap::map::IntoIter;
 use std::cmp::PartialEq;
@@ -14,9 +13,8 @@ pub struct Edge {
     pub(crate) properties: Map<String, Box<GValue>>,
 }
 
-impl Object for Edge {
-    const name: &'static str = "Edge";
-}
+obj!(Edge);
+tag!(Edge);
 
 // impl Edge {
 //     pub(crate) fn new<T>(

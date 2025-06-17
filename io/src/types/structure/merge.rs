@@ -1,5 +1,5 @@
 // use crate::process::traversal::step::OptionStep;
-use crate::{GValue, Map};
+use crate::*;
 
 #[derive(Clone)]
 pub struct MergeBuilder {
@@ -15,7 +15,8 @@ pub enum Merge {
     InV,
 }
 
-crate::obj!(Merge);
+obj!(Merge);
+tag!(Merge);
 
 impl std::ops::Deref for MergeBuilder {
     type Target = Merge;

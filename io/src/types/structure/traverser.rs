@@ -6,6 +6,9 @@ pub struct Traverser {
     pub(crate) value: Box<GValue>,
 }
 
+obj!(Traverser);
+tag!(Traverser);
+
 impl Traverser {
     pub fn new(bulk: i64, value: GValue) -> Traverser {
         Traverser {
@@ -13,8 +16,4 @@ impl Traverser {
             value: Box::new(value),
         }
     }
-}
-
-impl Object for Traverser {
-    const name: &'static str = "Traverser";
 }

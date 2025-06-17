@@ -3,6 +3,7 @@ use crate::*;
 #[derive(Debug, Clone)]
 pub struct GIDs(pub(crate) Vec<GID>);
 
+
 impl<T: Into<GID>> From<T> for GIDs {
     fn from(val: T) -> GIDs {
         GIDs(vec![val.into()])

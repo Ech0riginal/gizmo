@@ -1,10 +1,13 @@
-crate::primitive_prelude!();
-crate::primitive!(Class, String);
-crate::deref!(Class, String);
-crate::deref_mut!(Class);
-crate::partial_eq!(Class);
-crate::eq!(Class);
-crate::hash!(Class);
+use crate::*;
+
+primitive_prelude!();
+primitive!(Class, String);
+self::deref!(Class, String);
+deref_mut!(Class);
+partial_eq!(Class);
+eq!(Class);
+hash!(Class);
+tag!(Class);
 
 impl From<&String> for Class {
     fn from(value: &String) -> Self {
