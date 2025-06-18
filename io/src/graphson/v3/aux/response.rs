@@ -6,19 +6,19 @@ use serde_json::Value;
 impl<D: Dialect> GraphsonDeserializer<Response, D> for GraphSON<V3> {
     fn deserialize(value: &Value) -> Result<Response, Error> {
         let map = get_value!(value, Value::Object)?;
-        let id = map.ensure("requestId")?.deserialize::<Self, uuid::Uuid>()?;
+        let id = map.ensure("requestId")?.deserialize::<Self, D, uuid::Uuid>()?;
         let result = map.ensure("result")?;
-        let data = result.ensure("data")?.deserialize::<Self, GValue>()?;
+        let data = result.ensure("data")?.deserialize::<Self, D, GValue>()?;
         let meta = result.ensure("meta")?;
         let meta = get_value!(meta, Value::Object)?
             .into_iter()
-            .map(|(k, v)| (k.clone(), v.deserialize::<Self, GValue>()))
+            .map(|(k, v)| (k.clone(), v.deserialize::<Self, D, GValue>()))
             .map(|(k, result)| match result {
                 Ok(v) => Ok((k, v)),
                 Err(e) => Err(e),
             })
             .collect::<Result<Map<String, GValue>, _>>()?;
-        let status = value.ensure("status")?.deserialize::<Self, Status>()?;
+        let status = value.ensure("status")?.deserialize::<Self, D, Status>()?;
         Ok(Response {
             id,
             status,
@@ -57,17 +57,17 @@ impl<D: Dialect> GraphsonSerializer<Response, D> for GraphSON<V3> {
         let mut meta = IndexMap::new();
 
         for (key, value) in val.meta.iter() {
-            let serialized = value.serialize::<Self>()?;
+            let serialized = value.serialize::<Self, D>()?;
             meta.insert(Value::String(key.clone()), serialized);
         }
 
         Ok(json!({
             "requestId": val.id,
             "result": {
-                "data": val.data.serialize::<Self>()?,
+                "data": val.data.serialize::<Self, D>()?,
                 "meta": meta,
             },
-            "status": val.status.serialize::<Self>()?,
+            "status": val.status.serialize::<Self, D>()?,
         }))
     }
 }

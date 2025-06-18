@@ -3,7 +3,7 @@ use crate::{Args, Request};
 
 impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3> {
     fn serialize(val: &Request) -> Result<Value, Error> {
-        let argh = val.args.serialize::<Self>()?;
+        let argh = val.args.serialize::<Self, D>()?;
         Ok(json!({
             "requestId": val.id,
             "op": val.op,
@@ -14,7 +14,7 @@ impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3> {
 }
 impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V3> {
     fn serialize(value: &Args) -> Result<Value, Error> {
-        value.0.serialize::<Self>()
+        value.0.serialize::<Self, D>()
     }
 }
 
