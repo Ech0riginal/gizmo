@@ -35,6 +35,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::Tree(val) => handle!(val, Tree),
             GValue::Vertex(val) => handle!(val, Vertex),
             GValue::VertexProperty(val) => handle!(val, VertexProperty),
+            GValue::Barrier(val) => handle!(val, Barrier),
             GValue::Bytecode(val) => handle!(val, Bytecode),
             GValue::Cardinality(val) => handle!(val, Cardinality),
             GValue::Column(val) => handle!(val, Column),
@@ -107,6 +108,7 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                         .deserialize::<Self, D, VertexProperty>()
                         .map(GValue::from),
                     // Tag::BulkSet => blob.value.deserialize::<Self, D, BulkSet>().map(GValue::from),
+                    Tag::Barrier => blob.value.deserialize::<Self, D, Barrier>().map(GValue::from),
                     Tag::Bytecode => blob
                         .value
                         .deserialize::<Self, D, Bytecode>()

@@ -24,6 +24,7 @@ impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V2> {
                     (
                         k,
                         match v {
+                            // why are you like this
                             GValue::Map(map) => map
                                 .iter()
                                 .map(|(k, v)| (k.serialize::<Self, D>(), v.serialize::<Self, D>()))

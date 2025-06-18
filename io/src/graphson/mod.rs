@@ -1,4 +1,3 @@
-// mod id;
 mod key;
 mod tags;
 #[cfg(test)]
@@ -7,7 +6,6 @@ mod utils;
 mod v2;
 mod v3;
 
-// pub use tags::Tag;
 pub use utils::Ensure;
 
 pub struct GraphSON<V> {
