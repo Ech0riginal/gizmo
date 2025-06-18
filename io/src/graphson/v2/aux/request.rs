@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 use crate::{Args, Request};
 
-impl Serializer<Request> for V2 {
+impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V2> {
     fn serialize(val: &Request) -> Result<Value, Error> {
         Ok(json!({
             "requestId": val.id.serialize::<Self>()?,
@@ -11,7 +11,7 @@ impl Serializer<Request> for V2 {
         }))
     }
 }
-impl Serializer<Args> for V2 {
+impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V2> {
     fn serialize(value: &Args) -> Result<Value, Error> {
         let mut map = IndexMap::new();
         map.extend(

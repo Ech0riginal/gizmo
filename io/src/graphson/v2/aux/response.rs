@@ -29,7 +29,7 @@ impl Deserializer<Response> for V2 {
         })
     }
 }
-impl Serializer<Response> for V2 {
+impl<D: Dialect> GraphsonSerializer<Response, D> for GraphSON<V2> {
     fn serialize(val: &Response) -> Result<Value, Error> {
         let mut meta = HashMap::new();
 
@@ -72,7 +72,7 @@ impl Deserializer<Status> for V2 {
         })
     }
 }
-impl Serializer<Status> for V2 {
+impl<D: Dialect> GraphsonSerializer<Status, D> for GraphSON<V2> {
     fn serialize(val: &Status) -> Result<Value, Error> {
         let message = if let Some(msg) = &val.message {
             msg
