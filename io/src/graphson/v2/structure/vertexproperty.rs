@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
-use std::collections::HashMap;
 use crate::graphson::tags::Typed;
+use std::collections::HashMap;
 
 impl<D: Dialect> GraphsonDeserializer<super::VertexProperties, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<super::VertexProperties, Error> {

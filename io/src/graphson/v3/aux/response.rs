@@ -6,7 +6,9 @@ use serde_json::Value;
 impl<D: Dialect> GraphsonDeserializer<Response, D> for GraphSON<V3> {
     fn deserialize(value: &Value) -> Result<Response, Error> {
         let map = get_value!(value, Value::Object)?;
-        let id = map.ensure("requestId")?.deserialize::<Self, D, uuid::Uuid>()?;
+        let id = map
+            .ensure("requestId")?
+            .deserialize::<Self, D, uuid::Uuid>()?;
         let result = map.ensure("result")?;
         let data = result.ensure("data")?.deserialize::<Self, D, GValue>()?;
         let meta = result.ensure("meta")?;

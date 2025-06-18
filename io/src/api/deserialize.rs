@@ -9,7 +9,7 @@ pub trait DeserializeExt: Sized {
     where
         F: Format,
         F: Deserializer<T, Self, D>,
-        D: Dialect
+        D: Dialect,
     {
         F::do_deserialize(self)
     }

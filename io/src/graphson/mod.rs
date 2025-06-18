@@ -24,7 +24,7 @@ pub trait GraphsonSerializer<T, D> {
 
 impl<O, D, T> crate::Deserializer<O, serde_json::Value, D> for T
 where
-    T: GraphsonDeserializer<O, D>
+    T: GraphsonDeserializer<O, D>,
 {
     fn do_deserialize(serial: &serde_json::Value) -> Result<O, crate::Error> {
         <T as GraphsonDeserializer<O, D>>::deserialize(serial)
@@ -33,13 +33,12 @@ where
 
 impl<O, D, T> crate::Serializer<O, serde_json::Value, D> for T
 where
-    T: GraphsonSerializer<O, D>
+    T: GraphsonSerializer<O, D>,
 {
     fn do_serialize(object: &O) -> Result<serde_json::Value, crate::Error> {
         <T as GraphsonSerializer<O, D>>::serialize(object)
     }
 }
-
 
 mod prelude {
     pub use indexmap::IndexMap;

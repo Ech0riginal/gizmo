@@ -74,10 +74,7 @@ where
         let properties = edge
             .properties
             .iter()
-            .map(|(label, property)| (
-                json!(label),
-                (**property).serialize::<S, D>()
-            ))
+            .map(|(label, property)| (json!(label), (**property).serialize::<S, D>()))
             .map(|(label, result)| match result {
                 Ok(value) => Ok((label, value)),
                 Err(e) => Err(e),
@@ -89,4 +86,3 @@ where
 
     Ok(json!(value))
 }
-

@@ -1,4 +1,4 @@
-use crate::{obj, tag, GValue, List, Object};
+use crate::{GValue, List, Object, obj, tag};
 use std::hash::Hash;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]

@@ -1,10 +1,10 @@
+pub use crate::api::V3;
 pub use crate::graphson::tags::*;
 pub(crate) use crate::{gvalue_test, request_test, response_test};
 pub use chrono::TimeZone;
 pub use indexmap::{IndexMap, indexset};
 pub use serde_json::json;
 pub use std::str::FromStr;
-pub use crate::api::V3;
 
 mod core {
     pub use super::*;

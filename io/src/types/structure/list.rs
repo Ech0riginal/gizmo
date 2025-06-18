@@ -11,7 +11,6 @@ impl<T, D> Tag_<D> for List<T> {
     const tag: &'static str = "g:List";
 }
 
-
 // impl<T> From<GValue> for List<T>
 // where
 //     GValue: Into<T>,

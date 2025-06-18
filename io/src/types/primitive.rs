@@ -1,4 +1,3 @@
-
 pub trait Tag_<D> {
     const tag: &'static str;
 }
@@ -64,7 +63,6 @@ macro_rules! obj {
     };
 }
 
-
 #[macro_export]
 macro_rules! tag {
     ($id:ident) => {
@@ -76,7 +74,11 @@ macro_rules! tag {
         }
     };
     ($id:ident, $dialect:ident) => {
-        $crate::tag!($id, $dialect, const_format::concatcp!("g:", stringify!($id)));
+        $crate::tag!(
+            $id,
+            $dialect,
+            const_format::concatcp!("g:", stringify!($id))
+        );
     };
     ($id:ident, $dialect:ident, $tag:expr) => {
         impl $crate::Tag_<$dialect> for $id {
@@ -84,8 +86,6 @@ macro_rules! tag {
         }
     };
 }
-
-
 
 #[macro_export]
 macro_rules! new {

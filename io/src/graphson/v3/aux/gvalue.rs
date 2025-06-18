@@ -11,7 +11,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V3> {
                 }))
             };
         }
-        
+
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => handle!(val, Bool),
@@ -67,23 +67,44 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V3> {
                 Ok(blob) => match blob.tag {
                     Tag::Class => blob.value.deserialize::<Self, D, Class>().map(GValue::from),
                     Tag::Date => blob.value.deserialize::<Self, D, Date>().map(GValue::from),
-                    Tag::Double => blob.value.deserialize::<Self, D, Double>().map(GValue::from),
+                    Tag::Double => blob
+                        .value
+                        .deserialize::<Self, D, Double>()
+                        .map(GValue::from),
                     Tag::Float => blob.value.deserialize::<Self, D, Float>().map(GValue::from),
-                    Tag::Integer => blob.value.deserialize::<Self, D, Integer>().map(GValue::from),
-                    Tag::List => blob.value.deserialize::<Self, D, List<GValue>>().map(GValue::from),
+                    Tag::Integer => blob
+                        .value
+                        .deserialize::<Self, D, Integer>()
+                        .map(GValue::from),
+                    Tag::List => blob
+                        .value
+                        .deserialize::<Self, D, List<GValue>>()
+                        .map(GValue::from),
                     Tag::Long => blob.value.deserialize::<Self, D, Long>().map(GValue::from),
-                    Tag::Map => blob.value.deserialize::<Self, D, Map<GValue, GValue>>().map(GValue::from),
+                    Tag::Map => blob
+                        .value
+                        .deserialize::<Self, D, Map<GValue, GValue>>()
+                        .map(GValue::from),
                     Tag::Set => blob.value.deserialize::<Self, D, Set>().map(GValue::from),
-                    Tag::Timestamp => blob.value.deserialize::<Self, D, Timestamp>().map(GValue::from),
+                    Tag::Timestamp => blob
+                        .value
+                        .deserialize::<Self, D, Timestamp>()
+                        .map(GValue::from),
                     Tag::Uuid => blob.value.deserialize::<Self, D, Uuid>().map(GValue::from),
                     Tag::Edge => blob.value.deserialize::<Self, D, Edge>().map(GValue::from),
                     Tag::Path => blob.value.deserialize::<Self, D, Path>().map(GValue::from),
-                    Tag::Property => blob.value.deserialize::<Self, D, Property>().map(GValue::from),
+                    Tag::Property => blob
+                        .value
+                        .deserialize::<Self, D, Property>()
+                        .map(GValue::from),
                     Tag::TinkerGraph => blob
                         .value
                         .deserialize::<Self, D, TinkerGraph>()
                         .map(GValue::from),
-                    Tag::Vertex => blob.value.deserialize::<Self, D, Vertex>().map(GValue::from),
+                    Tag::Vertex => blob
+                        .value
+                        .deserialize::<Self, D, Vertex>()
+                        .map(GValue::from),
                     Tag::VertexProperty => blob
                         .value
                         .deserialize::<Self, D, VertexProperty>()

@@ -23,10 +23,10 @@ impl<D: Dialect> GraphsonDeserializer<T, D> for GraphSON<V3> {
 impl<D: Dialect> GraphsonSerializer<T, D> for GraphSON<V3> {
     fn serialize(val: &T) -> Result<Value, Error> {
         Ok(json!(match val {
-                T::Id => "id",
-                T::Key => "key",
-                T::Label => "label",
-                T::Value => "value",
+            T::Id => "id",
+            T::Key => "key",
+            T::Label => "label",
+            T::Value => "value",
         }))
     }
 }

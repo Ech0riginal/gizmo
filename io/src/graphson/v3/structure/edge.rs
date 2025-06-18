@@ -45,8 +45,8 @@ impl<D: Dialect> GraphsonSerializer<Edge, D> for GraphSON<V3> {
         value.insert("id", val.id.serialize::<Self, D>()?);
         value.insert("label", val.label.serialize::<Self, D>()?);
         // if serialize_labels {
-            value.insert("inVLabel", val.in_v.label.serialize::<Self, D>()?);
-            value.insert("outVLabel", val.out_v.label.serialize::<Self, D>()?);
+        value.insert("inVLabel", val.in_v.label.serialize::<Self, D>()?);
+        value.insert("outVLabel", val.out_v.label.serialize::<Self, D>()?);
         // }
         value.insert("inV", val.in_v.id.serialize::<Self, D>()?);
         value.insert("outV", val.out_v.id.serialize::<Self, D>()?);
@@ -96,9 +96,9 @@ impl<D: Dialect> GraphsonSerializer<Edge, D> for GraphSON<V3> {
 //             })
 //             .collect::<Result<Map<_, _>, Error>>()?;
 //         let json = properties.serialize::<S, D>()?;
-// 
+//
 //         value.insert("properties", json);
 //     }
-// 
+//
 //     Ok(json!(value))
 // }

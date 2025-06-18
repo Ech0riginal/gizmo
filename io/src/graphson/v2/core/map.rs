@@ -18,8 +18,7 @@ where
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Map<Value, Value>, D> for GraphSON<V2>
-{
+impl<D: Dialect> GraphsonSerializer<Map<Value, Value>, D> for GraphSON<V2> {
     fn serialize(val: &Map<Value, Value>) -> Result<Value, Error> {
         Ok(json!(val.0))
     }

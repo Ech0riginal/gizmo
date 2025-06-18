@@ -27,7 +27,7 @@ impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V3> {
 
         if elements.is_empty() {
             // Why.
-            Ok(json!([ ]))
+            Ok(json!([]))
         } else {
             Ok(json!(elements))
         }

@@ -10,7 +10,9 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
         let traversers = counts
             .ensure("traverserCount")?
             .deserialize::<Self, D, Long>()?;
-        let count = counts.ensure("elementCount")?.deserialize::<Self, D, Long>()?;
+        let count = counts
+            .ensure("elementCount")?
+            .deserialize::<Self, D, Long>()?;
         let annotations = get_value!(
             metric
                 .get("annotations")

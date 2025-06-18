@@ -2,8 +2,6 @@ use crate::graphson::prelude::*;
 use crate::graphson::tags::{Tag, Type, Typed};
 use serde_json::Value;
 
-
-
 impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
     fn serialize(val: &GValue) -> Result<Value, Error> {
         macro_rules! handle {
@@ -72,40 +70,70 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                 Ok(blob) => match blob.tag {
                     Tag::Class => blob.value.deserialize::<Self, D, Class>().map(GValue::from),
                     Tag::Date => blob.value.deserialize::<Self, D, Date>().map(GValue::from),
-                    Tag::Double => blob.value.deserialize::<Self, D, Double>().map(GValue::from),
+                    Tag::Double => blob
+                        .value
+                        .deserialize::<Self, D, Double>()
+                        .map(GValue::from),
                     Tag::Float => blob.value.deserialize::<Self, D, Float>().map(GValue::from),
-                    Tag::Integer => blob.value.deserialize::<Self, D, Integer>().map(GValue::from),
+                    Tag::Integer => blob
+                        .value
+                        .deserialize::<Self, D, Integer>()
+                        .map(GValue::from),
                     // Tag::List => blob.value.deserialize::<Self, D, List<GValue>>().map(GValue::from),
                     Tag::Long => blob.value.deserialize::<Self, D, Long>().map(GValue::from),
                     // Tag::Map => blob.value.deserialize::<Self, Map>().map(GValue::from),
                     // Tag::Set => blob.value.deserialize::<Self, Set>().map(GValue::from),
-                    Tag::Timestamp => blob.value.deserialize::<Self, D, Timestamp>().map(GValue::from),
+                    Tag::Timestamp => blob
+                        .value
+                        .deserialize::<Self, D, Timestamp>()
+                        .map(GValue::from),
                     Tag::Uuid => blob.value.deserialize::<Self, D, Uuid>().map(GValue::from),
                     Tag::Edge => blob.value.deserialize::<Self, D, Edge>().map(GValue::from),
                     Tag::Path => blob.value.deserialize::<Self, D, Path>().map(GValue::from),
-                    Tag::Property => blob.value.deserialize::<Self, D, Property>().map(GValue::from),
-                    Tag::StarGraph => blob.value.deserialize::<Self, D, StarGraph>().map(GValue::from),
+                    Tag::Property => blob
+                        .value
+                        .deserialize::<Self, D, Property>()
+                        .map(GValue::from),
+                    Tag::StarGraph => blob
+                        .value
+                        .deserialize::<Self, D, StarGraph>()
+                        .map(GValue::from),
                     Tag::TinkerGraph => blob
                         .value
                         .deserialize::<Self, D, TinkerGraph>()
                         .map(GValue::from),
                     Tag::Tree => blob.value.deserialize::<Self, D, Tree>().map(GValue::from),
-                    Tag::Vertex => blob.value.deserialize::<Self, D, Vertex>().map(GValue::from),
+                    Tag::Vertex => blob
+                        .value
+                        .deserialize::<Self, D, Vertex>()
+                        .map(GValue::from),
                     Tag::VertexProperty => blob
                         .value
                         .deserialize::<Self, D, VertexProperty>()
                         .map(GValue::from),
                     // Tag::BulkSet => blob.value.deserialize::<Self, D, BulkSet>().map(GValue::from),
-                    Tag::Bytecode => blob.value.deserialize::<Self, D, Bytecode>().map(GValue::from),
+                    Tag::Bytecode => blob
+                        .value
+                        .deserialize::<Self, D, Bytecode>()
+                        .map(GValue::from),
                     Tag::Cardinality => blob
                         .value
                         .deserialize::<Self, D, Cardinality>()
                         .map(GValue::from),
-                    Tag::Column => blob.value.deserialize::<Self, D, Column>().map(GValue::from),
-                    Tag::Direction => blob.value.deserialize::<Self, D, Direction>().map(GValue::from),
+                    Tag::Column => blob
+                        .value
+                        .deserialize::<Self, D, Column>()
+                        .map(GValue::from),
+                    Tag::Direction => blob
+                        .value
+                        .deserialize::<Self, D, Direction>()
+                        .map(GValue::from),
                     // Tag::DT => blob.value.deserialize::<Self, DT>().map(GValue::from),
                     // Tag::Merge => blob.value.deserialize::<Self, D, Merge>().map(GValue::from),
-                    Tag::Metrics => blob.value.deserialize::<Self, D, Metrics>().map(GValue::from),
+                    Tag::Metrics => blob
+                        .value
+                        .deserialize::<Self, D, Metrics>()
+                        .map(GValue::from),
                     Tag::Order => blob.value.deserialize::<Self, D, Order>().map(GValue::from),
                     Tag::P => blob.value.deserialize::<Self, D, P>().map(GValue::from),
                     // Tag::Pop => blob.value.deserialize::<Self, D, Pop>().map(GValue::from),
@@ -116,7 +144,10 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                         .value
                         .deserialize::<Self, D, TraversalMetrics>()
                         .map(GValue::from),
-                    Tag::Traverser => blob.value.deserialize::<Self, D, Traverser>().map(GValue::from),
+                    Tag::Traverser => blob
+                        .value
+                        .deserialize::<Self, D, Traverser>()
+                        .map(GValue::from),
                     type_tag => Err(Error::Unsupported {
                         tag: type_tag.to_string(),
                         location: location!(),
@@ -124,7 +155,9 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                 },
                 Err(err) => match err {
                     Error::Missing { .. } => match value {
-                        val if is_stargraph(val) => value.deserialize::<GraphSON<V2>, D, StarGraph>().map(GValue::from),
+                        val if is_stargraph(val) => value
+                            .deserialize::<GraphSON<V2>, D, StarGraph>()
+                            .map(GValue::from),
                         _ => Err(Error::Unexpected {
                             expectation: "Special case".into(),
                             actual: format!("{value}"),

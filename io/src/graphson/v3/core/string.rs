@@ -12,4 +12,3 @@ impl<D: Dialect> GraphsonSerializer<String, D> for GraphSON<V3> {
         Ok(json!(val))
     }
 }
-

@@ -2,7 +2,7 @@
 
 use crate::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V2> 
+impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V2>
 where
     Self: GraphsonSerializer<GValue, D>,
 {

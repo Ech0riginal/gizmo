@@ -54,7 +54,7 @@ macro_rules! module {
             #[test]
             fn ok() {
                 let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
+                // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                 match result {
                     Ok(_) => {
                         assert!(true);
@@ -68,7 +68,7 @@ macro_rules! module {
             #[test]
             fn accurate() {
                 let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
+                // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                 match result {
                     Err(e) => {
                         assert!(false, "serialization failed: {:?}", e);
@@ -265,8 +265,8 @@ macro_rules! expect_f64 {
     };
 }
 
+use crate::GValue;
 #[allow(unused_imports)]
 pub(crate) use {expect_f32, expect_f64, expect_i32, expect_i64, expect_i128, get_value};
 #[allow(unused_imports)]
 pub(crate) use {gvalue_test, io, test_prelude, types};
-use crate::GValue;

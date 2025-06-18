@@ -8,7 +8,6 @@ pub struct Token {
 obj!(Token);
 tag!(Token);
 
-
 impl Token {
     pub fn new<T>(value: T) -> Token
     where
