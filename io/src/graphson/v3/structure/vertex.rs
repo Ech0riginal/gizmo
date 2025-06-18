@@ -52,7 +52,12 @@ fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> {
     for (k, v) in v.properties.iter() {
         let mut props = vec![];
         for i in v.iter() {
-            let result = i.serialize::<GraphSON<V3>, D>();
+            let result = i.serialize::<GraphSON<V3>, D>().map(|value| {
+                json!({
+                    "@type": D::tag::<VertexProperty>(),
+                    "@value": value,
+                })
+            });
             props.push(result?);
         }
         properties.insert(k.to_string(), Value::Array(props));

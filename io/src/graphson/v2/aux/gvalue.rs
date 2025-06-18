@@ -6,16 +6,14 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
     fn serialize(val: &GValue) -> Result<Value, Error> {
         macro_rules! handle {
             ($val:ident, $var:ty) => {
-                Ok(json!({
-                    "@type": D::tag::<$var>(),
-                    "@value": $val.serialize::<Self, D>()?,
-                }))
+                $val.serialize::<Self, D>()
+                    .map(|v| json!({ "@type": D::tag::<$var>(), "@value": v }))
             };
         }
-
         match val {
             GValue::Null => Ok(Value::Null),
-            GValue::Bool(val) => handle!(val, Bool),
+            GValue::Bool(val) => Ok(Value::Bool(**val)),
+            GValue::String(val) => Ok(Value::String(val.to_string())),
             GValue::Class(val) => handle!(val, Class),
             GValue::Date(val) => handle!(val, Date),
             GValue::Double(val) => handle!(val, Double),
@@ -25,7 +23,6 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::Long(val) => handle!(val, Long),
             GValue::Map(val) => handle!(val, Map<GValue, GValue>),
             GValue::Set(val) => handle!(val, Set),
-            GValue::String(val) => Ok(json!(val)),
             GValue::Timestamp(val) => handle!(val, Timestamp),
             GValue::Uuid(val) => handle!(val, Uuid),
             GValue::Edge(val) => handle!(val, Edge),
@@ -47,10 +44,6 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::T(val) => handle!(val, T),
             GValue::TraversalMetrics(val) => handle!(val, TraversalMetrics),
             GValue::Traverser(val) => handle!(val, Traverser),
-            // GValue::Int128(_) => Err(Error::Unsupported {
-            //     tag: Tag::Int128.to_string(),
-            //     location: location!(),
-            // }),
             GValue::Metrics(val) => handle!(val, Metrics),
             GValue::TextP(val) => handle!(val, TextP),
             value => Err(Error::Unsupported {

@@ -3,12 +3,14 @@ use crate::{Args, Request};
 
 impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3> {
     fn serialize(val: &Request) -> Result<Value, Error> {
-        let argh = val.args.serialize::<Self, D>()?;
         Ok(json!({
             "requestId": val.id,
             "op": val.op,
             "processor": val.proc,
-            "args": argh
+            "args": {
+                "@type": <Map::<(),()> as Tag_<D>>::tag,
+                "@value": val.args.serialize::<Self, D>()?,
+            },
         }))
     }
 }

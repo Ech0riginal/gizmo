@@ -1396,7 +1396,15 @@ mod request {
         GraphSON<V3>,
         SQLg,
         Test {
-            serial: json!({"requestId":"cb682578-9d92-4499-9ebc-5c6aa73c5397","op":"authentication","processor":"","args":{"@type":"g:Map","@value":["saslMechanism","PLAIN","sasl","AHN0ZXBocGhlbgBwYXNzd29yZA=="]}}),
+            serial: json!({
+                "requestId":"cb682578-9d92-4499-9ebc-5c6aa73c5397",
+                "op":"authentication",
+                "processor":"",
+                "args": {
+                    "@type":"g:Map",
+                    "@value":["saslMechanism","PLAIN","sasl","AHN0ZXBocGhlbgBwYXNzd29yZA=="]
+                }
+            }),
             object: Request {
                 id: Uuid::from_str("cb682578-9d92-4499-9ebc-5c6aa73c5397").unwrap(),
                 op: "authentication",

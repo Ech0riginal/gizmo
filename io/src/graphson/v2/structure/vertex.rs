@@ -34,7 +34,14 @@ impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V2> {
                         label.clone(),
                         properties
                             .iter()
-                            .flat_map(|vp| vp.serialize::<Self, D>())
+                            .flat_map(|vp| {
+                                vp.serialize::<Self, D>().map(|value| {
+                                    json!({
+                                        "@type": D::tag::<VertexProperty>(),
+                                        "@value": value,
+                                    })
+                                })
+                            })
                             .collect::<Vec<_>>(),
                     )
                 })

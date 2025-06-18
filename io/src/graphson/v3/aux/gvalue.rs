@@ -5,16 +5,14 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V3> {
     fn serialize(val: &GValue) -> Result<Value, Error> {
         macro_rules! handle {
             ($val:ident, $var:ty) => {
-                Ok(json!({
-                    "@type": $val.serialize::<Self, D>()?,
-                    "@value": D::tag::<$var>(),
-                }))
+                $val.serialize::<Self, D>()
+                    .map(|v| json!({ "@type": D::tag::<$var>(), "@value": v }))
             };
         }
 
         match val {
             GValue::Null => Ok(Value::Null),
-            GValue::Bool(val) => handle!(val, Bool),
+            GValue::Bool(val) => Ok(Value::Bool(**val)),
             GValue::Class(val) => handle!(val, Class),
             GValue::Date(val) => handle!(val, Date),
             GValue::Double(val) => handle!(val, Double),

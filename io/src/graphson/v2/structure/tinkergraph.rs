@@ -29,12 +29,26 @@ impl<D: Dialect> GraphsonSerializer<TinkerGraph, D> for GraphSON<V2> {
         let vertices = val
             .vertices
             .iter()
-            .map(|v| v.serialize::<Self, D>())
+            .map(|v| {
+                v.serialize::<Self, D>().map(|value| {
+                    json!({
+                        "@type": D::tag::<Vertex>(),
+                        "@value": value,
+                    })
+                })
+            })
             .collect::<Result<Vec<_>, Error>>()?;
         let edges = val
             .edges
             .iter()
-            .map(|v| v.serialize::<Self, D>())
+            .map(|v| {
+                v.serialize::<Self, D>().map(|value| {
+                    json!({
+                        "@type": D::tag::<Edge>(),
+                        "@value": value,
+                    })
+                })
+            })
             .collect::<Result<Vec<_>, Error>>()?;
 
         Ok(json!({
