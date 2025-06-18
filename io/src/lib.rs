@@ -8,10 +8,10 @@ mod macros;
 mod request;
 mod response;
 mod types;
+mod versions;
 
 pub use api::*;
 pub use error::Error;
-pub use graphson::V3;
 pub use request::{Args, Request};
 pub use response::{Response, Status};
 pub use types::*;
