@@ -1,6 +1,6 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<BulkSet> for V3 {
+impl<D: Dialect> GraphsonDeserializer<BulkSet, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<BulkSet, Error> {
         if val.to_string().contains("[null]") {
             // TODO Gremlin docs!
@@ -21,7 +21,7 @@ impl Deserializer<BulkSet> for V3 {
         let mut counts = vec![];
 
         for json in values.clone().into_iter() {
-            let gval = json.deserialize::<Self, GValue>()?;
+            let gval = json.deserialize::<Self, D, GValue>()?;
             if data.len() > counts.len() {
                 counts.push(gval);
             } else {
@@ -58,7 +58,7 @@ impl Deserializer<BulkSet> for V3 {
     }
 }
 
-impl Serializer<BulkSet> for V3 {
+impl<D: Dialect> GraphsonSerializer<BulkSet, D> for GraphSON<V3> {
     fn serialize(val: &BulkSet) -> Result<Value, Error> {
         todo!()
     }

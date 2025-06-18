@@ -1,9 +1,9 @@
 use crate::graphson::prelude::*;
 use crate::{GValue, List};
 
-impl Deserializer<TraversalMetrics> for V3 {
+impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
-        let mut metrics = val.deserialize::<Self, Map<GValue, GValue>>()?;
+        let mut metrics = val.deserialize::<Self, D, Map<GValue, GValue>>()?;
 
         let duration = metrics.remove_ok::<Double, _>("dur")?;
         let m = metrics
@@ -17,7 +17,7 @@ impl Deserializer<TraversalMetrics> for V3 {
     }
 }
 
-impl Serializer<TraversalMetrics> for V3 {
+impl<D: Dialect> GraphsonSerializer<TraversalMetrics, D> for GraphSON<V3> {
     fn serialize(val: &TraversalMetrics) -> Result<Value, Error> {
         todo!()
     }

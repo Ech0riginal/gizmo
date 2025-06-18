@@ -1,22 +1,13 @@
 use crate::graphson::prelude::*;
+use crate::graphson::tags::Typed;
 
-impl Deserializer<Metrics> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let ty = val.typed()?;
         let mut metrics = val
             .typed()?
             .value
-            .deserialize::<Self, Map<GValue, GValue>>()?;
-
-        // Honestly this is a pretty unacceptable amount of boilerplate
-        macro_rules! gotta_be_a_better_way {
-            ($val:ident, $key:expr, $ty:ty) => {
-                $val.ensure($key)?.deserialize::<Self, $ty>()?
-            };
-        }
-
-        // todo!();
-
+            .deserialize::<Self, D, Map<GValue, GValue>>()?;
         let duration = metrics.remove_ok::<Double, _>("dur")?;
         let id = metrics.remove_ok::<String, _>("id")?;
         let name = metrics.remove_ok::<String, _>("name")?;
@@ -50,7 +41,7 @@ impl Deserializer<Metrics> for V3 {
     }
 }
 
-impl Serializer<Metrics> for V3 {
+impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V3> {
     fn serialize(val: &Metrics) -> Result<Value, Error> {
         todo!()
     }
