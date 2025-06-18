@@ -1,13 +1,13 @@
 use crate::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Column, D> for GraphSON<V3> {
-    fn deserialize(val: &Value) -> Result<Column, Error> {
+    fn deserialize(_val: &Value) -> Result<Column, Error> {
         todo!()
     }
 }
 
 impl<D: Dialect> GraphsonSerializer<Column, D> for GraphSON<V3> {
-    fn serialize(val: &Column) -> Result<Value, Error> {
+    fn serialize(_val: &Column) -> Result<Value, Error> {
         todo!()
     }
 }

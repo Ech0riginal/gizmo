@@ -1,5 +1,6 @@
 use crate::*;
 
+#[allow(dead_code)]
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Lambda {
     pub(crate) script: String,

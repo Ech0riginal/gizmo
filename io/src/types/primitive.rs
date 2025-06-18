@@ -1,4 +1,5 @@
 pub trait Tag_<D> {
+    #[allow(nonstandard_style)]
     const tag: &'static str;
 }
 

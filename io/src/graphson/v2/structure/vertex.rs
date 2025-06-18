@@ -20,7 +20,7 @@ impl<D: Dialect> GraphsonDeserializer<Vertex, D> for GraphSON<V2> {
 
 impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V2> {
     fn serialize(val: &Vertex) -> Result<Value, Error> {
-        let root = IndexMap::<&'static str, Value>::new();
+        let _root = IndexMap::<&'static str, Value>::new();
         let mut value = IndexMap::<&'static str, Value>::new();
 
         value.insert("id", val.id.serialize::<Self, D>()?);

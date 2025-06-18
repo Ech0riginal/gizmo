@@ -1,5 +1,5 @@
-use snafu::ResultExt;
 use super::*;
+use snafu::ResultExt;
 
 pub trait Deserializer<O, S, D> {
     fn do_deserialize(serial: &S) -> Result<O, Error>;

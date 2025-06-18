@@ -1,14 +1,14 @@
+pub(self) use super::macros::*;
 pub use crate::GraphSON;
 pub use crate::graphson::tags::*;
 pub use crate::*;
 pub use chrono::TimeZone;
 pub use serde_json::json;
 pub use std::str::FromStr;
-pub(self) use super::macros::*;
 
 mod core {
     use super::*;
-    
+
     gvalue_test!(
         class,
         GraphSON<V2>,

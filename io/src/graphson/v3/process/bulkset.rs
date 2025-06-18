@@ -59,7 +59,7 @@ impl<D: Dialect> GraphsonDeserializer<BulkSet, D> for GraphSON<V3> {
 }
 
 impl<D: Dialect> GraphsonSerializer<BulkSet, D> for GraphSON<V3> {
-    fn serialize(val: &BulkSet) -> Result<Value, Error> {
+    fn serialize(_val: &BulkSet) -> Result<Value, Error> {
         todo!()
     }
 }

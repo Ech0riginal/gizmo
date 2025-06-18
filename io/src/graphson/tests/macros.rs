@@ -6,7 +6,6 @@
 /*******     Boilerplate                                                                    *******/
 /**************************************************************************************************/
 
-
 /**************************************************************************************************/
 /*******     Macros                                                                         *******/
 /**************************************************************************************************/
@@ -17,7 +16,7 @@ macro_rules! gvalue_test {
             $crate::test_prelude!();
 
             $crate::tests!($crate::GValue);
-            
+
             lazy_static::lazy_static! {
                 static ref TEST_CASE: Test = $case;
             }
@@ -62,8 +61,4 @@ macro_rules! request_test {
     };
 }
 
-pub(crate) use {
-    gvalue_test,
-    response_test,
-    request_test,
-};
+pub(crate) use {gvalue_test, request_test, response_test};

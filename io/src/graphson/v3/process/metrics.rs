@@ -3,7 +3,6 @@ use crate::graphson::tags::Typed;
 
 impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
-        let ty = val.typed()?;
         let mut metrics = val
             .typed()?
             .value
@@ -42,7 +41,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
 }
 
 impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V3> {
-    fn serialize(val: &Metrics) -> Result<Value, Error> {
+    fn serialize(_val: &Metrics) -> Result<Value, Error> {
         todo!()
     }
 }

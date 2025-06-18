@@ -6,7 +6,7 @@ impl<D: Dialect> GraphsonDeserializer<Traverser, D> for GraphSON<V2> {
     }
 }
 impl<D: Dialect> GraphsonSerializer<Traverser, D> for GraphSON<V2> {
-    fn serialize(val: &Traverser) -> Result<Value, Error> {
+    fn serialize(_val: &Traverser) -> Result<Value, Error> {
         todo!()
     }
 }

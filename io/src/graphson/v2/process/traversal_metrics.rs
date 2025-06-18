@@ -15,7 +15,7 @@ impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V2> {
 }
 
 impl<D: Dialect> GraphsonSerializer<TraversalMetrics, D> for GraphSON<V2> {
-    fn serialize(val: &TraversalMetrics) -> Result<Value, Error> {
+    fn serialize(_val: &TraversalMetrics) -> Result<Value, Error> {
         todo!()
     }
 }

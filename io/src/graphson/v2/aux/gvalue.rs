@@ -12,7 +12,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
                 }))
             };
         }
-        
+
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => handle!(val, Bool),
