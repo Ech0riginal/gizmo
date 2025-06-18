@@ -100,6 +100,8 @@ impl GValue {
     }
 }
 
+crate::obj!(GValue);
+
 enom!(
     // Core
     Bool(Bool),

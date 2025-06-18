@@ -20,6 +20,5 @@ mod blankets {
     use super::*;
 
     impl<T: Object> SerializeExt for T {}
-    impl SerializeExt for crate::GValue {}
     impl DeserializeExt for serde_json::Value {}
 }

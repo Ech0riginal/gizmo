@@ -1,3 +1,4 @@
+use snafu::ResultExt;
 use super::*;
 
 pub trait Serializer<O, S, D> {
@@ -10,7 +11,8 @@ pub trait SerializeExt: Sized {
         F: Format,
         F: Serializer<Self, F::Serial, D>,
         D: Dialect,
+        Self: Object,
     {
-        F::do_serialize(self)
+        F::do_serialize(self).context(ObjectSnafu { name: Self::name, })
     }
 }

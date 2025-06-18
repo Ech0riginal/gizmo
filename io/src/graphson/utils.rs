@@ -31,7 +31,7 @@ impl Ensure<str, crate::GValue> for crate::Map<crate::GValue, crate::GValue> {
         self.get(&key).ok_or({
             let caller = std::panic::Location::caller();
             Error::Missing {
-                key: format!("{:?}", key),
+                key: format!("{key:?}"),
                 location: Location::new(caller.file(), caller.line(), caller.column()),
             }
         })

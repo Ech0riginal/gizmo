@@ -1,4 +1,4 @@
-use crate::{Dialect, Edge, List, Object, StarGraph, Tag_, Vertex, obj};
+use crate::{Dialect, Edge, List, Tag_, Vertex, obj};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, Eq, PartialEq)]

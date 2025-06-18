@@ -1,5 +1,4 @@
-use crate::{GID, List, Map};
-use crate::{Object, VertexProperty};
+use crate::*;
 use indexmap::map::IntoIter;
 use std::hash::Hasher;
 

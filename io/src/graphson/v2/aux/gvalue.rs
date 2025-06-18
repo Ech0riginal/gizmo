@@ -1,5 +1,5 @@
 use crate::graphson::prelude::*;
-use crate::graphson::tags::{Tag, Type, Typed};
+use crate::graphson::tags::{Tag, Typed};
 use serde_json::Value;
 
 impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
@@ -7,12 +7,12 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
         macro_rules! handle {
             ($val:ident, $var:ty) => {
                 Ok(json!({
-                    "@type": $val.serialize::<Self, D>()?,
-                    "@value": D::tag::<$var>(),
+                    "@type": D::tag::<$var>(),
+                    "@value": $val.serialize::<Self, D>()?,
                 }))
             };
         }
-
+        
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => handle!(val, Bool),
@@ -54,7 +54,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::Metrics(val) => handle!(val, Metrics),
             GValue::TextP(val) => handle!(val, TextP),
             value => Err(Error::Unsupported {
-                tag: format!("{}", value),
+                tag: format!("{value}"),
                 location: location!(),
             }),
         }

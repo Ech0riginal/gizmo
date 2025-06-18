@@ -212,9 +212,9 @@ tag!(Float);
 very_primitive!(Double, f64);
 tag!(Double);
 very_primitive!(Integer, i32);
-tag!(Integer);
+tag!(Integer, "g:Int32");
 very_primitive!(Long, i64);
-tag!(Long);
+tag!(Long, "g:Int64");
 
 // Misnomer: These are never used
 obj!(String);

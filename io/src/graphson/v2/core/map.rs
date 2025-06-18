@@ -4,8 +4,8 @@ use indexmap::IndexMap;
 impl<K, V, D: Dialect> GraphsonSerializer<Map<K, V>, D> for GraphSON<V2>
 where
     Self: GraphsonSerializer<K, D> + GraphsonSerializer<V, D>,
-    K: SerializeExt,
-    V: SerializeExt,
+    K: SerializeExt + Object,
+    V: SerializeExt + Object,
 {
     fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mapd = val

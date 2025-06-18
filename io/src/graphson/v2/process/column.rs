@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Column, D> for GraphSON<V2> {
-    fn deserialize(val: &Value) -> Result<Column, Error> {
+    fn deserialize(_val: &Value) -> Result<Column, Error> {
         todo!()
     }
 }

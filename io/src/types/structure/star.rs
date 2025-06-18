@@ -1,4 +1,4 @@
-use crate::{Dialect, GID, List, Map, Object, Tag_, Vertex, VertexProperty, obj};
+use crate::{Dialect, GID, List, Map, Tag_, Vertex, VertexProperty, obj};
 
 use std::hash::{Hash, Hasher};
 

@@ -13,5 +13,3 @@ pub use graphson::GraphSON;
 pub use request::{Args, Request};
 pub use response::{Response, Status};
 pub use types::*;
-
-pub(crate) use macros::*;

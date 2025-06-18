@@ -85,7 +85,7 @@ impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V2> {
 
 impl<D: Dialect> GraphsonSerializer<VertexProperty, D> for GraphSON<V2> {
     fn serialize(val: &VertexProperty) -> Result<Value, Error> {
-        let mut root = HashMap::<&'static str, Value>::new();
+        let root = HashMap::<&'static str, Value>::new();
         let mut value = HashMap::<&'static str, Value>::new();
 
         value.insert("id", val.id().serialize::<Self, D>()?);

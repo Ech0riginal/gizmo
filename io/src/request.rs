@@ -50,6 +50,7 @@ impl Args {
         Self(Map::with_capacity(8))
     }
 
+    #[allow(mismatched_lifetime_syntaxes)]
     pub fn iter(&self) -> indexmap::map::Iter<String, GValue> {
         self.0.iter()
     }

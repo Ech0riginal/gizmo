@@ -3,7 +3,7 @@ use crate::graphson::prelude::*;
 impl<T, D> GraphsonSerializer<Option<T>, D> for GraphSON<V2>
 where
     Self: GraphsonSerializer<T, D>,
-    T: SerializeExt,
+    T: SerializeExt + Object,
     D: Dialect,
 {
     fn serialize(val: &Option<T>) -> Result<Value, Error> {

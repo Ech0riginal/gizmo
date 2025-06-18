@@ -1,4 +1,4 @@
-use crate::{GID, GValue, Map, Object, Property};
+use crate::*;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone)]

@@ -79,7 +79,7 @@ impl<D: Dialect> GraphsonSerializer<Status, D> for GraphSON<V3> {
         let message = if let Some(msg) = &val.message {
             msg
         } else {
-            ""
+            "n/a"
         };
 
         Ok(json!({
