@@ -1,15 +1,10 @@
 use crate::graphson::prelude::*;
 
-impl Serializer<Scope> for V2 {
+impl<D: Dialect> GraphsonSerializer<Scope, D> for GraphSON<V2> {
     fn serialize(val: &Scope) -> Result<Value, Error> {
-        let v = match val {
+        Ok(json!(match val {
             Scope::Global => "global",
             Scope::Local => "local",
-        };
-
-        Ok(json!({
-            "@type" : Tag::Scope,
-            "@value" : v
         }))
     }
 }

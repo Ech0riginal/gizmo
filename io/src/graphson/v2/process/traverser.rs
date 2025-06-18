@@ -1,11 +1,11 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<Traverser> for V2 {
+impl<D: Dialect> GraphsonDeserializer<Traverser, D> for GraphSON<V2> {
     fn deserialize(_val: &Value) -> Result<Traverser, Error> {
         todo!()
     }
 }
-impl Serializer<Traverser> for V2 {
+impl<D: Dialect> GraphsonSerializer<Traverser, D> for GraphSON<V2> {
     fn serialize(val: &Traverser) -> Result<Value, Error> {
         todo!()
     }

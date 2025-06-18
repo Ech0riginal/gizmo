@@ -1,13 +1,16 @@
 use crate::graphson::prelude::*;
 
-impl Serializer<P> for V2 {
+impl<D: Dialect> GraphsonDeserializer<P, D> for GraphSON<V2> {
+    fn deserialize(val: &Value) -> Result<P, Error> {
+        todo!()
+    }
+}
+
+impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V2> {
     fn serialize(val: &P) -> Result<Value, Error> {
         Ok(json!({
-            "@type": Tag::P,
-            "@value": {
-                "predicate": val.operator,
-                "value": (*val.value).serialize::<Self>()?
-            }
+            "predicate": val.operator,
+            "value": (*val.value).serialize::<Self, D>()?
         }))
     }
 }

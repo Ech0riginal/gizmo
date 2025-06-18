@@ -1,16 +1,16 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<Metrics> for V2 {
+impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val, Value::Object)?.to_owned();
-        let duration = metric.ensure("dur")?.deserialize::<Self, Double>()?;
-        let id = metric.ensure("id")?.deserialize::<Self, String>()?;
-        let name = metric.ensure("name")?.deserialize::<Self, String>()?;
+        let duration = metric.ensure("dur")?.deserialize::<Self, D, Double>()?;
+        let id = metric.ensure("id")?.deserialize::<Self, D, String>()?;
+        let name = metric.ensure("name")?.deserialize::<Self, D, String>()?;
         let counts = get_value!(metric.ensure("counts")?, Value::Object)?;
         let traversers = counts
             .ensure("traverserCount")?
-            .deserialize::<Self, Long>()?;
-        let count = counts.ensure("elementCount")?.deserialize::<Self, Long>()?;
+            .deserialize::<Self, D, Long>()?;
+        let count = counts.ensure("elementCount")?.deserialize::<Self, D, Long>()?;
         let annotations = get_value!(
             metric
                 .get("annotations")
@@ -20,11 +20,11 @@ impl Deserializer<Metrics> for V2 {
         )?;
         let perc_duration = annotations
             .ensure("percentDur")?
-            .deserialize::<Self, Double>()
+            .deserialize::<Self, D, Double>()
             .unwrap_or(Double(0.0));
         let nested = get_value!(metric.ensure("metrics")?, Value::Array)?
             .iter()
-            .map(|val| val.deserialize::<Self, Metrics>())
+            .map(|val| val.deserialize::<Self, D, Metrics>())
             .collect::<Result<List<_>, _>>()?;
         let metric = Metrics::new(id, name, duration, count, traversers, perc_duration, nested);
 
@@ -32,7 +32,7 @@ impl Deserializer<Metrics> for V2 {
     }
 }
 
-impl Serializer<Metrics> for V2 {
+impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V2> {
     fn serialize(val: &Metrics) -> Result<Value, Error> {
         todo!()
     }
