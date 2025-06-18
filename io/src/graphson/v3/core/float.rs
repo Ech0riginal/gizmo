@@ -1,17 +1,14 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<Float> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Float, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Float, Error> {
         let val = expect_f32!(val)?;
         Ok(Float(val))
     }
 }
 
-impl Serializer<Float> for V3 {
+impl<D: Dialect> GraphsonSerializer<Float, D> for GraphSON<V3> {
     fn serialize(val: &Float) -> Result<Value, Error> {
-        Ok(json!({
-            "@type" : Tag::Float,
-            "@value" : **val,
-        }))
+        Ok(json!(**val))
     }
 }

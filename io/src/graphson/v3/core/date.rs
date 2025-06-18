@@ -1,7 +1,7 @@
 use crate::graphson::prelude::*;
 use chrono::{TimeZone, Utc};
 
-impl Deserializer<Date> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Date, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Date, Error> {
         let val = expect_i64!(val)?;
         let datetime = Utc.timestamp_millis_opt(val).unwrap();
@@ -10,11 +10,8 @@ impl Deserializer<Date> for V3 {
     }
 }
 
-impl Serializer<Date> for V3 {
+impl<D: Dialect> GraphsonSerializer<Date, D> for GraphSON<V3> {
     fn serialize(val: &Date) -> Result<Value, Error> {
-        Ok(json!({
-            "@type" : Tag::Date,
-            "@value" : val.timestamp_millis()
-        }))
+        Ok(json!(val.timestamp_millis()))
     }
 }

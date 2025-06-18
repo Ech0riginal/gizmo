@@ -2,27 +2,22 @@
 
 use crate::graphson::prelude::*;
 
-impl<T> Serializer<List<T>> for V3
+impl<T: SerializeExt, D: Dialect> GraphsonSerializer<List<T>, D> for GraphSON<V3>
 where
-    V3: Serializer<T>,
-    T: Object,
+    Self: GraphsonSerializer<T, D>,
 {
     fn serialize(val: &List<T>) -> Result<Value, Error> {
         let value = val
             .iter()
-            .map(|v| v.serialize::<Self>())
+            .map(|v| v.serialize::<Self, D>())
             .collect::<Result<Vec<Value>, Error>>()?;
-        Ok(json!({
-            "@type" : Tag::List,
-            "@value" : value
-        }))
+        Ok(json!(value))
     }
 }
 
-impl<T> Deserializer<List<T>> for V3
+impl<T, D: Dialect> GraphsonDeserializer<List<T>, D> for GraphSON<V3>
 where
-    V3: Deserializer<T>,
-    T: Object,
+    Self: GraphsonDeserializer<T, D>,
 {
     fn deserialize(val: &Value) -> Result<List<T>, Error> {
         if val.to_string().contains("[null]") {
@@ -33,7 +28,7 @@ where
 
         let mut elements = List::with_capacity(val.len());
         for item in val {
-            let result = item.deserialize::<Self, T>();
+            let result = item.deserialize::<Self, D, T>();
             elements.push(result?);
         }
         Ok(elements)

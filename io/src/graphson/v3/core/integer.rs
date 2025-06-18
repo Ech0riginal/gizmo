@@ -1,17 +1,14 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<Integer> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Integer, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Integer, Error> {
         let val = expect_i32!(val)?;
         Ok(Integer(val))
     }
 }
 
-impl Serializer<Integer> for V3 {
+impl<D: Dialect> GraphsonSerializer<Integer, D> for GraphSON<V3> {
     fn serialize(val: &Integer) -> Result<Value, Error> {
-        Ok(json!({
-            "@type" : Tag::Integer,
-            "@value" : **val,
-        }))
+        Ok(json!(**val))
     }
 }
