@@ -1,14 +1,14 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<GID> for V2 {
+impl<D: Dialect> GraphsonDeserializer<GID, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<GID, Error> {
-        let gvalue = val.deserialize::<Self, GValue>()?;
+        let gvalue = val.deserialize::<Self, D, GValue>()?;
         match gvalue {
             GValue::String(d) => Ok(GID::String(d)),
             GValue::Integer(d) => Ok(GID::Integer(d)),
             GValue::Long(d) => Ok(GID::Long(d)),
             value => Err(Error::Unexpected {
-                expectation: "eligible for GKey".into(),
+                expectation: "an eligible GKey".to_string(),
                 actual: format!("{value:?}"),
                 location: location!(),
             }),
@@ -16,9 +16,9 @@ impl Deserializer<GID> for V2 {
     }
 }
 
-impl Serializer<GID> for V2 {
+impl<D: Dialect> GraphsonSerializer<GID, D> for GraphSON<V3> {
     fn serialize(val: &GID) -> Result<Value, Error> {
         let val: GValue = val.into();
-        val.serialize::<Self>()
+        val.serialize::<Self, D>()
     }
 }

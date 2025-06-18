@@ -3,8 +3,12 @@ use crate::*;
 primitive_prelude!();
 
 pub struct List<T>(pub(crate) Vec<T>);
-impl<T: Object> Object for List<T> {
+impl<T> Object for List<T> {
     const name: &'static str = "List";
+}
+
+impl<T, D> Tag_<D> for List<T> {
+    const tag: &'static str = "g:List";
 }
 
 // impl<T> From<GValue> for List<T>

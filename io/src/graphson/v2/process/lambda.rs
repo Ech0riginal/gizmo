@@ -1,5 +1,6 @@
-use crate::{List, obj};
+use crate::*;
 
+#[allow(dead_code)]
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Lambda {
     pub(crate) script: String,
@@ -8,3 +9,4 @@ pub struct Lambda {
 }
 
 obj!(Lambda);
+tag!(Lambda);

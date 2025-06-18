@@ -1,13 +1,13 @@
 use crate::graphson::prelude::*;
-impl Deserializer<Bool> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Bool, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Bool, Error> {
         let bool = get_value!(val, Value::Bool)?;
         Ok(Bool(*bool))
     }
 }
 
-impl Serializer<Bool> for V3 {
+impl<D: Dialect> GraphsonSerializer<Bool, D> for GraphSON<V3> {
     fn serialize(val: &Bool) -> Result<Value, Error> {
-        Ok(Value::Bool(**val))
+        Ok(json!(**val))
     }
 }

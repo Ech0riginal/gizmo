@@ -1,5 +1,4 @@
-use crate::{GID, List, Map};
-use crate::{Object, VertexProperty};
+use crate::*;
 use indexmap::map::IntoIter;
 use std::hash::Hasher;
 
@@ -10,9 +9,8 @@ pub struct Vertex {
     pub(crate) properties: Map<String, List<VertexProperty>>,
 }
 
-impl Object for Vertex {
-    const name: &'static str = "Vertex";
-}
+crate::obj!(Vertex);
+crate::tag!(Vertex);
 
 impl IntoIterator for Vertex {
     type Item = (String, List<VertexProperty>);

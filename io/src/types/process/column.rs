@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::*;
 
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub enum Column {
@@ -6,6 +6,5 @@ pub enum Column {
     Values,
 }
 
-impl Object for Column {
-    const name: &'static str = "Column";
-}
+obj!(Column);
+tag!(Column);

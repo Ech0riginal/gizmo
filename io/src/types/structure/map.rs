@@ -1,4 +1,4 @@
-use crate::error::{Error, MissingSnafu};
+use crate::api::{Error, MissingSnafu};
 use crate::*;
 use indexmap::IndexMap;
 use snafu::OptionExt;
@@ -13,6 +13,10 @@ pub struct Map<K, V>(pub(crate) IndexMap<K, V>);
 impl<K, V> crate::Object for Map<K, V> {
     const name: &'static str = "Map";
 }
+impl<K, V, D> Tag_<D> for Map<K, V> {
+    const tag: &'static str = "g:Map";
+}
+
 impl<K: Default, V: Default> Default for Map<K, V> {
     fn default() -> Self {
         Self(IndexMap::default())

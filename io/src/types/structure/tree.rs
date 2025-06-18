@@ -1,4 +1,4 @@
-use crate::{GValue, List, Object};
+use crate::*;
 use std::hash::Hash;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
@@ -6,15 +6,14 @@ pub struct Tree {
     pub(crate) branches: List<Branch>,
 }
 
+obj!(Tree);
+tag!(Tree);
+
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Branch {
     pub(crate) key: Box<GValue>,
     pub(crate) value: Box<GValue>,
 }
 
-impl Object for Tree {
-    const name: &'static str = "Tree";
-}
-impl Object for Branch {
-    const name: &'static str = "Branch";
-}
+obj!(Branch);
+tag!(Branch);

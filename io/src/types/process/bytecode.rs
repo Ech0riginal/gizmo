@@ -7,9 +7,8 @@ pub struct Bytecode {
     pub(crate) step_instructions: List<Instruction>,
 }
 
-impl Object for Bytecode {
-    const name: &'static str = "Bytecode";
-}
+obj!(Bytecode);
+tag!(Bytecode);
 
 impl std::fmt::Debug for Bytecode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Scope {
@@ -6,9 +6,8 @@ pub enum Scope {
     Local,
 }
 
-impl Object for Scope {
-    const name: &'static str = "Scope";
-}
+obj!(Scope);
+tag!(Scope);
 
 impl From<()> for Scope {
     fn from(_val: ()) -> Self {

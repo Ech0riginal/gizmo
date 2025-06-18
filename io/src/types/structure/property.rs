@@ -7,9 +7,8 @@ pub struct Property {
     pub(crate) element: Box<GValue>,
 }
 
-impl Object for Property {
-    const name: &'static str = "Property";
-}
+obj!(Property);
+tag!(Property);
 
 impl Property {
     pub fn new<K, V, E>(key: K, value: V, element: E) -> Property

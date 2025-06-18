@@ -1,24 +1,21 @@
-use crate::graphson::Tag;
 use crate::graphson::prelude::*;
-use std::arch::breakpoint;
 
-impl<K, V> Deserializer<Map<K, V>> for V3
+impl<K, V, D: Dialect> GraphsonDeserializer<Map<K, V>, D> for GraphSON<V3>
 where
-    Self: Deserializer<K> + Deserializer<V>,
-    K: std::hash::Hash + Eq,
-    K: Object,
+    Self: GraphsonDeserializer<K, D> + GraphsonDeserializer<V, D>,
+    K: std::hash::Hash + Eq + Object,
     V: Object,
 {
     fn deserialize(val: &Value) -> Result<Map<K, V>, Error> {
-        let mut val = get_value!(val, Value::Array)?.to_owned();
+        let val = get_value!(val, Value::Array)?.to_owned();
         let mut map = Map::new();
         let mut x = 0;
 
         if !val.is_empty() {
             loop {
-                let key = val[x].deserialize::<Self, K>()?;
+                let key = val[x].deserialize::<Self, D, K>()?;
                 x += 1;
-                let value = val[x].deserialize::<Self, V>()?;
+                let value = val[x].deserialize::<Self, D, V>()?;
                 x += 1;
                 map.insert(key, value);
                 if x >= val.len() {
@@ -31,21 +28,18 @@ where
     }
 }
 
-impl<K, V> Serializer<Map<K, V>> for V3
+impl<K, V, D: Dialect> GraphsonSerializer<Map<K, V>, D> for GraphSON<V3>
 where
-    Self: Serializer<K> + Serializer<V>,
-    K: Object,
-    V: Object,
+    Self: GraphsonSerializer<K, D> + GraphsonSerializer<V, D>,
+    K: SerializeExt + Object,
+    V: SerializeExt + Object,
 {
     fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mut values = vec![];
         for (k, v) in val.iter() {
-            values.push(k.serialize::<Self>()?);
-            values.push(v.serialize::<Self>()?);
+            values.push(k.serialize::<Self, D>()?);
+            values.push(v.serialize::<Self, D>()?);
         }
-        Ok(json!({
-            "@type": Tag::Map,
-            "@value": values,
-        }))
+        Ok(json!(values))
     }
 }

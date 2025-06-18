@@ -1,4 +1,4 @@
-use crate::{Double, List, Long, Object};
+use crate::*;
 
 use std::hash::{Hash, Hasher};
 
@@ -13,7 +13,8 @@ pub struct Metrics {
     pub(crate) nested: List<Metrics>,
 }
 
-crate::obj!(Metrics);
+obj!(Metrics);
+tag!(Metrics);
 
 impl Hash for Metrics {
     fn hash<H: Hasher>(&self, state: &mut H) {

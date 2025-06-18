@@ -1,4 +1,4 @@
-use crate::{GID, List, Map, Object, Vertex, VertexProperty};
+use crate::{Dialect, GID, List, Map, Tag_, Vertex, VertexProperty, obj};
 
 use std::hash::{Hash, Hasher};
 
@@ -9,8 +9,10 @@ pub struct StarGraph {
     pub(crate) properties: Map<String, List<VertexProperty>>,
 }
 
-impl Object for StarGraph {
-    const name: &'static str = "StarGraph";
+obj!(StarGraph);
+
+impl<D: Dialect> Tag_<D> for StarGraph {
+    const tag: &'static str = "starVertex";
 }
 
 impl From<&StarGraph> for Vertex {

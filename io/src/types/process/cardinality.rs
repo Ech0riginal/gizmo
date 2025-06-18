@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Cardinality {
@@ -7,6 +7,5 @@ pub enum Cardinality {
     Single,
 }
 
-impl Object for Cardinality {
-    const name: &'static str = "Cardinality";
-}
+obj!(Cardinality);
+tag!(Cardinality);

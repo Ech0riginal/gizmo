@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::*;
 
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub enum Direction {
@@ -8,6 +8,5 @@ pub enum Direction {
     To,
 }
 
-impl Object for Direction {
-    const name: &'static str = "Direction";
-}
+obj!(Direction);
+tag!(Direction);

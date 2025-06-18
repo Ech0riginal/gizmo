@@ -1,6 +1,6 @@
 use crate::graphson::prelude::*;
 
-impl Deserializer<Barrier> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Barrier, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Barrier, Error> {
         let str = get_value!(val, Value::String)?;
         match str.as_ref() {
@@ -14,13 +14,10 @@ impl Deserializer<Barrier> for V3 {
     }
 }
 
-impl Serializer<Barrier> for V3 {
+impl<D: Dialect> GraphsonSerializer<Barrier, D> for GraphSON<V3> {
     fn serialize(val: &Barrier) -> Result<Value, Error> {
-        Ok(json!({
-            "@type": Tag::Barrier,
-            "@value": match val {
-                Barrier::NormSack => "normSack",
-            }
+        Ok(json!(match val {
+            Barrier::NormSack => "normSack",
         }))
     }
 }

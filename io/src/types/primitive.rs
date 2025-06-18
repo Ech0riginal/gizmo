@@ -1,7 +1,6 @@
-pub trait Object {
+pub trait Tag_<D> {
     #[allow(nonstandard_style)]
-    const name: &'static str;
-    const __id: u32 = const_random::const_random!(u32) & 0xFFFF4FFF | 0x40008000; // Realistically we only have 50-ish types
+    const tag: &'static str;
 }
 
 #[macro_export]
@@ -64,6 +63,31 @@ macro_rules! obj {
         }
     };
 }
+
+#[macro_export]
+macro_rules! tag {
+    ($id:ident) => {
+        $crate::tag!($id, const_format::concatcp!("g:", stringify!($id)));
+    };
+    ($id:ident, $tag:expr) => {
+        impl<D: $crate::Dialect> $crate::Tag_<D> for $id {
+            const tag: &'static str = $tag;
+        }
+    };
+    ($id:ident, $dialect:ident) => {
+        $crate::tag!(
+            $id,
+            $dialect,
+            const_format::concatcp!("g:", stringify!($id))
+        );
+    };
+    ($id:ident, $dialect:ident, $tag:expr) => {
+        impl $crate::Tag_<$dialect> for $id {
+            const tag: &'static str = $tag;
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! new {
     ($name:ident, $inner:ident) => {
@@ -183,14 +207,19 @@ macro_rules! partial_eq {
 // TODO move these elsewhere
 primitive_prelude!();
 very_primitive!(Bool, bool);
+tag!(Bool);
 very_primitive!(Float, f32);
+tag!(Float);
 very_primitive!(Double, f64);
+tag!(Double);
 very_primitive!(Integer, i32);
+tag!(Integer, "g:Int32");
 very_primitive!(Long, i64);
+tag!(Long, "g:Int64");
 
-impl Object for String {
-    const name: &'static str = "String";
-}
+// Misnomer: These are never used
+obj!(String);
+tag!(String);
 
 use std::hash::{Hash, Hasher};
 

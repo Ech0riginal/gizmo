@@ -94,14 +94,14 @@ Null,
         $(primitive_interop!($variant, $primitive);)+
     }
 }
-impl Object for GValue {
-    const name: &'static str = "GValue";
-}
 impl GValue {
+    #[allow(dead_code)]
     pub(crate) fn boxed(self) -> Box<Self> {
         Box::new(self)
     }
 }
+
+crate::obj!(GValue);
 
 enom!(
     // Core

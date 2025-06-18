@@ -1,4 +1,5 @@
 //! https://github.com/apache/tinkerpop/blob/master/gremlin-core/src/main/java/org/apache/tinkerpop/gremlin/process/traversal/Operator.java
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum Operator {
@@ -15,7 +16,8 @@ pub enum Operator {
     SumLong,
 }
 
-crate::obj!(Operator);
+obj!(Operator);
+tag!(Operator);
 
 /*
 sum {

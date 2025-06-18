@@ -1,4 +1,4 @@
-use crate::{GValue, Map, Object};
+use crate::*;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -7,9 +7,9 @@ pub struct BulkSet {
     pub(crate) occurrences: usize,
 }
 
-impl Object for BulkSet {
-    const name: &'static str = "BulkSet";
-}
+obj!(BulkSet);
+tag!(BulkSet);
+
 impl Eq for BulkSet {}
 impl Hash for BulkSet {
     fn hash<H: Hasher>(&self, state: &mut H) {
