@@ -1,15 +1,14 @@
-use crate::graphson::Tag;
 use crate::graphson::prelude::*;
 
-impl Deserializer<Property> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Property, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Property, Error> {
         let val = get_value!(val, Value::Object)?;
-        let key = val.ensure("key")?.deserialize::<Self, String>()?;
-        let value = Box::new(val.ensure("value")?.deserialize::<Self, GValue>()?);
+        let key = val.ensure("key")?.deserialize::<Self, D, String>()?;
+        let value = Box::new(val.ensure("value")?.deserialize::<Self, D, GValue>()?);
         let mut element = Box::new(GValue::Null);
 
         if let Some(el) = val.get("element") {
-            element = Box::new(el.deserialize::<Self, GValue>()?);
+            element = Box::new(el.deserialize::<Self, D, GValue>()?);
         }
 
         Ok(Property {
@@ -20,14 +19,11 @@ impl Deserializer<Property> for V3 {
     }
 }
 
-impl Serializer<Property> for V3 {
+impl<D: Dialect> GraphsonSerializer<Property, D> for GraphSON<V3> {
     fn serialize(val: &Property) -> Result<Value, Error> {
         Ok(json!({
-            "@type": Tag::Property,
-            "@value": {
-              "key" : val.key.serialize::<Self>()?,
-              "value" : (*val.value).serialize::<Self>()?,
-            }
+          "key" : val.key.serialize::<Self, D>()?,
+          "value" : (*val.value).serialize::<Self, D>()?,
         }))
     }
 }
