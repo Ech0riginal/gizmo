@@ -1,24 +1,27 @@
-pub use crate::graphson::V2;
 pub use crate::graphson::tags::*;
 pub use crate::*;
 pub use chrono::TimeZone;
 pub use serde_json::json;
 pub use std::str::FromStr;
+pub use crate::GraphSON;
 
 mod core {
     use super::*;
 
     gvalue_test!(
         class,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Class, "@value" : "java.io.File"}),
             object: GValue::Class("java.io.File".into()),
         }
     );
+
     gvalue_test!(
         date,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Date, "@value" : 1481750076295i64 }),
             object: GValue::Date(Date(
@@ -28,7 +31,8 @@ mod core {
     );
     gvalue_test!(
         timestamp,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Timestamp, "@value" : 1481750076295i64 }),
             object: GValue::Timestamp(Timestamp(1481750076295i64)),
@@ -36,7 +40,8 @@ mod core {
     );
     gvalue_test!(
         double,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Double, "@value" : 100.0f64 }),
             object: GValue::Double(100.0.into()),
@@ -44,7 +49,8 @@ mod core {
     );
     gvalue_test!(
         float,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Float, "@value" : 100.0f32 }),
             object: GValue::Float(100.0.into()),
@@ -52,7 +58,8 @@ mod core {
     );
     gvalue_test!(
         integer,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Integer, "@value" : 100i32 }),
             object: GValue::Integer(100.into()),
@@ -60,7 +67,8 @@ mod core {
     );
     gvalue_test!(
         long,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Long, "@value" : 100u64 }),
             object: GValue::Long(100.into()),
@@ -68,7 +76,8 @@ mod core {
     );
     gvalue_test!(
         uuid,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : Tag::Uuid, "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786"}),
             object: GValue::Uuid(
@@ -158,7 +167,8 @@ mod structure {
 
     gvalue_test!(
         edge,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2009 } } }}),
             object: GValue::Edge(Edge {
@@ -180,7 +190,8 @@ mod structure {
     );
     gvalue_test!(
         path,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({"@type":"g:Path","@value":{"labels":[[],[],[]],"objects":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person"}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":10},"label":"software","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":4},"value":"gremlin","vertex":{"@type":"g:Int32","@value":10},"label":"name"}}]}}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":11},"label":"software","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":5},"value":"tinkergraph","vertex":{"@type":"g:Int32","@value":11},"label":"name"}}]}}}]}}),
             object: GValue::Path(Path {
@@ -238,7 +249,8 @@ mod structure {
     );
     gvalue_test!(
         property,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Property", "@value" : { "key" : "since", "value" : { "@type" : "g:Int32", "@value" : 2009 }, "element" : { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "outV" : { "@type" : "g:Int32", "@value" : 1 }, "inV" : { "@type" : "g:Int32", "@value" : 10 } } } }}),
             object: GValue::Property(Property {
@@ -264,7 +276,8 @@ mod structure {
     );
     gvalue_test!(
         stargraph,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({"starVertex":{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","vertex":{"@type":"g:Int32","@value":1},"label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}}}),
             object: GValue::StarGraph(StarGraph::from(match marko!() {
@@ -276,7 +289,8 @@ mod structure {
 
     gvalue_test!(
         tinkergraph,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "tinker:graph", "@value" : { "vertices" : [ { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 1 }, "value" : "stephen", "vertex" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 10 }, "value" : "centreville", "vertex" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1990 }, "endTime" : { "@type" : "g:Int32", "@value" : 2000 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 11 }, "value" : "dulles", "vertex" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2000 }, "endTime" : { "@type" : "g:Int32", "@value" : 2006 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 12 }, "value" : "purcellville", "vertex" : { "@type" : "g:Int32", "@value" : 7 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2006 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 2 }, "value" : "matthias", "vertex" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 13 }, "value" : "bremen", "vertex" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2007 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 14 }, "value" : "baltimore", "vertex" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2007 }, "endTime" : { "@type" : "g:Int32", "@value" : 2011 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 15 }, "value" : "oakland", "vertex" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2011 }, "endTime" : { "@type" : "g:Int32", "@value" : 2014 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 16 }, "value" : "seattle", "vertex" : { "@type" : "g:Int32", "@value" : 8 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2014 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 3 }, "value" : "daniel", "vertex" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 17 }, "value" : "spremberg", "vertex" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1982 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 18 }, "value" : "kaiserslautern", "vertex" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 }, "endTime" : { "@type" : "g:Int32", "@value" : 2009 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 19 }, "value" : "aachen", "vertex" : { "@type" : "g:Int32", "@value" : 9 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2009 } } } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 4 }, "value" : "gremlin", "vertex" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "name" } } ] } } }, { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 5 }, "value" : "tinkergraph", "vertex" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "name" } } ] } } } ], "edges" : [ { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 13 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2009 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 14 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2010 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 15 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 4 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 16 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 1 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 5 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 17 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2010 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 18 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2011 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 19 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 5 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 20 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 7 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 4 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 21 }, "label" : "develops", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "since" : { "@type" : "g:Int32", "@value" : 2012 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 22 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 3 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 23 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 8 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 3 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 24 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 10 }, "outV" : { "@type" : "g:Int32", "@value" : 9 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 5 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 25 }, "label" : "uses", "inVLabel" : "software", "outVLabel" : "person", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 9 }, "properties" : { "skill" : { "@type" : "g:Int32", "@value" : 3 } } } }, { "@type" : "g:Edge", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 26 }, "label" : "traverses", "inVLabel" : "software", "outVLabel" : "software", "inV" : { "@type" : "g:Int32", "@value" : 11 }, "outV" : { "@type" : "g:Int32", "@value" : 10 } } } ] }}),
             object: GValue::TinkerGraph(TinkerGraph {
@@ -868,7 +882,8 @@ mod structure {
     );
     gvalue_test!(
         vertex,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } }}),
             object: marko!(),
@@ -876,7 +891,8 @@ mod structure {
     );
     gvalue_test!(
         tree,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Tree", "@value" : [ { "key" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } }, "value" : { "@type" : "g:Tree", "@value" : [ { "key" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 4 }, "value" : "gremlin", "vertex" : { "@type" : "g:Int32", "@value" : 10 }, "label" : "name" } } ] } } }, "value" : { "@type" : "g:Tree", "@value" : [ { "key" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "software", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 5 }, "value" : "tinkergraph", "vertex" : { "@type" : "g:Int32", "@value" : 11 }, "label" : "name" } } ] } } }, "value" : { "@type" : "g:Tree", "@value" : [ ] } } ] } } ] } } ]}),
             object: GValue::Tree(Tree {
@@ -936,7 +952,8 @@ mod structure {
     );
     gvalue_test!(
         vertexproperty,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" }}),
             object: GValue::VertexProperty(VertexProperty {
@@ -954,7 +971,8 @@ mod process {
 
     gvalue_test!(
         barrier,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Barrier", "@value" : "normSack"}),
             object: GValue::Null,
@@ -962,7 +980,8 @@ mod process {
     );
     gvalue_test!(
         binding,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Binding", "@value" : { "key" : "x", "value" : { "@type" : "g:Int32", "@value" : 1 } }}),
             object: GValue::Null,
@@ -970,7 +989,8 @@ mod process {
     );
     gvalue_test!(
         bytecode,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Bytecode", "@value" : { "step" : [ [ "V" ], [ "hasLabel", "person" ], [ "out" ], [ "in" ], [ "tree" ] ] }}),
             object: GValue::Null,
@@ -978,7 +998,8 @@ mod process {
     );
     gvalue_test!(
         cardinality,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Cardinality", "@value" : "list"}),
             object: GValue::Null,
@@ -986,7 +1007,8 @@ mod process {
     );
     gvalue_test!(
         column,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Column", "@value" : "keys"}),
             object: GValue::Null,
@@ -994,7 +1016,8 @@ mod process {
     );
     gvalue_test!(
         direction,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Direction", "@value" : "OUT"}),
             object: GValue::Null,
@@ -1002,7 +1025,8 @@ mod process {
     );
     gvalue_test!(
         operator,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Operator", "@value" : "sum"}),
             object: GValue::Null,
@@ -1010,7 +1034,8 @@ mod process {
     );
     gvalue_test!(
         order,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Order", "@value" : "shuffle"}),
             object: GValue::Null,
@@ -1018,7 +1043,8 @@ mod process {
     );
     gvalue_test!(
         pick,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Pick", "@value" : "any"}),
             object: GValue::Null,
@@ -1026,7 +1052,8 @@ mod process {
     );
     gvalue_test!(
         pop,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Pop", "@value" : "all"}),
             object: GValue::Null,
@@ -1034,7 +1061,8 @@ mod process {
     );
     gvalue_test!(
         lambda,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Lambda", "@value" : { "script" : "{ it.get() }", "language" : "gremlin-groovy", "arguments" : 1 }}),
             object: GValue::Null,
@@ -1042,7 +1070,8 @@ mod process {
     );
     gvalue_test!(
         metrics,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 4 }, "elementCount" : { "@type" : "g:Int64", "@value" : 4 } }, "name" : "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "7.0.0()", "metrics" : [ { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 7 }, "elementCount" : { "@type" : "g:Int64", "@value" : 7 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "3.0.0()" } } ] }}),
             object: GValue::Null,
@@ -1050,7 +1079,8 @@ mod process {
     );
     gvalue_test!(
         p,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } }}),
             object: GValue::Null,
@@ -1058,7 +1088,8 @@ mod process {
     );
     gvalue_test!(
         p_within,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "within", "value" : [ { "@type" : "g:Int32", "@value" : 1 } ] }}),
             object: GValue::Null,
@@ -1066,7 +1097,8 @@ mod process {
     );
     gvalue_test!(
         p_without,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "without", "value" : [ { "@type" : "g:Int32", "@value" : 1 }, { "@type" : "g:Int32", "@value" : 2 } ] }}),
             object: GValue::Null,
@@ -1074,7 +1106,8 @@ mod process {
     );
     gvalue_test!(
         p_and,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "and", "value" : [ { "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } } }, { "@type" : "g:P", "@value" : { "predicate" : "lt", "value" : { "@type" : "g:Int32", "@value" : 10 } } } ] }}),
             object: GValue::Null,
@@ -1082,7 +1115,8 @@ mod process {
     );
     gvalue_test!(
         p_or,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "or", "value" : [ { "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } } }, { "@type" : "g:P", "@value" : { "predicate" : "within", "value" : [ { "@type" : "g:Int32", "@value" : -1 }, { "@type" : "g:Int32", "@value" : -10 }, { "@type" : "g:Int32", "@value" : -100 } ] } } ] }}),
             object: GValue::Null,
@@ -1090,7 +1124,8 @@ mod process {
     );
     gvalue_test!(
         scope,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Scope", "@value" : "local"}),
             object: GValue::Null,
@@ -1098,7 +1133,8 @@ mod process {
     );
     gvalue_test!(
         t,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:T", "@value" : "label"}),
             object: GValue::Null,
@@ -1106,7 +1142,8 @@ mod process {
     );
     gvalue_test!(
         textp,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:TextP", "@value" : { "predicate" : "containing", "value" : "ark" }}),
             object: GValue::Null,
@@ -1114,7 +1151,8 @@ mod process {
     );
     gvalue_test!(
         traversalmetrics,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:TraversalMetrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 0.004 }, "metrics" : [ { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 4 }, "elementCount" : { "@type" : "g:Int64", "@value" : 4 } }, "name" : "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "7.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 13 }, "elementCount" : { "@type" : "g:Int64", "@value" : 13 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "2.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 7 }, "elementCount" : { "@type" : "g:Int64", "@value" : 7 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "3.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 1 }, "elementCount" : { "@type" : "g:Int64", "@value" : 1 } }, "name" : "TreeStep", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "4.0.0()" } } ] }}),
             object: GValue::Null,
@@ -1122,7 +1160,8 @@ mod process {
     );
     gvalue_test!(
         traverser,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "@type" : "g:Traverser", "@value" : { "bulk" : { "@type" : "g:Int64", "@value" : 1 }, "value" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } }}),
             object: GValue::Null,
@@ -1134,7 +1173,8 @@ mod request {
 
     request_test!(
         authentication_response,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "authentication", "processor" : "", "args" : { "saslMechanism" : "PLAIN", "sasl" : "AHN0ZXBocGhlbgBwYXNzd29yZA==" }}),
             object: Request {
@@ -1149,7 +1189,8 @@ mod request {
     );
     request_test!(
         session_eval,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
             object: Request {
@@ -1175,7 +1216,8 @@ mod request {
     );
     request_test!(
         session_eval_aliased,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "session", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
             object: Request {
@@ -1206,7 +1248,8 @@ mod request {
     );
     request_test!(
         session_close,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "close", "processor" : "session", "args" : { "session" : { "@type" : "g:UUID", "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786" } }}),
             object: Request {
@@ -1224,7 +1267,8 @@ mod request {
     );
     request_test!(
         sessionless_eval,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "g.V(x)", "language" : "gremlin-groovy", "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
             object: Request {
@@ -1244,7 +1288,8 @@ mod request {
     );
     request_test!(
         sessionless_eval_aliased,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : { "@type" : "g:UUID", "@value" : "cb682578-9d92-4499-9ebc-5c6aa73c5397" }, "op" : "eval", "processor" : "", "args" : { "gremlin" : "social.V(x)", "language" : "gremlin-groovy", "aliases" : { "g" : "social" }, "bindings" : { "x" : { "@type" : "g:Int32", "@value" : 1 } } }}),
             object: Request {
@@ -1273,7 +1318,8 @@ mod response {
 
     response_test!(
         authentication_challenge,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({ "requestId" : "41d2e28a-20a4-4ab0-b379-d810dede3786", "status" : { "message" : "", "code" : 407, "attributes" : { } }, "result" : { "data" : null, "meta" : { } }}),
             object: crate::Response {
@@ -1290,7 +1336,8 @@ mod response {
     );
     response_test!(
         standard_result,
-        V2,
+        GraphSON<V2>,
+        SQLg,
         Test {
             serial: json!({"requestId":"41d2e28a-20a4-4ab0-b379-d810dede3786","status":{"message":"","code":200,"attributes":{}},"result":{"data":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","vertex":{"@type":"g:Int32","@value":1},"label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","vertex":{"@type":"g:Int32","@value":1},"label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}}],"meta":{}}}),
             object: crate::Response {
@@ -1392,7 +1439,8 @@ mod response {
 //
 //     gvalue_test!(
 //         bigdecimal,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:BigDecimal", "@value" : 123456789987654321123456789987654321u128}),
 //             object: GValue::Null,
@@ -1400,7 +1448,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         biginteger,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:BigInteger", "@value" : 123456789987654321123456789987654321u128 }),
 //             object: GValue::Null,
@@ -1408,7 +1457,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         byte,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Byte", "@value" : 1}),
 //             object: GValue::Null,
@@ -1416,7 +1466,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         bytebuffer,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:ByteBuffer", "@value" : "c29tZSBieXRlcyBmb3IgeW91"}),
 //             object: GValue::Null,
@@ -1424,7 +1475,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         char,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Char", "@value" : "x"}),
 //             object: GValue::Null,
@@ -1432,7 +1484,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         duration,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Duration", "@value" : "PT120H"}),
 //             object: GValue::Null,
@@ -1440,7 +1493,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         inetaddress,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:InetAddress", "@value" : "localhost"}),
 //             object: GValue::Null,
@@ -1448,7 +1502,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         instant,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Instant", "@value" : "2016-12-14T16:39:19.349Z"}),
 //             object: GValue::Null,
@@ -1456,7 +1511,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         localdate,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:LocalDate", "@value" : "2016-01-01"}),
 //             object: GValue::Null,
@@ -1464,7 +1520,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         localdatetime,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:LocalDateTime", "@value" : "2016-01-01T12:30"}),
 //             object: GValue::Null,
@@ -1472,7 +1529,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         localtime,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:LocalTime", "@value" : "12:30:45"}),
 //             object: GValue::Null,
@@ -1480,7 +1538,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         monthday,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:MonthDay", "@value" : "--01-01"}),
 //             object: GValue::Null,
@@ -1488,7 +1547,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         offsetdatetime,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:OffsetDateTime", "@value" : "2007-12-03T10:15:30+01:00"}),
 //             object: GValue::Null,
@@ -1496,7 +1556,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         offsettime,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:OffsetTime", "@value" : "10:15:30+01:00"}),
 //             object: GValue::Null,
@@ -1504,7 +1565,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         period,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Period", "@value" : "P1Y6M15D"}),
 //             object: GValue::Null,
@@ -1512,7 +1574,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         short,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Int16", "@value" : 100}),
 //             object: GValue::Null,
@@ -1520,7 +1583,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         year,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:Year", "@value" : "2016"}),
 //             object: GValue::Null,
@@ -1528,7 +1592,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         yearmonth,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:YearMonth", "@value" : "2016-06"}),
 //             object: GValue::Null,
@@ -1536,7 +1601,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         zoneddatetime,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:ZonedDateTime", "@value" : "2016-12-23T12:12:24.000000036+02:00[GMT+02:00]"}),
 //             object: GValue::Null,
@@ -1544,7 +1610,8 @@ mod response {
 //     );
 //     gvalue_test!(
 //         zoneoffset,
-//         V2,
+//         GraphSON<V2>,
+//         SQLg,
 //         Test {
 //             serial: json!({ "@type" : "gx:ZoneOffset", "@value" : "+03:06:09"}),
 //             object: GValue::Null,
