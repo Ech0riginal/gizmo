@@ -25,7 +25,11 @@ impl<D: Dialect> GraphsonSerializer<Property, D> for GraphSON<V2> {
             "key": val.key,
             "value": (*val.value).serialize::<Self, D>()?,
             "element": match &*val.element {
-                GValue::Edge(edge) => super::edge::serialize_edge::<Self, D>(edge, false)?,
+                GValue::Edge(edge) => super::edge::serialize_edge::<Self, D>(edge, false)
+                    .map(|value| json!({
+                        "@type": D::tag::<Edge>(),
+                        "@value": value,
+                    }))?,
                 element => element.serialize::<Self, D>()?,
             }
         }))

@@ -13,6 +13,6 @@ impl<D: Dialect> GraphsonDeserializer<StarGraph, D> for GraphSON<V2> {
 impl<D: Dialect> GraphsonSerializer<StarGraph, D> for GraphSON<V2> {
     fn serialize(val: &StarGraph) -> Result<Value, Error> {
         let binding = GValue::Vertex(val.into());
-        Ok(json!({"starVertex": binding.serialize::<Self, D>()?,}))
+        Ok(json!(binding.serialize::<Self, D>()?))
     }
 }

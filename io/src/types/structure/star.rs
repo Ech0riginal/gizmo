@@ -12,7 +12,7 @@ pub struct StarGraph {
 obj!(StarGraph);
 
 impl<D: Dialect> Tag_<D> for StarGraph {
-    const tag: &'static str = "star";
+    const tag: &'static str = "starVertex";
 }
 
 impl From<&StarGraph> for Vertex {
