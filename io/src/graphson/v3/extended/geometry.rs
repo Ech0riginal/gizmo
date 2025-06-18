@@ -7,7 +7,7 @@ type PointType = Vec<f64>;
 type LineStringType = Vec<PointType>;
 type PolygonType = Vec<Vec<PointType>>;
 
-impl Deserializer<Geometry> for V3 {
+impl<D: Dialect> GraphsonDeserializer<Geometry, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Geometry, Error> {
         let coordinates = val.ensure("coordinates")?;
 
@@ -44,12 +44,9 @@ impl Deserializer<Geometry> for V3 {
     }
 }
 
-impl Serializer<Geometry> for V3 {
+impl<D: Dialect> GraphsonSerializer<Geometry, D> for GraphSON<V3> {
     fn serialize(val: &Geometry) -> Result<Value, Error> {
-        Ok(json!({
-            "@type": Tag::Geometry,
-            "@value": geojson::Value::from(&val.0)
-        }))
+        Ok(json!(geojson::Value::from(&val.0)))
     }
 }
 
