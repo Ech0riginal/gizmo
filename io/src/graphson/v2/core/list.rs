@@ -7,22 +7,9 @@ use crate::graphson::prelude::*;
 impl<T, D: Dialect> GraphsonSerializer<List<T>, D> for GraphSON<V2>
 where
     Self: GraphsonSerializer<T, D>,
-    T: Object,
+    T: SerializeExt,
 {
     fn serialize(val: &List<T>) -> Result<Value, Error> {
-        let value = val
-            .iter()
-            .map(|v| v.serialize::<Self, D>())
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(json!(value))
-    }
-}
-
-impl<D: Dialect> GraphsonSerializer<List<GValue>, D> for GraphSON<V2>
-where
-    Self: GraphsonSerializer<GValue, D>,
-{
-    fn serialize(val: &List<GValue>) -> Result<Value, Error> {
         let value = val
             .iter()
             .map(|v| v.serialize::<Self, D>())

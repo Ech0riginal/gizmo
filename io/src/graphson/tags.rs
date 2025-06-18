@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use crate::error::*;
+use crate::api::*;
 use crate::graphson::Ensure;
 use crate::macros::get_value;
 use serde_json::Value;

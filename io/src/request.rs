@@ -35,10 +35,9 @@ impl std::hash::Hash for Request {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct Args(pub(crate) Map<&'static str, GValue>);
-impl Object for Args {
-    const name: &'static str = "Args";
-}
+pub struct Args(pub(crate) Map<String, GValue>);
+crate::obj!(Args);
+crate::tag!(Args, "g:Map");
 
 impl Default for Args {
     fn default() -> Self {
@@ -51,29 +50,31 @@ impl Args {
         Self(Map::with_capacity(8))
     }
 
-    pub fn iter(&self) -> indexmap::map::Iter<&'static str, GValue> {
+    pub fn iter(&self) -> indexmap::map::Iter<String, GValue> {
         self.0.iter()
     }
 
     #[allow(private_bounds)]
-    pub fn arg<V>(mut self, key: &'static str, value: V) -> Self
+    pub fn arg<K, V>(mut self, key: K, value: V) -> Self
     where
+        K: AsRef<str>,
         Self: Insert<V>,
     {
+        let key = key.as_ref().to_string();
         Self::insert(&mut self.0, key, value);
         self
     }
 }
 
 impl std::ops::Deref for Args {
-    type Target = IndexMap<&'static str, GValue>;
+    type Target = IndexMap<String, GValue>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl Insert<GValue> for Args {
-    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: GValue) {
+    fn insert(map: &mut IndexMap<String, GValue>, key: String, value: GValue) {
         map.insert(key, value);
     }
 }
@@ -82,7 +83,7 @@ impl<I> Insert<Option<I>> for Args
 where
     Args: Insert<I>,
 {
-    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: Option<I>) {
+    fn insert(map: &mut IndexMap<String, GValue>, key: String, value: Option<I>) {
         if let Some(inner_value) = value {
             Args::insert(map, key, inner_value);
         }
@@ -92,14 +93,14 @@ where
 macro_rules! insert {
     ($ty:path) => {
        impl Insert<$ty> for Args {
-            fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: $ty) {
+            fn insert(map: &mut IndexMap<String, GValue>, key: String, value: $ty) {
                 Args::insert(map, key, GValue::from(value));
             }
         }
     };
     (&$lt:lifetime $ty:path) => {
         impl<$lt> Insert<&$lt $ty> for Args {
-            fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: &$lt $ty) {
+            fn insert(map: &mut IndexMap<String, GValue>, key: String, value: &$lt $ty) {
                 Args::insert(map, key, GValue::from(value));
             }
         }
@@ -113,5 +114,5 @@ insert!(IndexMap<&str, GValue>);
 insert!(IndexMap<GValue, GValue>);
 
 trait Insert<I> {
-    fn insert(map: &mut IndexMap<&'static str, GValue>, key: &'static str, value: I);
+    fn insert(map: &mut IndexMap<String, GValue>, key: String, value: I);
 }

@@ -1,7 +1,3 @@
-pub trait Object {
-    #[allow(nonstandard_style)]
-    const name: &'static str;
-}
 
 pub trait Tag_<D> {
     const tag: &'static str;
@@ -210,14 +206,19 @@ macro_rules! partial_eq {
 // TODO move these elsewhere
 primitive_prelude!();
 very_primitive!(Bool, bool);
+tag!(Bool);
 very_primitive!(Float, f32);
+tag!(Float);
 very_primitive!(Double, f64);
+tag!(Double);
 very_primitive!(Integer, i32);
+tag!(Integer);
 very_primitive!(Long, i64);
+tag!(Long);
 
-impl Object for String {
-    const name: &'static str = "String";
-}
+// Misnomer: These are never used
+obj!(String);
+tag!(String);
 
 use std::hash::{Hash, Hasher};
 

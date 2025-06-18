@@ -19,10 +19,10 @@ impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V2> {
                 .iter()
                 .map(|(k, v)| (k, v.serialize::<Self, D>()))
                 .map(|(k, result)| match result {
-                    Ok(v) => Ok((*k, v)),
+                    Ok(v) => Ok((k, v)),
                     Err(e) => Err(e),
                 })
-                .collect::<Result<Vec<(&'static str, Value)>, Error>>()?
+                .collect::<Result<List<_>, Error>>()?
                 .drain(..),
         );
 

@@ -10,9 +10,8 @@ pub struct Vertex {
     pub(crate) properties: Map<String, List<VertexProperty>>,
 }
 
-impl Object for Vertex {
-    const name: &'static str = "Vertex";
-}
+crate::obj!(Vertex);
+crate::tag!(Vertex);
 
 impl IntoIterator for Vertex {
     type Item = (String, List<VertexProperty>);

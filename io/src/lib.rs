@@ -2,18 +2,16 @@
 #![feature(impl_trait_in_assoc_type)]
 
 mod api;
-mod error;
 mod graphson;
 mod macros;
 mod request;
 mod response;
 mod types;
-mod versions;
 
 pub use api::*;
-pub use error::Error;
+pub use graphson::GraphSON;
 pub use request::{Args, Request};
 pub use response::{Response, Status};
 pub use types::*;
 
-pub(crate) use api::Sealed;
+pub(crate) use macros::*;

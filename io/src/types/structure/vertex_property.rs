@@ -56,9 +56,8 @@ pub struct VertexProperty {
     pub(crate) properties: Option<Map<String, GValue>>,
 }
 
-impl Object for VertexProperty {
-    const name: &'static str = "VertexProperty";
-}
+crate::obj!(VertexProperty);
+crate::tag!(VertexProperty);
 
 impl VertexProperty {
     pub fn new<G, T, GT>(id: G, label: T, value: GT) -> VertexProperty

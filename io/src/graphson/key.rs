@@ -3,7 +3,7 @@
 //         todo!()
 //     }
 // }
-// impl Serializer<GKey> for V2 {
+// impl<D: Dialect> GraphsonSerializer<GKey, D> for GraphSON<V2> {
 //     fn serialize(val: &GKey) -> Result<Value, Error> {
 //         todo!()
 //     }

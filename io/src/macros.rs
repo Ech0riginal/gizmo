@@ -21,12 +21,6 @@ macro_rules! types {
         }
     };
 }
-#[cfg(test)]
-#[allow(dead_code)] // 'tis but a scratch
-pub struct Test<T> {
-    pub serial: serde_json::Value,
-    pub object: T,
-}
 
 #[macro_export]
 macro_rules! test_prelude {
@@ -53,14 +47,14 @@ macro_rules! tests {
 
 #[macro_export]
 macro_rules! module {
-    ($engine:ident, serialize $ty:ty) => {
+    ($engine:ty, $dialect:ident, serialize $ty:ty) => {
         mod serialization {
             pub(self) use super::*;
 
             #[test]
             fn ok() {
-                let result =
-                    <$engine as $crate::api::Serializer<$ty>>::serialize(&TEST_CASE.object);
+                let result = TEST_CASE.object.serialize::<$engine, $dialect>();
+                    // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                 match result {
                     Ok(_) => {
                         assert!(true);
@@ -73,8 +67,8 @@ macro_rules! module {
 
             #[test]
             fn accurate() {
-                let result =
-                    <$engine as $crate::api::Serializer<$ty>>::serialize(&TEST_CASE.object);
+                let result = TEST_CASE.object.serialize::<$engine, $dialect>();
+                    // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                 match result {
                     Err(e) => {
                         assert!(false, "serialization failed: {:?}", e);
@@ -90,21 +84,19 @@ macro_rules! module {
         }
     };
 
-    ($engine:ident, deserialize $ty:ty) => {
+    ($engine:ty, $dialect:ident, deserialize $ty:ty) => {
         mod deserialization {
             pub(self) use super::*;
 
             #[test]
             fn ok() {
-                let result =
-                    <$engine as $crate::api::Deserializer<$ty>>::deserialize(&TEST_CASE.serial);
+                let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
                 assert!(result.is_ok(), "deserialization failed: {:?}", result);
             }
 
             #[test]
             fn accurate() {
-                let result =
-                    <$engine as $crate::api::Deserializer<$ty>>::deserialize(&TEST_CASE.serial);
+                let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
                 match result {
                     Err(e) => {
                         assert!(false, "deserialization failed: {:#?}", e);
@@ -132,7 +124,7 @@ macro_rules! test_case {
 
 #[macro_export]
 macro_rules! gvalue_test {
-    ($fun:ident, $engine:ident, $case:expr) => {
+    ($fun:ident, $engine:ty, $dialect:ident, $case:expr) => {
         mod $fun {
             $crate::test_prelude!();
 
@@ -142,15 +134,15 @@ macro_rules! gvalue_test {
                 static ref TEST_CASE: Test = $case;
             }
 
-            $crate::module!($engine, deserialize $crate::GValue);
-            $crate::module!($engine, serialize $crate::GValue);
+            $crate::module!($engine, $dialect, deserialize $crate::GValue);
+            $crate::module!($engine, $dialect, serialize $crate::GValue);
         }
     };
 }
 
 #[macro_export]
 macro_rules! response_test {
-    ($fun:ident, $engine:ident, $case:expr) => {
+    ($fun:ident, $engine:ty, $dialect:ident, $case:expr) => {
         mod $fun {
             $crate::test_prelude!();
 
@@ -160,7 +152,7 @@ macro_rules! response_test {
                 pub static ref TEST_CASE: Test = $case;
             }
 
-            $crate::module!($engine, deserialize $crate::Response);
+            $crate::module!($engine, $dialect, deserialize $crate::Response);
             // $crate::module!($engine, serialize $crate::Response);
         }
     };
@@ -168,7 +160,7 @@ macro_rules! response_test {
 
 #[macro_export]
 macro_rules! request_test {
-    ($fun:ident, $engine:ident, $case:expr) => {
+    ($fun:ident, $engine:ty, $dialect:ident, $case:expr) => {
         mod $fun {
             $crate::test_prelude!();
 
@@ -179,7 +171,7 @@ macro_rules! request_test {
             }
 
             // $crate::module!($engine, deserialize $crate::Request);
-            $crate::module!($engine, serialize $crate::Request);
+            $crate::module!($engine, $dialect, serialize $crate::Request);
         }
     };
 }
@@ -187,8 +179,8 @@ macro_rules! request_test {
 macro_rules! get_value {
     ($value:expr,Value::$v:ident) => {
         match $value {
-            Value::$v(e) => Ok(e),
-            _ => Err($crate::error::Error::Unexpected {
+            serde_json::Value::$v(e) => Ok(e),
+            _ => Err($crate::api::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
                 location: location!(),
@@ -198,8 +190,8 @@ macro_rules! get_value {
 
     ($value:expr,GValue::$v:ident) => {
         match $value {
-            GValue::$v(e) => Ok(e),
-            _ => Err($crate::error::Error::Unexpected {
+            $crate::GValue::$v(e) => Ok(e),
+            _ => Err($crate::api::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
                 location: location!(),
@@ -212,7 +204,7 @@ macro_rules! expect_i32 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v as i32),
-            None => Err($crate::error::Error::Unexpected {
+            None => Err($crate::api::Error::Unexpected {
                 expectation: "an i32".into(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -225,7 +217,7 @@ macro_rules! expect_i64 {
     ($value:expr) => {
         match $value.as_i64() {
             Some(v) => Ok(v),
-            None => Err($crate::error::Error::Unexpected {
+            None => Err($crate::api::Error::Unexpected {
                 expectation: "an i64".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -238,7 +230,7 @@ macro_rules! expect_i128 {
     ($value:expr) => {
         match $value.as_i128() {
             Some(v) => Ok(v),
-            None => Err($crate::error::Error::Unexpected {
+            None => Err($crate::api::Error::Unexpected {
                 expectation: "An i128".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -251,7 +243,7 @@ macro_rules! expect_f32 {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v as f32),
-            None => Err($crate::error::Error::Unexpected {
+            None => Err($crate::api::Error::Unexpected {
                 expectation: "An f32".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -264,7 +256,7 @@ macro_rules! expect_f64 {
     ($value:expr) => {
         match $value.as_f64() {
             Some(v) => Ok(v),
-            None => Err($crate::error::Error::Unexpected {
+            None => Err($crate::api::Error::Unexpected {
                 expectation: "An f64".to_string(),
                 actual: format!("{:?}", $value),
                 location: snafu::location!(),
@@ -277,3 +269,4 @@ macro_rules! expect_f64 {
 pub(crate) use {expect_f32, expect_f64, expect_i32, expect_i64, expect_i128, get_value};
 #[allow(unused_imports)]
 pub(crate) use {gvalue_test, io, test_prelude, types};
+use crate::GValue;

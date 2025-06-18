@@ -14,8 +14,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
                 }))
             };
         }
-        
-        
+
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => handle!(val, Bool),
@@ -28,7 +27,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::Long(val) => handle!(val, Long),
             GValue::Map(val) => handle!(val, Map<GValue, GValue>),
             GValue::Set(val) => handle!(val, Set),
-            GValue::String(val) => val.serialize::<Self, D>(),
+            GValue::String(val) => Ok(json!(val)),
             GValue::Timestamp(val) => handle!(val, Timestamp),
             GValue::Uuid(val) => handle!(val, Uuid),
             GValue::Edge(val) => handle!(val, Edge),

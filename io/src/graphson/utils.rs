@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::api::Error;
 use serde_json::Value;
 use snafu::Location;
 
