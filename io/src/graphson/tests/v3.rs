@@ -1176,7 +1176,7 @@ mod process {
             serial: json!({ "@type" : "g:Bytecode", "@value" : { "step" : [ [ "V" ], [ "hasLabel", "person" ], [ "out" ], [ "in" ], [ "tree" ] ] }}),
             object: GValue::Bytecode(Bytecode {
                 source_instructions: list![Instruction {
-                    operator: "V".into(),
+                    op: "V".into(),
                     args: list!["hasLabel".into(), "person".into()],
                 }],
                 step_instructions: list![],

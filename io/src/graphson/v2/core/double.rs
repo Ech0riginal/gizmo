@@ -2,6 +2,7 @@ use crate::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Double, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Double, Error> {
+        let myb = val.as_f64();
         let val = expect_f64!(val)?;
         Ok(Double(val))
     }

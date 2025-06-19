@@ -319,7 +319,7 @@ mod gvalues {
     basic!(Cardinality);
     basic!(Column);
     basic!(Direction);
-    diff!(Instruction, operator, args);
+    diff!(Instruction, op, args);
     diff!(Lambda, script, language, arguments);
     basic!(Merge);
     diff!(
@@ -327,7 +327,7 @@ mod gvalues {
         id,
         duration,
         name,
-        count,
+        elements,
         traversers,
         perc_duration,
         nested
