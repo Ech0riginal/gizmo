@@ -10,8 +10,9 @@ impl<D: Dialect> GraphsonDeserializer<Bytecode, D> for GraphSON<V2> {
             source_instructions.extend(
                 get_value!(sourceroonies, Value::Array)?
                     .iter()
-                    .map(|v| v.deserialize::<Self, D, Instruction>()).collect::<Result<List<_>, Error>>()?
-                    .drain(..)
+                    .map(|v| v.deserialize::<Self, D, Instruction>())
+                    .collect::<Result<List<_>, Error>>()?
+                    .drain(..),
             )
         }
 
@@ -19,11 +20,11 @@ impl<D: Dialect> GraphsonDeserializer<Bytecode, D> for GraphSON<V2> {
             step_instructions.extend(
                 get_value!(steperoonies, Value::Array)?
                     .iter()
-                    .map(|v| v.deserialize::<Self, D, Instruction>()).collect::<Result<List<_>, Error>>()?
-                    .drain(..)
+                    .map(|v| v.deserialize::<Self, D, Instruction>())
+                    .collect::<Result<List<_>, Error>>()?
+                    .drain(..),
             )
         }
-
 
         Ok(Bytecode {
             source_instructions,
@@ -36,7 +37,7 @@ impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Instruction, Error> {
         let arr = get_value!(val, Value::Array)?;
         if arr.is_empty() {
-            return Err(Error::unexpected(val, "an array with a size of at least 1"))
+            return Err(Error::unexpected(val, "an array with a size of at least 1"));
         }
 
         let op = arr[0].deserialize::<Self, D, String>()?;
@@ -49,10 +50,7 @@ impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V2> {
                 .collect::<Result<List<GValue>, Error>>()?,
         };
 
-        Ok(Instruction {
-            op,
-            args
-        })
+        Ok(Instruction { op, args })
     }
 }
 
