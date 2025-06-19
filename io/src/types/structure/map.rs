@@ -3,7 +3,7 @@ use crate::*;
 use indexmap::IndexMap;
 use snafu::OptionExt;
 use std::hash::{Hash, Hasher};
-// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
+// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has the ability to allow for non-String keys.
 // TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 
 primitive_prelude!();
@@ -22,6 +22,7 @@ impl<K: Default, V: Default> Default for Map<K, V> {
         Self(IndexMap::default())
     }
 }
+
 impl<K: fmt::Debug, V: fmt::Debug> fmt::Debug for Map<K, V> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_fmt(::core::format_args!("{:?}", self.0))

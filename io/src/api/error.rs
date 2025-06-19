@@ -55,6 +55,27 @@ pub enum Error {
     Infallible,
 }
 
+impl Error {
+    #[track_caller]
+    pub fn unexpected<T: std::fmt::Debug, M: AsRef<str>>(value: &T, expectation: M) -> Self {
+        Self::Unexpected {
+            actual: format!("{:?}", value),
+            expectation: expectation.as_ref().to_string(),
+            location: {
+                let l = std::panic::Location::caller();
+                Location::new(l.file(), l.line(), l.column())
+            },
+        }
+    }
+}
+
+trait Unexpected: std::fmt::Debug {
+    fn debug(&self) -> String {
+        format!("{:?}", &self)
+    }
+}
+impl<T> Unexpected for T where T: std::fmt::Debug {}
+
 impl From<uuid::Error> for Error {
     #[track_caller]
     fn from(value: uuid::Error) -> Self {

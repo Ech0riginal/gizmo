@@ -4,7 +4,7 @@ use crate::*;
 pub struct Lambda {
     pub(crate) script: String,
     pub(crate) language: String,
-    pub(crate) arguments: List<String>,
+    pub(crate) arguments: i64,
 }
 
 obj!(Lambda);

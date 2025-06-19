@@ -7,7 +7,7 @@ pub struct Metrics {
     pub(crate) id: String,
     pub(crate) duration: Double,
     pub(crate) name: String,
-    pub(crate) count: Long,
+    pub(crate) elements: Long,
     pub(crate) traversers: Long,
     pub(crate) perc_duration: Double,
     pub(crate) nested: List<Metrics>,
@@ -20,7 +20,8 @@ impl Hash for Metrics {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
         self.duration.hash(state);
-        self.count.hash(state);
+        self.elements.hash(state);
+        self.traversers.hash(state);
     }
 }
 
@@ -30,7 +31,7 @@ crate::getters!(
     name -> String,
     duration -> Double,
     perc_duration -> Double,
-    count -> Long,
+    elements -> Long,
     traversers -> Long
 );
 
@@ -56,7 +57,7 @@ impl Metrics {
             id: id.into(),
             name: name.into(),
             duration: duration.into(),
-            count: count.into(),
+            elements: count.into(),
             traversers: traversers.into(),
             perc_duration: perc_duration.into(),
             nested,

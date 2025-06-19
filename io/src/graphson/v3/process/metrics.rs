@@ -11,7 +11,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
         let name = metrics.remove_ok::<String, _>("name")?;
         let mut counts = metrics.remove_ok::<Map<GValue, GValue>, _>("counts")?;
         let traversers = counts.remove_ok::<Long, _>("traverserCount")?;
-        let count = counts.remove_ok::<Long, _>("elementCount")?;
+        let elements = counts.remove_ok::<Long, _>("elementCount")?;
         let annotations_raw = metrics
             .remove_ok::<GValue, _>("annotations")
             .unwrap_or_else(|_| GValue::Null);
@@ -31,7 +31,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
             id,
             duration,
             name,
-            count,
+            elements,
             traversers,
             perc_duration,
             nested,

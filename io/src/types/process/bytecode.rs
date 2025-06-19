@@ -53,9 +53,11 @@ impl Bytecode {
 
 #[derive(Eq, PartialEq, Clone, Hash)]
 pub struct Instruction {
-    pub(crate) operator: String,
+    pub(crate) op: String,
     pub(crate) args: List<GValue>,
 }
+
+obj!(Instruction);
 
 impl std::fmt::Debug for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -64,7 +66,7 @@ impl std::fmt::Debug for Instruction {
                 GValue::P(_) => write!(f, "P{:?}", &self.args[0])?,
                 GValue::T(_) => write!(f, "T{:?}", &self.args[0])?,
                 _ => {
-                    write!(f, "{}", &self.operator)?;
+                    write!(f, "{}", &self.op)?;
                     write!(f, "(")?;
                     write!(f, "{:?}", &self.args[0])?
                 }
@@ -90,6 +92,6 @@ impl std::fmt::Debug for Instruction {
 
 impl Instruction {
     pub fn new(operator: String, args: List<GValue>) -> Instruction {
-        Instruction { operator, args }
+        Instruction { op: operator, args }
     }
 }
