@@ -217,7 +217,6 @@ tag!(Integer, "g:Int32");
 very_primitive!(Long, i64);
 tag!(Long, "g:Int64");
 
-// Misnomer: These are never used
 obj!(String);
 tag!(String);
 

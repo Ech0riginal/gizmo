@@ -27,7 +27,7 @@
 //     () => {
 //         pub(self) use super::*;
 //         #[allow(unused_imports)]
-//         pub(self) use $crate::graphson::tests::diff::{Diff, Difference};
+//         pub(self) use $crate::formats::graphson::tests::diff::{Diff, Difference};
 //         #[allow(unused_imports)]
 //         pub(self) use $crate::*;
 //         #[allow(unused_imports)]
@@ -281,7 +281,7 @@ pub mod test_macros {
         () => {
             pub(self) use super::*;
             #[allow(unused_imports)]
-            pub(self) use $crate::graphson::tests::diff::{Diff, Difference};
+            pub(self) use $crate::formats::graphson::tests::diff::{Diff, Difference};
             #[allow(unused_imports)]
             pub(self) use $crate::*;
             #[allow(unused_imports)]
