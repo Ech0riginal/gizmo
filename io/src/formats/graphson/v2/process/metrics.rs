@@ -1,13 +1,10 @@
-use serde::Serialize;
 use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val, Value::Object)?.to_owned();
         let duration = get_value!(
-            metric
-                .ensure("dur")?
-            .deserialize::<Self, D, GValue>()?,
+            metric.ensure("dur")?.deserialize::<Self, D, GValue>()?,
             GValue::Double
         )?;
         let id = metric.ensure("id")?.deserialize::<Self, D, String>()?;
@@ -40,7 +37,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
             Ok(gval) => get_value!(gval, GValue::Double),
             Err(e) => Err(e),
         }
-            .unwrap_or(Double(0.0));
+        .unwrap_or(Double(0.0));
         let nested = if let Ok(metrics) = metric.ensure("metrics") {
             let gval = metrics.deserialize::<Self, D, GValue>()?;
             get_value!(gval, GValue::List)?
@@ -50,7 +47,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
         } else {
             list![]
         };
-        
+
         let metric = Metrics::new(id, name, duration, count, traversers, perc_duration, nested);
 
         Ok(metric)
