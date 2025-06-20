@@ -20,26 +20,32 @@ pub trait GraphsonSerializer<T, D> {
 }
 
 mod blankets {
-    use crate::DeserializeExt;
+    use crate::api::ObjectSnafu;
     use crate::formats::graphson::{GraphsonDeserializer, GraphsonSerializer};
+    use crate::{DeserializeExt, Dialect, Named};
+    use snafu::ResultExt;
 
     impl DeserializeExt for serde_json::Value {}
 
     impl<O, D, T> crate::Deserializer<O, serde_json::Value, D> for T
     where
+        O: Named,
+        D: Dialect,
         T: GraphsonDeserializer<O, D>,
     {
         fn deserialize(serial: &serde_json::Value) -> Result<O, crate::Error> {
-            <T as GraphsonDeserializer<O, D>>::deserialize(serial)
+            T::deserialize(serial).context(ObjectSnafu { name: O::name })
         }
     }
 
     impl<O, D, T> crate::Serializer<O, serde_json::Value, D> for T
     where
+        O: Named,
+        D: Dialect,
         T: GraphsonSerializer<O, D>,
     {
         fn serialize(object: &O) -> Result<serde_json::Value, crate::Error> {
-            <T as GraphsonSerializer<O, D>>::serialize(object)
+            T::serialize(object).context(ObjectSnafu { name: O::name })
         }
     }
 }

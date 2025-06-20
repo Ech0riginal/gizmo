@@ -3,8 +3,8 @@ use crate::formats::graphson::prelude::*;
 impl<K, V, D: Dialect> GraphsonSerializer<Map<K, V>, D> for GraphSON<V2>
 where
     Self: GraphsonSerializer<K, D> + GraphsonSerializer<V, D>,
-    K: SerializeExt + Object,
-    V: SerializeExt + Object,
+    K: SerializeExt + Named,
+    V: SerializeExt + Named,
 {
     fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mut values = vec![];

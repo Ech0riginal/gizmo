@@ -40,7 +40,7 @@ macro_rules! gid {
 
 gid!(String, Integer, Long);
 
-impl Object for GID {
+impl Named for GID {
     const name: &'static str = "GID";
 }
 

@@ -5,7 +5,7 @@ use crate::formats::graphson::prelude::*;
 impl<T: SerializeExt, D: Dialect> GraphsonSerializer<List<T>, D> for GraphSON<V3>
 where
     Self: GraphsonSerializer<T, D>,
-    T: Object,
+    T: Named,
 {
     fn serialize(val: &List<T>) -> Result<Value, Error> {
         let value = val
@@ -19,7 +19,7 @@ where
 impl<T, D: Dialect> GraphsonDeserializer<List<T>, D> for GraphSON<V3>
 where
     Self: GraphsonDeserializer<T, D>,
-    T: Object,
+    T: Named,
 {
     fn deserialize(val: &Value) -> Result<List<T>, Error> {
         if val.to_string().contains("[null]") {

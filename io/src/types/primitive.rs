@@ -16,7 +16,7 @@ macro_rules! primitive {
         #[derive(Clone)]
         pub struct $name(pub(crate) $inner);
 
-        impl $crate::Object for $name {
+        impl $crate::Named for $name {
             const name: &'static str = stringify!($name);
         }
 
@@ -58,7 +58,7 @@ macro_rules! getters {
 #[macro_export]
 macro_rules! obj {
     ($id:ident) => {
-        impl $crate::Object for $id {
+        impl $crate::Named for $id {
             const name: &'static str = stringify!($id);
         }
     };

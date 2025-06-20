@@ -1,6 +1,6 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::{GValue, Map, Object};
+use crate::{GValue, Map, Named};
 use derive_builder::Builder;
 use indexmap::IndexMap;
 use std::hash::Hasher;
@@ -19,7 +19,7 @@ impl Request {
         RequestBuilder::create_empty()
     }
 }
-impl Object for Request {
+impl Named for Request {
     const name: &'static str = "Request";
 }
 impl Eq for Request {}

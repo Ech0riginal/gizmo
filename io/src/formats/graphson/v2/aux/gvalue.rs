@@ -67,6 +67,9 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
         match value {
             Value::String(string) => Ok(GValue::from(string)),
             Value::Number(_) => value.deserialize::<Self, D, Integer>().map(GValue::from),
+            Value::Array(_) => value
+                .deserialize::<Self, D, List<GValue>>()
+                .map(GValue::from),
             Value::Object(_obj) => match value.typed() {
                 Ok(blob) => {
                     macro_rules! deserialize {
@@ -136,13 +139,6 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                     _ => panic!(),
                 },
             },
-            Value::Array(values) => {
-                let collection = values
-                    .iter()
-                    .map(|v| v.deserialize::<Self, D, GValue>())
-                    .collect::<Result<List<_>, Error>>()?;
-                Ok(GValue::List(collection))
-            }
             Value::Bool(bool) => Ok(Bool(*bool).into()),
             Value::Null => Ok(GValue::Null),
         }

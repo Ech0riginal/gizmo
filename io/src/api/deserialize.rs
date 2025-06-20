@@ -11,7 +11,7 @@ pub trait DeserializeExt: Sized {
         F: Format,
         F: Deserializer<T, Self, D>,
         D: Dialect,
-        T: Object,
+        T: Named,
     {
         let result = F::deserialize(self).context(ObjectSnafu { name: T::name });
 

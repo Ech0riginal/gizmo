@@ -3,8 +3,8 @@ use crate::formats::graphson::prelude::*;
 impl<K, V, D: Dialect> GraphsonDeserializer<Map<K, V>, D> for GraphSON<V3>
 where
     Self: GraphsonDeserializer<K, D> + GraphsonDeserializer<V, D>,
-    K: std::hash::Hash + Eq + Object,
-    V: Object,
+    K: std::hash::Hash + Eq + Named,
+    V: Named,
 {
     fn deserialize(val: &Value) -> Result<Map<K, V>, Error> {
         let val = get_value!(val, Value::Array)?.to_owned();
@@ -31,8 +31,8 @@ where
 impl<K, V, D: Dialect> GraphsonSerializer<Map<K, V>, D> for GraphSON<V3>
 where
     Self: GraphsonSerializer<K, D> + GraphsonSerializer<V, D>,
-    K: SerializeExt + Object,
-    V: SerializeExt + Object,
+    K: SerializeExt + Named,
+    V: SerializeExt + Named,
 {
     fn serialize(val: &Map<K, V>) -> Result<Value, Error> {
         let mut values = vec![];

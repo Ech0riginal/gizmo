@@ -20,6 +20,6 @@ impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V3> {
     }
 }
 
-impl Object for &'static str {
+impl Named for &'static str {
     const name: &'static str = "not an object";
 }

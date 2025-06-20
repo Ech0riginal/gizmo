@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::Named;
 use snafu::Location;
 use snafu::prelude::*;
 

@@ -11,7 +11,7 @@ pub trait SerializeExt: Sized {
         F: Format,
         F: Serializer<Self, F::Serial, D>,
         D: Dialect,
-        Self: Object,
+        Self: Named,
     {
         let result = F::serialize(self).context(ObjectSnafu { name: Self::name });
 
