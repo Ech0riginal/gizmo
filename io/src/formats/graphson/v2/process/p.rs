@@ -9,14 +9,23 @@ use crate::formats::graphson::prelude::*;
 impl<D: Dialect> GraphsonDeserializer<P, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<P, Error> {
         let map = get_value!(val, Value::Object)?;
-
-        let value = map
-            .ensure("value")?
-            .deserialize::<Self, D, GValue>()?
-            .boxed();
         let predicate = map
             .ensure("predicate")?
             .deserialize::<Self, D, Predicate>()?;
+        let value = {
+            let value = map.ensure("value")?;
+            let gvalue = if let Ok(list) = get_value!(value, Value::Array) {
+                list.iter()
+                    .map(|v| v.deserialize::<Self, D, GValue>())
+                    .collect::<Result<List<_>, _>>()
+                    .map(GValue::from)?
+            } else if let Ok(blob) = value.typed() {
+                blob.value.deserialize::<Self, D, GValue>()?
+            } else {
+                Err(Error::unexpected(value, "a List or typed value"))?
+            };
+            gvalue.boxed()
+        };
 
         Ok(P { predicate, value })
     }
