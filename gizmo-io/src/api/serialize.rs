@@ -13,7 +13,7 @@ pub trait SerializeExt: Sized {
         D: Dialect,
         Self: Named,
     {
-        let result = F::serialize(self).context(ObjectSnafu { name: Self::name });
+        let result = F::serialize(self);
 
         #[cfg(feature = "tracing")]
         match result.as_ref() {
