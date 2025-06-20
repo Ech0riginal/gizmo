@@ -1,6 +1,6 @@
 [package]
 authors = ["Ech0riginal <samwatkins94@me.com>"]
-name = "io"
+name = "gizmo-io"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.87.0"
@@ -23,4 +23,5 @@ uuid                = { version = "1.17.0", features = ["serde", "v4"] }
 tracing             = { version = "0.1.41", features = ["default"], optional = true }
 
 [features]
-tracing = ["dep:tracing"]
+tracing     = ["dep:tracing"]
+happy_paths = [] 

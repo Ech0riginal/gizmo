@@ -2,7 +2,7 @@
 resolver = "3"
 members = [
     "gizmo",
-    "io"
+    "gizmo-io",
 ]
 
 [profile.release]
