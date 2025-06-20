@@ -1144,12 +1144,64 @@ mod process {
         }
     );
     gvalue_test!(
+        p_and,
+        GraphSON<V2>,
+        SQLg,
+        Test {
+            serial: json!({"@type":"g:P","@value":{"predicate":"and","value":[{"@type":"g:P","@value":{"predicate":"gt","value":{"@type":"g:Int32","@value":0}}},{"@type":"g:P","@value":{"predicate":"lt","value":{"@type":"g:Int32","@value":10}}}]}}),
+            object: GValue::P(P {
+                predicate: Predicate::And,
+                value: GValue::List(list![
+                    GValue::P(P {
+                        predicate: Predicate::GreaterThan,
+                        value: GValue::Integer(0.into()).boxed(),
+                    }),
+                    GValue::P(P {
+                        predicate: Predicate::LessThan,
+                        value: GValue::Integer(10.into()).boxed(),
+                    }),
+                ])
+                .boxed()
+            }),
+        }
+    );
+    gvalue_test!(
+        p_or,
+        GraphSON<V2>,
+        SQLg,
+        Test {
+            serial: json!({"@type":"g:P","@value":{"predicate":"or","value":[{"@type":"g:P","@value":{"predicate":"gt","value":{"@type":"g:Int32","@value":0}}},{"@type":"g:P","@value":{"predicate":"within","value":[{"@type":"g:Int32","@value":-1},{"@type":"g:Int32","@value":-10},{"@type":"g:Int32","@value":-100}]}}]}}),
+            object: GValue::P(P {
+                predicate: Predicate::Or,
+                value: GValue::List(list![
+                    GValue::P(P {
+                        predicate: Predicate::GreaterThan,
+                        value: GValue::Integer(0.into()).boxed()
+                    }),
+                    GValue::P(P {
+                        predicate: Predicate::Within,
+                        value: GValue::List(list![
+                            Integer(-1).into(),
+                            Integer(-10).into(),
+                            Integer(-100).into(),
+                        ])
+                        .boxed()
+                    })
+                ])
+                .boxed()
+            }),
+        }
+    );
+    gvalue_test!(
         p_within,
         GraphSON<V2>,
         SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "within", "value" : [ { "@type" : "g:Int32", "@value" : 1 } ] }}),
-            object: GValue::Null,
+            object: GValue::P(P {
+                predicate: Predicate::Within,
+                value: GValue::List(list![GValue::Integer(1.into())]).boxed()
+            }),
         }
     );
     gvalue_test!(
@@ -1158,25 +1210,11 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "without", "value" : [ { "@type" : "g:Int32", "@value" : 1 }, { "@type" : "g:Int32", "@value" : 2 } ] }}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        p_and,
-        GraphSON<V2>,
-        SQLg,
-        Test {
-            serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "and", "value" : [ { "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } } }, { "@type" : "g:P", "@value" : { "predicate" : "lt", "value" : { "@type" : "g:Int32", "@value" : 10 } } } ] }}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        p_or,
-        GraphSON<V2>,
-        SQLg,
-        Test {
-            serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "or", "value" : [ { "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } } }, { "@type" : "g:P", "@value" : { "predicate" : "within", "value" : [ { "@type" : "g:Int32", "@value" : -1 }, { "@type" : "g:Int32", "@value" : -10 }, { "@type" : "g:Int32", "@value" : -100 } ] } } ] }}),
-            object: GValue::Null,
+            object: GValue::P(P {
+                predicate: Predicate::Without,
+                value: GValue::List(list![GValue::Integer(1.into()), GValue::Integer(2.into()),])
+                    .boxed()
+            }),
         }
     );
     gvalue_test!(
