@@ -1,5 +1,4 @@
 use super::*;
-use snafu::ResultExt;
 
 pub trait Serializer<O, S, D> {
     fn serialize(object: &O) -> Result<S, Error>;

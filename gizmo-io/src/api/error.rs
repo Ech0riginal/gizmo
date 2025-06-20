@@ -1,4 +1,3 @@
-use crate::Named;
 use snafu::Location;
 use snafu::prelude::*;
 
@@ -57,7 +56,7 @@ impl Error {
         expectation: M,
     ) -> Self {
         Self::Unexpected {
-            actual: format!("{:?}", value),
+            actual: format!("{value:?}"),
             expectation: expectation.as_ref().to_string(),
             location: {
                 let l = std::panic::Location::caller();

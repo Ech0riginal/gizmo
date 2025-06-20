@@ -19,14 +19,21 @@ mod versions;
 
 pub use deserialize::*;
 pub use dialects::*;
-pub use error::*;
+pub use error::Error;
 pub use format::*;
 pub use name::*;
 pub use serialize::*;
 pub use versions::*;
 
+pub(crate) use error::*;
+
 mod blankets {
     use super::*;
 
+    // For GraphSON
     impl<T: Named> SerializeExt for T {}
+    impl DeserializeExt for serde_json::Value {}
+
+    // For GraphBinary
+    // impl DeserializeExt for bytes::Bytes {}
 }

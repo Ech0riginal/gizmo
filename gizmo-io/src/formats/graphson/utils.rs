@@ -84,7 +84,7 @@ mod typing {
         fn typed<'a>(&'a self) -> Result<Type<'a>, Error> {
             let tag = match self.ensure(TYPE_TAG) {
                 Ok(v) => v.as_str().ok_or(Error::Unexpected {
-                    actual: format!("{:?}", v),
+                    actual: format!("{v:?}"),
                     expectation: "a json string".into(),
                     location: location!(),
                 }),
