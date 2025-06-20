@@ -3,95 +3,83 @@ use crate::*;
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct P {
     // TODO finish their P impl
-    pub(crate) operator: String,
+    pub(crate) predicate: Predicate,
     pub(crate) value: Box<GValue>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub enum Predicate {
+    Equal,
+    NotEqual,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
+    Within,
+    Without,
+    Inside,
+    Outside,
+    Between,
+    And,
+    Or,
+    Undocumented(String),
 }
 
 obj!(P);
 tag!(P);
 
+// We won't be de/serializing these from the top, so
+// tagging doesn't matter, just gets us into the blankets
+obj!(Predicate);
+tag!(Predicate);
+
+macro_rules! expose {
+    ($pred:ident, $func:ident) => {
+        pub fn $func<V>(value: V) -> P
+        where
+            V: Into<GValue>,
+        {
+            P {
+                predicate: Predicate::$pred,
+                value: value.into().boxed(),
+            }
+        }
+    };
+}
+
 impl P {
-    pub fn operator(&self) -> &String {
-        &self.operator
+    pub fn predicate(&self) -> &Predicate {
+        &self.predicate
     }
 
     pub fn value(&self) -> &GValue {
         &self.value
     }
 
-    pub(crate) fn new<T>(operator: T, value: GValue) -> P
-    where
-        T: Into<String>,
-    {
+    pub fn new(predicate: Predicate, value: GValue) -> P {
         P {
-            operator: operator.into(),
+            predicate,
             value: Box::new(value),
         }
     }
-    pub fn eq<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("eq", value.into())
-    }
 
-    pub fn neq<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("neq", value.into())
-    }
-
-    pub fn gt<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("gt", value.into())
-    }
-
-    pub fn gte<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("gte", value.into())
-    }
-
-    pub fn lt<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("lt", value.into())
-    }
-
-    pub fn lte<V>(value: V) -> P
-    where
-        V: Into<GValue>,
-    {
-        P::new("lte", value.into())
-    }
-
-    pub fn within<V>(value: V) -> P
-    where
-        V: IntoRange,
-    {
-        let values = value.into_range().values;
-        P::new("within", GValue::List(values))
-    }
+    expose!(Equal, eq);
+    expose!(NotEqual, neq);
+    expose!(GreaterThan, gt);
+    expose!(GreaterThanOrEqual, gte);
+    expose!(LessThan, lt);
+    expose!(LessThanOrEqual, lte);
+    expose!(Within, within);
+    expose!(Without, without);
+    expose!(Inside, inside);
+    expose!(Outside, outside);
+    expose!(Between, between);
+    expose!(And, and);
+    expose!(Or, or);
 }
 
 pub trait IntoPredicate {
     fn into_predicate(self) -> Either2<P, TextP>;
-}
-
-impl<T: Into<GValue>> IntoPredicate for T {
-    fn into_predicate(self) -> Either2<P, TextP> {
-        let val = self.into();
-        match val {
-            GValue::P(ref p) => Either2::A(p.clone()),
-            GValue::TextP(ref p) => Either2::B(p.clone()),
-            _ => Either2::A(P::new("eq", val)),
-        }
-    }
 }
 
 pub struct Range {

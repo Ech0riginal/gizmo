@@ -29,7 +29,6 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
                 .unwrap_or(Value::Object(serde_json::Map::new())),
             Value::Object
         )?;
-
         let perc_duration = match annotations
             .ensure("percentDur")?
             .deserialize::<Self, D, GValue>()

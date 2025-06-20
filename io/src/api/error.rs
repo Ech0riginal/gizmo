@@ -2,12 +2,6 @@ use crate::Object;
 use snafu::Location;
 use snafu::prelude::*;
 
-/// Extension trait to attach an Object's name to an error
-pub trait Obj<A> {
-    #[track_caller]
-    fn ctx<T: Object>(self) -> Result<A, Error>;
-}
-
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub(crate)))]
 pub enum Error {
@@ -17,6 +11,7 @@ pub enum Error {
         #[snafu(source(from(Error, Box::new)))]
         source: Box<Error>,
     },
+
     #[snafu(display("Unsupported type tag '{tag}'"))]
     Unsupported {
         tag: String,
@@ -57,7 +52,10 @@ pub enum Error {
 
 impl Error {
     #[track_caller]
-    pub fn unexpected<T: std::fmt::Debug, M: AsRef<str>>(value: &T, expectation: M) -> Self {
+    pub fn unexpected<T: std::fmt::Debug + ?Sized, M: AsRef<str>>(
+        value: &T,
+        expectation: M,
+    ) -> Self {
         Self::Unexpected {
             actual: format!("{:?}", value),
             expectation: expectation.as_ref().to_string(),
@@ -68,13 +66,6 @@ impl Error {
         }
     }
 }
-
-trait Unexpected: std::fmt::Debug {
-    fn debug(&self) -> String {
-        format!("{:?}", &self)
-    }
-}
-impl<T> Unexpected for T where T: std::fmt::Debug {}
 
 impl From<uuid::Error> for Error {
     #[track_caller]

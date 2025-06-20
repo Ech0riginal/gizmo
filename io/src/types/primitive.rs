@@ -207,14 +207,19 @@ macro_rules! partial_eq {
 // TODO move these elsewhere
 primitive_prelude!();
 very_primitive!(Bool, bool);
+impl Copy for Bool {}
 tag!(Bool);
 very_primitive!(Float, f32);
+impl Copy for Float {}
 tag!(Float);
 very_primitive!(Double, f64);
+impl Copy for Double {}
 tag!(Double);
 very_primitive!(Integer, i32);
+impl Copy for Integer {}
 tag!(Integer, "g:Int32");
 very_primitive!(Long, i64);
+impl Copy for Long {}
 tag!(Long, "g:Int64");
 
 obj!(String);

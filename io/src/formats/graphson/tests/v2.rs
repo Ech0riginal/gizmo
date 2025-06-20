@@ -1049,12 +1049,59 @@ mod process {
         }
     );
     gvalue_test!(
+        lambda,
+        GraphSON<V2>,
+        SQLg,
+        Test {
+            serial: json!({ "@type" : "g:Lambda", "@value" : { "script" : "{ it.get() }", "language" : "gremlin-groovy", "arguments" : 1 }}),
+            object: GValue::Lambda(Lambda {
+                script: "{ it.get() }".into(),
+                language: "gremlin-groovy".into(),
+                arguments: 1,
+            }),
+        }
+    );
+    // gvalue_test!(
+    //     merge,
+    //     GraphSON<V2>,
+    //     SQLg,
+    //     Test {
+    //         serial: json!({"@type" : "g:Merge", "@value" : "onMatch" }),
+    //         object: GValue::Merge(Merge::OnMatch),
+    //     }
+    // );
+    gvalue_test!(
+        metrics,
+        GraphSON<V2>,
+        SQLg,
+        Test {
+            serial: json!({"@type":"g:Metrics","@value":{"dur":{"@type":"g:Double","@value":100.0},"counts":{"traverserCount":{"@type":"g:Int64","@value":4},"elementCount":{"@type":"g:Int64","@value":4}},"name":"TinkerGraphStep(vertex,[~label.eq(person)])","annotations":{"percentDur":{"@type":"g:Double","@value":25.0}},"id":"7.0.0()","metrics":[{"@type":"g:Metrics","@value":{"dur":{"@type":"g:Double","@value":100.0},"counts":{"traverserCount":{"@type":"g:Int64","@value":7},"elementCount":{"@type":"g:Int64","@value":7}},"name":"VertexStep(OUT,vertex)","annotations":{"percentDur":{"@type":"g:Double","@value":25.0}},"id":"3.0.0()"}}]}}),
+            object: GValue::Metrics(Metrics {
+                id: "7.0.0()".into(),
+                duration: Double(100.0.into()),
+                name: "TinkerGraphStep(vertex,[~label.eq(person)])".into(),
+                elements: Long(4.into()),
+                traversers: Long(4.into()),
+                perc_duration: Double(25.0.into()),
+                nested: list![Metrics {
+                    id: "3.0.0()".to_string(),
+                    duration: Double(100.0),
+                    name: "VertexStep(OUT,vertex)".into(),
+                    elements: Long(7),
+                    traversers: Long(7),
+                    perc_duration: Double(25.0),
+                    nested: list![],
+                }],
+            }),
+        }
+    );
+    gvalue_test!(
         operator,
         GraphSON<V2>,
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Operator", "@value" : "sum"}),
-            object: GValue::Null,
+            object: GValue::Operator(Operator::Sum),
         }
     );
     gvalue_test!(
@@ -1063,7 +1110,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Order", "@value" : "shuffle"}),
-            object: GValue::Null,
+            object: GValue::Order(Order::Shuffle),
         }
     );
     gvalue_test!(
@@ -1081,37 +1128,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Pop", "@value" : "all"}),
-            object: GValue::Null,
-        }
-    );
-    gvalue_test!(
-        lambda,
-        GraphSON<V2>,
-        SQLg,
-        Test {
-            serial: json!({ "@type" : "g:Lambda", "@value" : { "script" : "{ it.get() }", "language" : "gremlin-groovy", "arguments" : 1 }}),
-            object: GValue::Lambda(Lambda {
-                script: "{ it.get() }".into(),
-                language: "gremlin-groovy".into(),
-                arguments: 1,
-            }),
-        }
-    );
-    gvalue_test!(
-        metrics,
-        GraphSON<V2>,
-        SQLg,
-        Test {
-            serial: json!({ "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0f64 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 4 }, "elementCount" : { "@type" : "g:Int64", "@value" : 4 } }, "name" : "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "7.0.0()", "metrics" : [ { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 7 }, "elementCount" : { "@type" : "g:Int64", "@value" : 7 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "3.0.0()" } } ] }}),
-            object: GValue::Metrics(Metrics {
-                id: "7.0.0()".into(),
-                duration: Double(100.0.into()),
-                name: "TinkerGraphStep(vertex,[~label.eq(person)])".into(),
-                elements: Long(4.into()),
-                traversers: Long(4.into()),
-                perc_duration: Double(25.0.into()),
-                nested: list![],
-            }),
+            object: GValue::Pop(Pop::All),
         }
     );
     gvalue_test!(
@@ -1120,7 +1137,10 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:P", "@value" : { "predicate" : "gt", "value" : { "@type" : "g:Int32", "@value" : 0 } }}),
-            object: GValue::Null,
+            object: GValue::P(P {
+                predicate: Predicate::GreaterThan,
+                value: GValue::Integer(0.into()).boxed(),
+            }),
         }
     );
     gvalue_test!(

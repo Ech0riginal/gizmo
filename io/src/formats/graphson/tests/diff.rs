@@ -45,17 +45,13 @@ impl<'a> Display for Debuggery<'a> {
             Same => write!(f, "Same\n"),
             Intrinsic => {
                 _ = write!(f, "Intrinsic\n");
-                _ = write!(f, "-------------------\n");
-                _ = write!(f, "{:?}\n", self.a);
-                _ = write!(f, "-------------------\n");
-                write!(f, "{:?}\n", self.b)
+                _ = write!(f, "Expected: {:?}\n", self.a);
+                write!(f, "  Actual: {:?}\n", self.b)
             }
             Field(field) => {
                 _ = write!(f, "{}\n", field);
-                _ = write!(f, "-------------------\n");
-                _ = write!(f, "{:?}\n", self.a);
-                _ = write!(f, "-------------------\n");
-                write!(f, "{:?}\n", self.b)
+                _ = write!(f, "Expected: {:?}\n", self.a);
+                write!(f, "  Actual: {:?}\n", self.b)
             }
         }
     }

@@ -15,7 +15,7 @@ impl<D: Dialect> GraphsonDeserializer<Lambda, D> for GraphSON<V2> {
         Ok(Lambda {
             script,
             language,
-            arguments
+            arguments,
         })
     }
 }

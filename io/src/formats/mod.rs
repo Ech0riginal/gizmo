@@ -1,5 +1,4 @@
-//! Wire format de/serialization implementations of our api. 
-
+//! Wire format de/serialization implementations of our api.
 
 // mod binary;
 mod graphson;

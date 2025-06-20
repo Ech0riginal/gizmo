@@ -25,7 +25,7 @@ pub use direction::Direction;
 pub use lambda::Lambda;
 pub use metrics::Metrics;
 pub use operator::Operator;
-pub use p::{IntoPredicate, P};
+pub use p::{IntoPredicate, P, Predicate};
 pub use pick::Pick;
 pub use pop::Pop;
 pub use scope::Scope;
