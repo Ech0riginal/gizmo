@@ -9,19 +9,19 @@ pub struct P {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub enum Predicate {
-    Equal,
-    NotEqual,
-    GreaterThan,
-    GreaterThanOrEqual,
-    LessThan,
-    LessThanOrEqual,
-    Within,
-    Without,
-    Inside,
-    Outside,
-    Between,
-    And,
-    Or,
+    Equal,              //(List<GValue>),
+    NotEqual,           //(List<GValue>),
+    GreaterThan,        //(List<GValue>),
+    GreaterThanOrEqual, //(List<GValue>),
+    LessThan,           //(List<GValue>),
+    LessThanOrEqual,    //(List<GValue>),
+    Within,             //(List<GValue>),
+    Without,            //(List<GValue>),
+    Inside,             //([Box<GValue>; 2]),
+    Outside,            //([Box<GValue>; 2]),
+    Between,            //([Box<GValue>; 2]),
+    And,                //(List<GValue>),
+    Or,                 //(List<GValue>),
     Undocumented(String),
 }
 
