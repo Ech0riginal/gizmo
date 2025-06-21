@@ -61,8 +61,8 @@ mod ensure {
 }
 
 mod typing {
-    use crate::Error;
     use crate::formats::graphson::Ensure;
+    use crate::{Dialect, Error, Format};
     use serde_json::Value;
     use snafu::location;
 
@@ -71,6 +71,10 @@ mod typing {
 
     pub trait Typed {
         fn typed<'a>(&'a self) -> Result<Type<'a>, Error>;
+    }
+
+    pub trait GraphsonType<F: Format> {
+        fn type_<'a, D: Dialect, T: crate::Tag_<D>>(&'a self) -> F::Serial;
     }
 
     #[derive(Debug)]

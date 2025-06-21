@@ -89,6 +89,15 @@ macro_rules! tag {
 }
 
 #[macro_export]
+macro_rules! string_reprs {
+    {$id:ident, $($variant:ident -> $val:expr,)*$(,)?} => {
+        impl $id {
+            $(pub const $variant: &'static str = $val;)*
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! new {
     ($name:ident, $inner:ident) => {
         impl Default for $name {
