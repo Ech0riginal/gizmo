@@ -18,3 +18,17 @@ pub enum Operator {
 
 obj!(Operator);
 tag!(Operator);
+string_reprs! {
+    Operator,
+    SUM -> "sum",
+    MINUS -> "minus",
+    MULT -> "mult",
+    DIV -> "div",
+    MIN -> "min",
+    MAX -> "max",
+    ASSIGN -> "assign",
+    AND -> "and",
+    OR -> "or",
+    ADD_ALL -> "addAll",
+    SUM_LONG -> "sumLong",
+}

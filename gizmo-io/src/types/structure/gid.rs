@@ -43,7 +43,6 @@ gid!(String, Integer, Long);
 impl Named for GID {
     const name: &'static str = "GID";
 }
-
 impl From<&'static str> for GID {
     fn from(val: &str) -> Self {
         GID::String(String::from(val))

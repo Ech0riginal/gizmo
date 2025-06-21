@@ -30,7 +30,7 @@ pub use pick::Pick;
 pub use pop::Pop;
 pub use scope::Scope;
 pub use t::T;
-pub use text_p::TextP;
+pub use text_p::{Text, TextP};
 pub use traversal_metrics::TraversalMetrics;
 
 #[allow(unused_imports)]

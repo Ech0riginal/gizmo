@@ -27,6 +27,22 @@ pub enum Predicate {
 
 obj!(P);
 tag!(P);
+string_reprs! {
+    Predicate,
+    EQUAL -> "eq",
+    NOT_EQUAL -> "neq",
+    GREATER_THAN -> "gt",
+    GREATER_THAN_OR_EQUAL -> "gte",
+    LESS_THAN -> "lt",
+    LESS_THAN_OR_EQUAL -> "lte",
+    WITHIN -> "within",
+    WITHOUT -> "without",
+    INSIDE -> "inside",
+    OUTSIDE -> "outside",
+    BETWEEN -> "between",
+    AND -> "and",
+    OR -> "or",
+}
 
 // We won't be de/serializing these from the top, so
 // tagging doesn't matter, just gets us into the blankets

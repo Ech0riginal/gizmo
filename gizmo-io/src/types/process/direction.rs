@@ -8,5 +8,11 @@ pub enum Direction {
     To,
 }
 
+string_reprs! {
+    Direction,
+    OUT -> "OUT",
+    IN -> "IN",
+}
+
 obj!(Direction);
 tag!(Direction);

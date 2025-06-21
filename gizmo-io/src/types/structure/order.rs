@@ -9,3 +9,9 @@ pub enum Order {
 
 obj!(Order);
 tag!(Order);
+string_reprs! {
+    Order,
+    ASC -> "asc",
+    DESC -> "desc",
+    SHUFFLE -> "shuffle",
+}
