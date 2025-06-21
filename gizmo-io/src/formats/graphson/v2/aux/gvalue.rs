@@ -10,6 +10,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
                     .map(|v| json!({ "@type": D::tag::<$var>(), "@value": v }))
             };
         }
+
         match val {
             GValue::Null => Ok(Value::Null),
             GValue::Bool(val) => Ok(Value::Bool(**val)),

@@ -1119,7 +1119,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Pick", "@value" : "any"}),
-            object: GValue::Null,
+            object: GValue::Pick(Pick::Any),
         }
     );
     gvalue_test!(
@@ -1223,7 +1223,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Scope", "@value" : "local"}),
-            object: GValue::Null,
+            object: GValue::Scope(Scope::Local),
         }
     );
     gvalue_test!(
@@ -1232,7 +1232,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:T", "@value" : "label"}),
-            object: GValue::Null,
+            object: GValue::T(T::Label),
         }
     );
     gvalue_test!(
@@ -1241,7 +1241,10 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:TextP", "@value" : { "predicate" : "containing", "value" : "ark" }}),
-            object: GValue::Null,
+            object: GValue::TextP(TextP {
+                predicate: Text::Containing,
+                value: GValue::String("ark".into()).boxed()
+            }),
         }
     );
     gvalue_test!(
@@ -1250,7 +1253,39 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:TraversalMetrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 0.004 }, "metrics" : [ { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 4 }, "elementCount" : { "@type" : "g:Int64", "@value" : 4 } }, "name" : "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "7.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 13 }, "elementCount" : { "@type" : "g:Int64", "@value" : 13 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "2.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 7 }, "elementCount" : { "@type" : "g:Int64", "@value" : 7 } }, "name" : "VertexStep(OUT,vertex)", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "3.0.0()" } }, { "@type" : "g:Metrics", "@value" : { "dur" : { "@type" : "g:Double", "@value" : 100.0 }, "counts" : { "traverserCount" : { "@type" : "g:Int64", "@value" : 1 }, "elementCount" : { "@type" : "g:Int64", "@value" : 1 } }, "name" : "TreeStep", "annotations" : { "percentDur" : { "@type" : "g:Double", "@value" : 25.0 } }, "id" : "4.0.0()" } } ] }}),
-            object: GValue::Null,
+            object: GValue::TraversalMetrics(TraversalMetrics::new(
+                Double(0.004),
+                list![
+                    Metrics::new(
+                        "7.0.0()",
+                        "TinkerGraphStep(vertex,[~label.eq(person)])",
+                        100.0,
+                        4,
+                        4,
+                        25.0,
+                        list![],
+                    ),
+                    Metrics::new(
+                        "2.0.0()",
+                        "VertexStep(OUT,vertex)",
+                        100.0,
+                        13,
+                        13,
+                        25.0,
+                        list![],
+                    ),
+                    Metrics::new(
+                        "3.0.0()",
+                        "VertexStep(OUT,vertex)",
+                        100.0,
+                        7,
+                        7,
+                        25.0,
+                        list![],
+                    ),
+                    Metrics::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0, list![],),
+                ],
+            )),
         }
     );
     gvalue_test!(
@@ -1259,7 +1294,28 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Traverser", "@value" : { "bulk" : { "@type" : "g:Int64", "@value" : 1 }, "value" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "vertex" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } }}),
-            object: GValue::Null,
+            object: GValue::Traverser(Traverser {
+                bulk: GID::Integer(1.into()),
+                value: GValue::Vertex(Vertex {
+                    id: GID::Integer(1.into()),
+                    label: "person".to_string(),
+                    properties: {
+                        let mut map = Map::new();
+                        map.insert(
+                            "name".into(),
+                            list![VertexProperty {
+                                id: GID::Long(0.into()),
+                                value: Box::new(GValue::String("marko".into())),
+                                vertex: Some(GID::Integer(1.into())),
+                                label: "name".to_string(),
+                                properties: None,
+                            }],
+                        );
+                        map
+                    },
+                })
+                .boxed(),
+            })
         }
     );
 }
