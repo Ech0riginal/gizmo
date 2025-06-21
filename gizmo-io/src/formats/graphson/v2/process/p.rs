@@ -35,17 +35,17 @@ impl<D: Dialect> GraphsonDeserializer<Predicate, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Predicate, Error> {
         let string_repr = get_value!(val, Value::String)?;
         let enoom = match string_repr.as_str() {
-            "gt" => Predicate::GreaterThan,
-            "gte" => Predicate::GreaterThanOrEqual,
-            "lt" => Predicate::LessThan,
-            "lte" => Predicate::LessThanOrEqual,
-            "within" => Predicate::Within,
-            "without" => Predicate::Without,
-            "inside" => Predicate::Inside,
-            "outside" => Predicate::Outside,
-            "between" => Predicate::Between,
-            "and" => Predicate::And,
-            "or" => Predicate::Or,
+            Predicate::GREATER_THAN => Predicate::GreaterThan,
+            Predicate::GREATER_THAN_OR_EQUAL => Predicate::GreaterThanOrEqual,
+            Predicate::LESS_THAN => Predicate::LessThan,
+            Predicate::LESS_THAN_OR_EQUAL => Predicate::LessThanOrEqual,
+            Predicate::WITHIN => Predicate::Within,
+            Predicate::WITHOUT => Predicate::Without,
+            Predicate::INSIDE => Predicate::Inside,
+            Predicate::OUTSIDE => Predicate::Outside,
+            Predicate::BETWEEN => Predicate::Between,
+            Predicate::AND => Predicate::And,
+            Predicate::OR => Predicate::Or,
             value => Predicate::Undocumented(value.to_string()),
         };
         Ok(enoom)
@@ -64,19 +64,19 @@ impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V2> {
 impl<D: Dialect> GraphsonSerializer<Predicate, D> for GraphSON<V2> {
     fn serialize(val: &Predicate) -> Result<Value, Error> {
         Ok(json!(match val {
-            Predicate::Equal => "eq",
-            Predicate::NotEqual => "neq",
-            Predicate::GreaterThan => "gt",
-            Predicate::GreaterThanOrEqual => "gte",
-            Predicate::LessThan => "lt",
-            Predicate::LessThanOrEqual => "lte",
-            Predicate::Within => "within",
-            Predicate::Without => "without",
-            Predicate::Inside => "inside",
-            Predicate::Outside => "outside",
-            Predicate::Between => "between",
-            Predicate::And => "and",
-            Predicate::Or => "or",
+            Predicate::Equal => Predicate::EQUAL,
+            Predicate::NotEqual => Predicate::NOT_EQUAL,
+            Predicate::GreaterThan => Predicate::GREATER_THAN,
+            Predicate::GreaterThanOrEqual => Predicate::GREATER_THAN_OR_EQUAL,
+            Predicate::LessThan => Predicate::LESS_THAN,
+            Predicate::LessThanOrEqual => Predicate::LESS_THAN_OR_EQUAL,
+            Predicate::Within => Predicate::WITHIN,
+            Predicate::Without => Predicate::WITHOUT,
+            Predicate::Inside => Predicate::INSIDE,
+            Predicate::Outside => Predicate::OUTSIDE,
+            Predicate::Between => Predicate::BETWEEN,
+            Predicate::And => Predicate::AND,
+            Predicate::Or => Predicate::OR,
             Predicate::Undocumented(something_from_the_deep) => something_from_the_deep.as_str(),
         }))
     }

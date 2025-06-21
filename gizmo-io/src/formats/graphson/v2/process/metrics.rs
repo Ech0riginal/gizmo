@@ -3,6 +3,7 @@ use crate::formats::graphson::prelude::*;
 impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val, Value::Object)?.to_owned();
+
         let duration = get_value!(
             metric.ensure("dur")?.deserialize::<Self, D, GValue>()?,
             GValue::Double
