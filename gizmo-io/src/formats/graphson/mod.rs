@@ -46,14 +46,20 @@ mod blankets {
     }
 }
 
-mod prelude {
+pub(crate) mod prelude {
     pub use indexmap::IndexMap;
     pub use serde_json::{Value, json};
     pub use snafu::location;
 
     pub use super::*;
     pub use crate::api::*;
+    pub use crate::macros::*;
     pub use crate::types::*;
+}
 
-    pub(crate) use crate::macros::*;
+#[test]
+fn x() {
+    let json = serde_json::json!(0.0004f64);
+    let f = json.as_f64();
+    println!("{:?}", f);
 }
