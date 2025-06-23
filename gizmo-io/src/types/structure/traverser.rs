@@ -2,7 +2,7 @@ use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Traverser {
-    pub(crate) bulk: GID,
+    pub(crate) bulk: Long,
     pub(crate) value: Box<GValue>,
 }
 
