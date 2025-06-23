@@ -61,8 +61,8 @@ mod ensure {
 }
 
 mod typing {
-    use crate::formats::graphson::Ensure;
-    use crate::{Dialect, Error, Format};
+    use super::Ensure;
+    use crate::Error;
     use serde_json::Value;
     use snafu::location;
 

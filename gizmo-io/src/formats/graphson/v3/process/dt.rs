@@ -1,5 +1,5 @@
-// use crate::formats::graphson::prelude::*;
-//
+use crate::formats::graphson::prelude::*;
+
 // impl<D: Dialect> GraphsonDeserializer<Direction, D> for GraphSON<V3> {
 //     fn deserialize(val: &Value) -> Result<Direction, Error> {
 //         todo!()

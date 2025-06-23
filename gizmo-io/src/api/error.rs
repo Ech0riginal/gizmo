@@ -45,11 +45,40 @@ pub enum Error {
         location: Location,
     },
 
+    #[snafu(display("{message}"))]
+    Generic {
+        message: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
+
     /// This error will never actually occur and should be considered !
     Infallible,
 }
 
 impl Error {
+    #[track_caller]
+    pub fn generic<T: AsRef<str>>(tag: &T) -> Self {
+        Self::Unsupported {
+            tag: tag.as_ref().to_string(),
+            location: {
+                let l = std::panic::Location::caller();
+                Location::new(l.file(), l.line(), l.column())
+            },
+        }
+    }
+
+    #[track_caller]
+    pub fn unsupported<T: std::fmt::Debug + ?Sized>(tag: &T) -> Self {
+        Self::Unsupported {
+            tag: format!("{tag:?}"),
+            location: {
+                let l = std::panic::Location::caller();
+                Location::new(l.file(), l.line(), l.column())
+            },
+        }
+    }
+
     #[track_caller]
     pub fn unexpected<T: std::fmt::Debug + ?Sized, M: AsRef<str>>(
         value: &T,

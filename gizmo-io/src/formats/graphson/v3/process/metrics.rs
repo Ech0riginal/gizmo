@@ -2,45 +2,86 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
-        let mut metrics = val
-            .typed()?
-            .value
-            .deserialize::<Self, D, Map<GValue, GValue>>()?;
-        let duration = metrics.remove_ok::<Double, _>("dur")?;
-        let id = metrics.remove_ok::<String, _>("id")?;
-        let name = metrics.remove_ok::<String, _>("name")?;
-        let mut counts = metrics.remove_ok::<Map<GValue, GValue>, _>("counts")?;
-        let traversers = counts.remove_ok::<Long, _>("traverserCount")?;
-        let elements = counts.remove_ok::<Long, _>("elementCount")?;
-        let annotations_raw = metrics
-            .remove_ok::<GValue, _>("annotations")
-            .unwrap_or_else(|_| GValue::Null);
-        let mut annotations = get_value!(annotations_raw, GValue::Map)?;
-        let perc_duration = annotations
-            .remove_ok::<Double, _>("percentDur")
-            .unwrap_or(Double(0.0));
-        let nested = match metrics.remove("metrics") {
-            None => list![],
-            Some(gvalue) => get_value!(gvalue, GValue::List)?
+        let metric = get_value!(val, Value::Object)?.to_owned();
+
+        let duration = get_value!(
+            metric.ensure("dur")?.deserialize::<Self, D, GValue>()?,
+            GValue::Double
+        )?;
+        let id = metric.ensure("id")?.deserialize::<Self, D, String>()?;
+        let name = metric.ensure("name")?.deserialize::<Self, D, String>()?;
+        let counts = get_value!(metric.ensure("counts")?, Value::Object)?;
+        let traversers = get_value!(
+            counts
+                .ensure("traverserCount")?
+                .deserialize::<Self, D, GValue>()?,
+            GValue::Long
+        )?;
+        let count = get_value!(
+            counts
+                .ensure("elementCount")?
+                .deserialize::<Self, D, GValue>()?,
+            GValue::Long
+        )?;
+        let annotations = get_value!(
+            metric
+                .get("annotations")
+                .map(|v| v.to_owned())
+                .unwrap_or(Value::Object(serde_json::Map::new())),
+            Value::Object
+        )?;
+        let perc_duration = match annotations
+            .ensure("percentDur")?
+            .deserialize::<Self, D, GValue>()
+        {
+            Ok(gval) => get_value!(gval, GValue::Double),
+            Err(e) => Err(e),
+        }
+        .unwrap_or(Double(0.0));
+        let nested = if let Ok(metrics) = metric.ensure("metrics") {
+            let gval = metrics.deserialize::<Self, D, GValue>()?;
+            get_value!(gval, GValue::List)?
                 .into_iter()
-                .map(|metric| get_value!(metric, GValue::Metrics))
-                .collect::<Result<List<_>, _>>()?,
+                .map(|gval| get_value!(gval, GValue::Metrics))
+                .collect::<Result<List<_>, Error>>()?
+        } else {
+            list![]
         };
 
-        Ok(Metrics {
-            id,
-            duration,
-            name,
-            elements,
-            traversers,
-            perc_duration,
-            nested,
-        })
+        let metric = Metrics::new(id, name, duration, count, traversers, perc_duration, nested);
+
+        Ok(metric)
     }
 }
 
 impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V3> {
-    fn serialize(_val: &Metrics) -> Result<Value, Error> {
-        todo!()
+    fn serialize(val: &Metrics) -> Result<Value, Error> {
+        let mut json = {
+            let tmp = json!({
+                "dur": GValue::Double(val.duration).serialize::<Self, D>()?,
+                "counts": {
+                    "traverserCount": GValue::Long(val.traversers).serialize::<Self, D>()?,
+                    "elementCount": GValue::Long(val.elements).serialize::<Self, D>()?,
+                },
+                "name": val.name,
+                "annotations": {
+                    "percentDur": GValue::Double(val.perc_duration).serialize::<Self, D>()?,
+                },
+                "id": val.id,
+            });
+            get_value!(tmp, Value::Object)?
+        };
+
+        if !val.nested.is_empty() {
+            let nested = val
+                .nested
+                .iter()
+                .map(GValue::from)
+                .collect::<List<_>>()
+                .serialize::<Self, D>()?;
+            json.insert("metrics".into(), nested);
+        }
+
+        Ok(Value::Object(json))
     }
 }

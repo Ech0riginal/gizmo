@@ -1,5 +1,6 @@
-#[allow(unused_imports)]
+#[allow(unused_imports)] // They're very much used
 pub use super::macros::*;
+
 pub use crate::api::V3;
 pub use chrono::TimeZone;
 pub use indexmap::{IndexMap, indexset};
@@ -1173,13 +1174,31 @@ mod process {
         GraphSON<V3>,
         SQLg,
         Test {
-            serial: json!({ "@type" : "g:Bytecode", "@value" : { "step" : [ [ "V" ], [ "hasLabel", "person" ], [ "out" ], [ "in" ], [ "tree" ] ] }}),
+            serial: json!({"@type":"g:Bytecode","@value":{"step":[["V"],["hasLabel","person"],["out"],["in"],["tree"]]}}),
             object: GValue::Bytecode(Bytecode {
-                source_instructions: list![Instruction {
-                    op: "V".into(),
-                    args: list!["hasLabel".into(), "person".into()],
-                }],
-                step_instructions: list![],
+                source_instructions: list![],
+                step_instructions: list![
+                    Instruction {
+                        op: "V".into(),
+                        args: list![],
+                    },
+                    Instruction {
+                        op: "hasLabel".into(),
+                        args: list!["person".into()],
+                    },
+                    Instruction {
+                        op: "out".into(),
+                        args: list![],
+                    },
+                    Instruction {
+                        op: "in".into(),
+                        args: list![],
+                    },
+                    Instruction {
+                        op: "tree".into(),
+                        args: list![],
+                    },
+                ],
             }),
         }
     );
@@ -1189,7 +1208,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Cardinality", "@value" : "list"}),
-            object: GValue::Null,
+            object: GValue::Cardinality(Cardinality::List),
         }
     );
     gvalue_test!(
@@ -1198,7 +1217,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Column", "@value" : "keys"}),
-            object: GValue::Null,
+            object: GValue::Column(Column::Keys),
         }
     );
     gvalue_test!(
@@ -1207,7 +1226,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Direction", "@value" : "OUT"}),
-            object: GValue::Null,
+            object: GValue::Direction(Direction::Out),
         }
     );
     gvalue_test!(
@@ -1216,7 +1235,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Operator", "@value" : "sum"}),
-            object: GValue::Null,
+            object: GValue::Operator(Operator::Sum),
         }
     );
     gvalue_test!(
@@ -1225,7 +1244,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Order", "@value" : "shuffle"}),
-            object: GValue::Null,
+            object: GValue::Order(Order::Shuffle),
         }
     );
     gvalue_test!(
@@ -1234,7 +1253,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Pick", "@value" : "any"}),
-            object: GValue::Null,
+            object: GValue::Pick(Pick::Any),
         }
     );
     gvalue_test!(
@@ -1243,7 +1262,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Pop", "@value" : "all"}),
-            object: GValue::Null,
+            object: GValue::Pop(Pop::All),
         }
     );
     gvalue_test!(
@@ -1251,8 +1270,12 @@ mod process {
         GraphSON<V3>,
         SQLg,
         Test {
-            serial: json!({ "@type" : "g:Lambda", "@value" : { "script" : "{ it.get() }", "language" : "gremlin-groovy", "arguments" : 1 }}),
-            object: GValue::Null,
+            serial: json!({"@type":"g:Lambda","@value":{"script":"{ it.get() }","language":"gremlin-groovy","arguments":1}}),
+            object: GValue::Lambda(Lambda {
+                script: "{ it.get() }".into(),
+                language: "gremlin-groovy".into(),
+                arguments: 1
+            }),
         }
     );
     gvalue_test!(
@@ -1315,7 +1338,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:Scope", "@value" : "local"}),
-            object: GValue::Null,
+            object: GValue::Scope(Scope::Local),
         }
     );
     gvalue_test!(
@@ -1324,7 +1347,7 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:T", "@value" : "label"}),
-            object: GValue::Null,
+            object: GValue::T(T::Label),
         }
     );
     gvalue_test!(
@@ -1333,7 +1356,10 @@ mod process {
         SQLg,
         Test {
             serial: json!({ "@type" : "g:TextP", "@value" : { "predicate" : "containing", "value" : "ark" }}),
-            object: GValue::Null,
+            object: GValue::TextP(TextP {
+                predicate: Text::Containing,
+                value: GValue::from("ark").boxed(),
+            }),
         }
     );
     gvalue_test!(
@@ -1382,8 +1408,82 @@ mod process {
         GraphSON<V3>,
         SQLg,
         Test {
-            serial: json!({ "@type" : "g:Traverser", "@value" : { "bulk" : { "@type" : "g:Int64", "@value" : 1 }, "value" : { "@type" : "g:Vertex", "@value" : { "id" : { "@type" : "g:Int32", "@value" : 1 }, "label" : "person", "properties" : { "name" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 0 }, "value" : "marko", "label" : "name" } } ], "location" : [ { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 6 }, "value" : "san diego", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 1997 }, "endTime" : { "@type" : "g:Int32", "@value" : 2001 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 7 }, "value" : "santa cruz", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2001 }, "endTime" : { "@type" : "g:Int32", "@value" : 2004 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 8 }, "value" : "brussels", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2004 }, "endTime" : { "@type" : "g:Int32", "@value" : 2005 } } } }, { "@type" : "g:VertexProperty", "@value" : { "id" : { "@type" : "g:Int64", "@value" : 9 }, "value" : "santa fe", "label" : "location", "properties" : { "startTime" : { "@type" : "g:Int32", "@value" : 2005 } } } } ] } } } }}),
-            object: GValue::Null,
+            serial: json!({"@type":"g:Traverser","@value":{"bulk":{"@type":"g:Int64","@value":1},"value":{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person","properties":{"name":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":0},"value":"marko","label":"name"}}],"location":[{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":6},"value":"san diego","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":1997},"endTime":{"@type":"g:Int32","@value":2001}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":7},"value":"santa cruz","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2001},"endTime":{"@type":"g:Int32","@value":2004}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":8},"value":"brussels","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2004},"endTime":{"@type":"g:Int32","@value":2005}}}},{"@type":"g:VertexProperty","@value":{"id":{"@type":"g:Int64","@value":9},"value":"santa fe","label":"location","properties":{"startTime":{"@type":"g:Int32","@value":2005}}}}]}}}}}),
+            object: GValue::Traverser(Traverser {
+                bulk: 1.into(),
+                value: GValue::Vertex(Vertex {
+                    id: GID::Integer(1.into()),
+                    label: "person".to_string(),
+                    properties: {
+                        let mut map = Map::new();
+                        map.insert(
+                            "name".into(),
+                            list![VertexProperty {
+                                id: GID::Long(0.into()),
+                                value: Box::new(GValue::String("marko".into())),
+                                vertex: Some(GID::Integer(1.into())),
+                                label: "name".to_string(),
+                                properties: None,
+                            }],
+                        );
+                        map.insert(
+                            "location".into(),
+                            list![
+                                VertexProperty {
+                                    id: GID::Long(6.into()),
+                                    value: GValue::from("san diego").boxed(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    label: "location".into(),
+                                    properties: {
+                                        let mut tmp = Map::new();
+                                        tmp.insert("startTime".into(), GValue::from(Integer(1997)));
+                                        tmp.insert("endTime".into(), GValue::from(Integer(2001)));
+                                        Some(tmp)
+                                    }
+                                },
+                                VertexProperty {
+                                    id: GID::Long(7.into()),
+                                    value: GValue::from("santa cruz").boxed(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    label: "location".into(),
+                                    properties: {
+                                        let mut tmp = Map::new();
+                                        tmp.insert("startTime".into(), GValue::from(Integer(2001)));
+                                        tmp.insert("endTime".into(), GValue::from(Integer(2004)));
+                                        Some(tmp)
+                                    }
+                                },
+                                VertexProperty {
+                                    id: GID::Long(8.into()),
+                                    value: GValue::from("brussels").boxed(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    label: "location".into(),
+                                    properties: {
+                                        let mut tmp = Map::new();
+                                        tmp.insert("startTime".into(), GValue::from(Integer(2004)));
+                                        tmp.insert("endTime".into(), GValue::from(Integer(2005)));
+                                        Some(tmp)
+                                    }
+                                },
+                                VertexProperty {
+                                    id: GID::Long(9.into()),
+                                    value: GValue::from("santa fe").boxed(),
+                                    vertex: Some(GID::Integer(1.into())),
+                                    label: "location".into(),
+                                    properties: {
+                                        let mut tmp = Map::new();
+                                        tmp.insert("startTime".into(), GValue::from(Integer(2005)));
+                                        Some(tmp)
+                                    }
+                                }
+                            ],
+                        );
+
+                        map
+                    },
+                })
+                .boxed(),
+            }),
         }
     );
 }

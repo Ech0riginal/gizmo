@@ -53,8 +53,9 @@ pub(crate) mod prelude {
 
     pub use super::*;
     pub use crate::api::*;
-    pub use crate::macros::*;
     pub use crate::types::*;
+
+    pub(crate) use crate::macros::*;
 }
 
 #[test]

@@ -1,13 +1,22 @@
 use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Order, D> for GraphSON<V3> {
-    fn deserialize(_val: &Value) -> Result<Order, Error> {
-        todo!()
+    fn deserialize(val: &Value) -> Result<Order, Error> {
+        match get_value!(val, Value::String)?.as_str() {
+            Order::ASC => Ok(Order::Asc),
+            Order::DESC => Ok(Order::Desc),
+            Order::SHUFFLE => Ok(Order::Shuffle),
+            item => Err(Error::unexpected(item, "a valid Order")),
+        }
     }
 }
 
 impl<D: Dialect> GraphsonSerializer<Order, D> for GraphSON<V3> {
-    fn serialize(_val: &Order) -> Result<Value, Error> {
-        todo!()
+    fn serialize(val: &Order) -> Result<Value, Error> {
+        Ok(json!(match val {
+            Order::Asc => Order::ASC,
+            Order::Desc => Order::DESC,
+            Order::Shuffle => Order::SHUFFLE,
+        }))
     }
 }

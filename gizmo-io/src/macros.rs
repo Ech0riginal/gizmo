@@ -93,27 +93,23 @@ macro_rules! expect_f64 {
 pub(crate) use {expect_f32, expect_f64, expect_i32, expect_i64, expect_i128, get_value};
 
 #[cfg(test)]
-pub mod test_macros {
+pub(crate) mod test_macros {
     pub fn _debug_pad<T, R>(test: &T, result: &R) {
         std::hint::black_box(test);
         std::hint::black_box(result);
         ()
     }
 
-    #[macro_export]
     macro_rules! test_prelude {
         () => {
             pub(self) use super::*;
             #[allow(unused_imports)]
-            pub(self) use $crate::formats::graphson::tests::diff::{Diff, Difference};
+            pub(self) use $crate::formats::graphson::tests::sanity::diff::{Diff, Difference};
             #[allow(unused_imports)]
             pub(self) use $crate::*;
-            #[allow(unused_imports)]
-            pub(self) use $crate::{Args, Request, Response, Status};
         };
     }
 
-    #[macro_export]
     macro_rules! tests {
         ($type_:path) => {
             #[derive(Debug)]
@@ -124,7 +120,6 @@ pub mod test_macros {
         };
     }
 
-    #[macro_export]
     macro_rules! module {
         ($engine:ty, $dialect:ident, serialize $ty:ty) => {
             mod serialization {
@@ -157,7 +152,11 @@ pub mod test_macros {
                         Ok(item) => {
                             if (TEST_CASE.serial != item) {
                                 let debug = TEST_CASE.serial.diff(&item);
-                                assert!(debug.diff == Difference::Same, "{}", debug);
+                                assert!(
+                                    debug.diff == Difference::Same,
+                                    "serialization is not accurate: {}",
+                                    debug
+                                );
                             }
                         }
                     }
@@ -187,7 +186,11 @@ pub mod test_macros {
                         Ok(item) => {
                             if (TEST_CASE.object != item) {
                                 let debug = TEST_CASE.object.diff(&item);
-                                assert!(debug.diff == Difference::Same, "{}", debug);
+                                assert!(
+                                    debug.diff == Difference::Same,
+                                    "deserialization is not accurate: {}",
+                                    debug
+                                );
                             }
                         }
                     }
@@ -196,15 +199,5 @@ pub mod test_macros {
         };
     }
 
-    #[macro_export]
-    macro_rules! test_case {
-        ($case:expr) => {
-            lazy_static::lazy_static! {
-                static ref TEST_CASE: Test = $case;
-            }
-        };
-    }
+    pub(crate) use {module, test_prelude, tests};
 }
-
-// #[allow(unused_imports)]
-// pub(crate) use {gvalue_test, io, test_prelude, types};

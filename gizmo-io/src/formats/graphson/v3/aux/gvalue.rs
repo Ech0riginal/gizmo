@@ -24,28 +24,38 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V3> {
             GValue::String(val) => Ok(json!(val)),
             GValue::Timestamp(val) => handle!(val, Timestamp),
             GValue::Uuid(val) => handle!(val, Uuid),
+
             GValue::Edge(val) => handle!(val, Edge),
             GValue::Path(val) => handle!(val, Path),
             GValue::Property(val) => handle!(val, Property),
             GValue::TinkerGraph(val) => handle!(val, TinkerGraph),
             GValue::Vertex(val) => handle!(val, Vertex),
             GValue::VertexProperty(val) => handle!(val, VertexProperty),
+
+            GValue::Barrier(val) => handle!(val, Barrier),
+            GValue::Binding(val) => handle!(val, Binding),
+            GValue::BulkSet(val) => handle!(val, BulkSet),
             GValue::Bytecode(val) => handle!(val, Bytecode),
             GValue::Cardinality(val) => handle!(val, Cardinality),
             GValue::Column(val) => handle!(val, Column),
             GValue::Direction(val) => handle!(val, Direction),
+            // GValue::DT(val) => handle!(val, DT),
+            GValue::Lambda(val) => handle!(val, Lambda),
+            GValue::Merge(val) => handle!(val, Merge),
+            GValue::Metrics(val) => handle!(val, Metrics),
+            GValue::Operator(val) => handle!(val, Operator),
             GValue::Order(val) => handle!(val, Order),
-            GValue::Pop(val) => handle!(val, Pop),
             GValue::P(val) => handle!(val, P),
+            GValue::Pop(val) => handle!(val, Pop),
             GValue::Scope(val) => handle!(val, Scope),
             GValue::T(val) => handle!(val, T),
             GValue::TextP(val) => handle!(val, TextP),
+            // GValue::TraversalExplanation(val) => handle!(val, TraversalExplanation),
             GValue::TraversalMetrics(val) => handle!(val, TraversalMetrics),
             GValue::Traverser(val) => handle!(val, Traverser),
-            GValue::Metrics(val) => handle!(val, Metrics),
+
             GValue::Geometry(val) => handle!(val, Geometry),
-            GValue::Merge(val) => handle!(val, Merge),
-            GValue::BulkSet(val) => handle!(val, BulkSet),
+
             gvalue => Err(Error::Unexpected {
                 expectation: "a supported GValue".to_string(),
                 actual: format!("{gvalue}"),
@@ -122,32 +132,73 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V3> {
                         .value
                         .deserialize::<Self, D, VertexProperty>()
                         .map(GValue::from),
-                    // <Barrier as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Barrier>().map(GValue::from),
-                    // <Binding as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Binding>().map(GValue::from),
-                    // <BulkSet as Tag_<D>>::tag => blob.value.deserialize::<Self, D, BulkSet>().map(GValue::from),
-                    // <Bytecode as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Bytecode>().map(GValue::from),
-                    // <Cardinality as Tag_<D>>::tag => blob
-                    //     .value
-                    //     .deserialize::<Self, D, Cardinality>()
-                    //     .map(GValue::from),
-                    // <Column as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Column>().map(GValue::from),
-                    // <Direction as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Direction>().map(GValue::from),
-                    // // <DT as Tag_<D>>::tag => blob.value.deserialize::<Self, D, DT>().map(GValue::from),
-                    // <Merge as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Merge>().map(GValue::from),
-                    // <Metrics as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Metrics>().map(GValue::from),
-                    // <Operator as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Operator>().map(GValue::from),
-                    // <Order as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Order>().map(GValue::from),
-                    // <P as Tag_<D>>::tag => blob.value.deserialize::<Self, D, P>().map(GValue::from),
-                    // <Pop as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Pop>().map(GValue::from),
-                    // <Scope as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Scope>().map(GValue::from),
-                    // <T as Tag_<D>>::tag => blob.value.deserialize::<Self, D, T>().map(GValue::from),
-                    // <TextP as Tag_<D>>::tag => blob.value.deserialize::<Self, D, TextP>().map(GValue::from),
-                    // // <TraversalExplanation as Tag_<D>>::tag => blob.value.deserialize::<Self, TraversalExplanation>().map(GValue::from),
-                    // <TraversalMetrics as Tag_<D>>::tag => blob
-                    //     .value
-                    //     .deserialize::<Self, D, TraversalMetrics>()
-                    //     .map(GValue::from),
-                    // <Traverser as Tag_<D>>::tag => blob.value.deserialize::<Self, D, Traverser>().map(GValue::from),
+                    <Barrier as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Barrier>()
+                        .map(GValue::from),
+                    <Binding as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Binding>()
+                        .map(GValue::from),
+                    <BulkSet as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, BulkSet>()
+                        .map(GValue::from),
+                    <Bytecode as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Bytecode>()
+                        .map(GValue::from),
+                    <Cardinality as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Cardinality>()
+                        .map(GValue::from),
+                    <Column as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Column>()
+                        .map(GValue::from),
+                    <Direction as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Direction>()
+                        .map(GValue::from),
+                    // <DT as Tag_<D>>::tag => blob.value.deserialize::<Self, D, DT>().map(GValue::from),
+                    <Lambda as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Lambda>()
+                        .map(GValue::from),
+                    <Merge as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, Merge>().map(GValue::from)
+                    }
+                    <Metrics as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Metrics>()
+                        .map(GValue::from),
+                    <Operator as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Operator>()
+                        .map(GValue::from),
+                    <Order as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, Order>().map(GValue::from)
+                    }
+                    <P as Tag_<D>>::tag => blob.value.deserialize::<Self, D, P>().map(GValue::from),
+                    <Pop as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, Pop>().map(GValue::from)
+                    }
+                    <Scope as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, Scope>().map(GValue::from)
+                    }
+                    <T as Tag_<D>>::tag => blob.value.deserialize::<Self, D, T>().map(GValue::from),
+                    <TextP as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, TextP>().map(GValue::from)
+                    }
+                    // <TraversalExplanation as Tag_<D>>::tag => blob.value.deserialize::<Self, TraversalExplanation>().map(GValue::from),
+                    <TraversalMetrics as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, TraversalMetrics>()
+                        .map(GValue::from),
+                    <Traverser as Tag_<D>>::tag => blob
+                        .value
+                        .deserialize::<Self, D, Traverser>()
+                        .map(GValue::from),
                     type_tag => Err(Error::Unsupported {
                         tag: type_tag.to_string(),
                         location: location!(),
