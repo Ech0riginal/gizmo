@@ -3,7 +3,7 @@ use crate::*;
 primitive_prelude!();
 
 pub struct List<T>(pub(crate) Vec<T>);
-impl<T> Named for List<T> {
+impl<T: std::fmt::Debug> Named for List<T> {
     const name: &'static str = "List";
 }
 

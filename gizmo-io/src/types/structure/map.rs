@@ -10,7 +10,7 @@ primitive_prelude!();
 
 #[derive(Clone)]
 pub struct Map<K, V>(pub(crate) IndexMap<K, V>);
-impl<K, V> crate::Named for Map<K, V> {
+impl<K: fmt::Debug, V: fmt::Debug> crate::Named for Map<K, V> {
     const name: &'static str = "Map";
 }
 impl<K, V, D> Tag_<D> for Map<K, V> {
