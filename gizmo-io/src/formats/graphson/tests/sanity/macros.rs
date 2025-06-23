@@ -49,4 +49,4 @@ macro_rules! request_test {
     };
 }
 
-pub(crate) use {gvalue_test, request_test, response_test};
+pub use {gvalue_test, request_test, response_test};
