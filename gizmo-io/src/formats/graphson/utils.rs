@@ -73,10 +73,6 @@ mod typing {
         fn typed<'a>(&'a self) -> Result<Type<'a>, Error>;
     }
 
-    pub trait GraphsonType<F: Format> {
-        fn type_<'a, D: Dialect, T: crate::Tag_<D>>(&'a self) -> F::Serial;
-    }
-
     #[derive(Debug)]
     pub struct Type<'a> {
         pub tag: &'a str,

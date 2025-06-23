@@ -1,5 +1,5 @@
 #[cfg(test)]
-pub(crate) mod tests;
+mod tests;
 
 pub(crate) use utils::*;
 
