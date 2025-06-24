@@ -139,7 +139,7 @@ pub(crate) mod test_macros {
                     // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                     match result {
                         Err(e) => {
-                            assert!(false, "serialization failed: {:?}", e);
+                            assert!(false, "serialization failed: {}", e);
                         }
                         Ok(item) => {
                             if (TEST_CASE.serial != item) {

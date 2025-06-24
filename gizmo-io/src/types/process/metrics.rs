@@ -9,7 +9,7 @@ pub struct Metrics {
     pub(crate) name: String,
     pub(crate) elements: Long,
     pub(crate) traversers: Long,
-    pub(crate) perc_duration: Double,
+    pub(crate) annotations: Map<String, GValue>,
     pub(crate) nested: List<Metrics>,
 }
 
@@ -30,19 +30,19 @@ crate::getters!(
     id -> String,
     name -> String,
     duration -> Double,
-    perc_duration -> Double,
+    annotations -> Map<String, GValue>,
     elements -> Long,
     traversers -> Long
 );
 
 impl Metrics {
-    pub fn new<I, N, D, C, T, P>(
+    pub fn new<I, N, D, C, T, A>(
         id: I,
         name: N,
         duration: D,
         count: C,
         traversers: T,
-        perc_duration: P,
+        annotations: A,
         nested: List<Metrics>,
     ) -> Self
     where
@@ -51,7 +51,7 @@ impl Metrics {
         D: Into<Double>,
         C: Into<Long>,
         T: Into<Long>,
-        P: Into<Double>,
+        A: Into<Map<String, GValue>>,
     {
         Metrics {
             id: id.into(),
@@ -59,7 +59,7 @@ impl Metrics {
             duration: duration.into(),
             elements: count.into(),
             traversers: traversers.into(),
-            perc_duration: perc_duration.into(),
+            annotations: annotations.into(),
             nested,
         }
     }

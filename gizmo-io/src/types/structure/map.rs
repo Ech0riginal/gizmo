@@ -33,16 +33,6 @@ impl<K: fmt::Display, V: fmt::Display> fmt::Display for Map<K, V> {
         f.write_fmt(::core::format_args!(stringify!(Map)))
     }
 }
-impl<K, V> From<Map<K, V>> for IndexMap<K, V> {
-    fn from(val: Map<K, V>) -> Self {
-        val.0
-    }
-}
-impl<K, V> From<IndexMap<K, V>> for Map<K, V> {
-    fn from(val: IndexMap<K, V>) -> Self {
-        Map(val)
-    }
-}
 
 impl<K: PartialEq, V: PartialEq> PartialEq<Self> for Map<K, V> {
     fn eq(&self, other: &Self) -> bool {
@@ -83,6 +73,40 @@ where
         tmp
     }
 }
+
+// impl<K, V> From<Map<K, V>> for IndexMap<K, V> {
+//     fn from(val: Map<K, V>) -> Self {
+//         val.0
+//     }
+// }
+// impl<K, V> From<IndexMap<K, V>> for Map<K, V> {
+//     fn from(val: IndexMap<K, V>) -> Self {
+//         Map(val)
+//     }
+// }
+
+// impl<C, K, V> From<C> for Map<K, V>
+// where
+//     C: IntoIterator<Item=(K, V)>,
+// {
+//     fn from(value: C) -> Self {
+//         value
+//             .into_iter()
+//             .collect::<Self>()
+//     }
+// }
+
+// impl<I, K, V> From<I> for Map<String, V>
+// where
+//     I: Iterator<Item = (K, V)>,
+//     K: AsRef<str>,
+// {
+//     fn from(value: I) -> Self {
+//         value
+//             .map(|(k, v)| (k.as_ref().to_string(), v))
+//             .collect::<Self>()
+//     }
+// }
 
 impl<K, V> Map<K, V> {
     pub fn new() -> Self {
