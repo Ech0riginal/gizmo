@@ -54,9 +54,26 @@ impl<D: Dialect> GraphsonDeserializer<Predicate, D> for GraphSON<V3> {
 
 impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V3> {
     fn serialize(val: &P) -> Result<Value, Error> {
+        let value = match val.predicate {
+            // This is fine, totally fine. (who thought this behavior's okay?)
+            Predicate::Or
+            | Predicate::And
+            | Predicate::Inside
+            | Predicate::Outside
+            | Predicate::Between => match &*val.value {
+                GValue::List(inner) => inner.serialize::<Self, D>(),
+                any => any.serialize::<Self, D>(),
+            },
+            Predicate::Within | Predicate::Without => match &*val.value {
+                GValue::List(inner) if inner.len() <= 2 => inner.serialize::<Self, D>(),
+                any => any.serialize::<Self, D>(),
+            },
+            _ => (&*val.value).serialize::<Self, D>(),
+        }?;
+
         Ok(json!({
             "predicate": val.predicate.serialize::<Self, D>()?,
-            "value": (*val.value).serialize::<Self, D>()?
+            "value": value,
         }))
     }
 }
