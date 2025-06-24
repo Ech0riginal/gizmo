@@ -56,6 +56,15 @@ impl<'a> Display for Debuggery<'a> {
         }
     }
 }
+
+fn max<'a>(d: &'a impl std::fmt::Debug) -> usize {
+    format!("{:?}", &d)
+        .split("\n")
+        .map(|l| l.len())
+        .max()
+        .unwrap()
+}
+
 trait Differ: Sized + Debug {
     fn differ<'a>(&'a self, other: &'a Self, diff: Difference) -> Debuggery<'a> {
         Debuggery {
@@ -325,7 +334,7 @@ mod gvalues {
         name,
         elements,
         traversers,
-        perc_duration,
+        annotations,
         nested
     );
     basic!(Operator);

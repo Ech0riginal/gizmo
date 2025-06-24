@@ -25,19 +25,20 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
         )?;
         let annotations = get_value!(
             metric
-                .get("annotations")
-                .map(|v| v.to_owned())
-                .unwrap_or(Value::Object(serde_json::Map::new())),
-            Value::Object
-        )?;
-        let perc_duration = match annotations
-            .ensure("percentDur")?
-            .deserialize::<Self, D, GValue>()
-        {
-            Ok(gval) => get_value!(gval, GValue::Double),
-            Err(e) => Err(e),
-        }
-        .unwrap_or(Double(0.0));
+                .ensure("annotations")?
+                .deserialize::<Self, D, GValue>()?,
+            GValue::Map
+        )
+        .map(|map| {
+            map.iter()
+                .filter_map(|(k, v)| {
+                    get_value!(k, GValue::String)
+                        .map(|k| (k.clone(), v.clone()))
+                        .ok()
+                })
+                .collect::<Map<String, GValue>>()
+        })?;
+
         let nested = if let Ok(metrics) = metric.ensure("metrics") {
             let gval = metrics.deserialize::<Self, D, GValue>()?;
             get_value!(gval, GValue::List)?
@@ -48,7 +49,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
             list![]
         };
 
-        let metric = Metrics::new(id, name, duration, count, traversers, perc_duration, nested);
+        let metric = Metrics::new(id, name, duration, count, traversers, annotations, nested);
 
         Ok(metric)
     }
@@ -64,9 +65,7 @@ impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V2> {
                     "elementCount": GValue::Long(val.elements).serialize::<Self, D>()?,
                 },
                 "name": val.name,
-                "annotations": {
-                    "percentDur": GValue::Double(val.perc_duration).serialize::<Self, D>()?,
-                },
+                "annotations": val.annotations.serialize::<Self, D>()?,
                 "id": val.id,
             });
             get_value!(tmp, Value::Object)?

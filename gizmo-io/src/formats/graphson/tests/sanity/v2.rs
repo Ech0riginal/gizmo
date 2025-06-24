@@ -1083,14 +1083,22 @@ mod process {
                 name: "TinkerGraphStep(vertex,[~label.eq(person)])".into(),
                 elements: Long(4.into()),
                 traversers: Long(4.into()),
-                perc_duration: Double(25.0.into()),
+                annotations: {
+                    let mut tmp = Map::new();
+                    tmp.insert("percentDur".into(), Double(25.0).into());
+                    tmp
+                },
                 nested: list![Metrics {
                     id: "3.0.0()".to_string(),
                     duration: Double(100.0),
                     name: "VertexStep(OUT,vertex)".into(),
                     elements: Long(7),
                     traversers: Long(7),
-                    perc_duration: Double(25.0),
+                    annotations: {
+                        let mut tmp = Map::new();
+                        tmp.insert("percentDur".into(), Double(25.0).into());
+                        tmp
+                    },
                     nested: list![],
                 }],
             }),
@@ -1263,7 +1271,7 @@ mod process {
                         100.0,
                         4,
                         4,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
                     Metrics::new(
@@ -1272,7 +1280,7 @@ mod process {
                         100.0,
                         13,
                         13,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
                     Metrics::new(
@@ -1281,10 +1289,18 @@ mod process {
                         100.0,
                         7,
                         7,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
-                    Metrics::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0, list![],),
+                    Metrics::new(
+                        "4.0.0()",
+                        "TreeStep",
+                        100.0,
+                        1,
+                        1,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
+                        list![],
+                    ),
                 ],
             )),
         }

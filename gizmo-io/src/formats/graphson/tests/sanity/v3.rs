@@ -1284,7 +1284,23 @@ mod process {
         SQLg,
         Test {
             serial: json!({"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":4},"elementCount",{"@type":"g:Int64","@value":4}]},"name","TinkerGraphStep(vertex,[~label.eq(person)])","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","7.0.0()","metrics",{"@type":"g:List","@value":[{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":7},"elementCount",{"@type":"g:Int64","@value":7}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","3.0.0()"]}}]}]}}),
-            object: GValue::Null,
+            object: GValue::Metrics(Metrics {
+                id: "7.0.0()".into(),
+                duration: Double(100.0.into()),
+                name: "TinkerGraphStep(vertex,[~label.eq(person)])".into(),
+                elements: Long(4.into()),
+                traversers: Long(4.into()),
+                annotations: [("percentDur".to_string(), GValue::Double(25.0.into()))].into(),
+                nested: list![Metrics {
+                    id: "3.0.0()".to_string(),
+                    duration: Double(100.0),
+                    name: "VertexStep(OUT,vertex)".into(),
+                    elements: Long(7),
+                    traversers: Long(7),
+                    annotations: [("percentDur".to_string(), GValue::Double(25.0.into()))].into(),
+                    nested: list![],
+                }],
+            }),
         }
     );
     gvalue_test!(
@@ -1418,7 +1434,7 @@ mod process {
                         100.0,
                         4,
                         4,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
                     Metrics::new(
@@ -1427,7 +1443,7 @@ mod process {
                         100.0,
                         13,
                         13,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
                     Metrics::new(
@@ -1436,10 +1452,18 @@ mod process {
                         100.0,
                         7,
                         7,
-                        25.0,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
                         list![],
                     ),
-                    Metrics::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0, list![]),
+                    Metrics::new(
+                        "4.0.0()",
+                        "TreeStep",
+                        100.0,
+                        1,
+                        1,
+                        [("percentDur".to_string(), GValue::Double(25.0.into()))],
+                        list![]
+                    ),
                 ],
             )),
         }
@@ -1595,22 +1619,24 @@ mod request {
                 args: Args::new()
                     .arg("gremlin", "social.V(x)")
                     .arg("language", "gremlin-groovy")
-                    .arg("aliases", {
-                        let mut tmp = IndexMap::new();
-                        tmp.insert("g".into(), GValue::String("social".into()));
-                        GValue::Map(Map::from(tmp))
-                    })
+                    .arg(
+                        "aliases",
+                        GValue::Map(
+                            [(GValue::String("g".into()), GValue::String("social".into()))].into()
+                        )
+                    )
                     .arg(
                         "session",
                         GValue::Uuid(
                             ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
                         )
                     )
-                    .arg("bindings", {
-                        let mut tmp = IndexMap::new();
-                        tmp.insert("x".into(), GValue::Integer(1.into()));
-                        GValue::Map(Map::from(tmp))
-                    }),
+                    .arg(
+                        "bindings",
+                        GValue::Map(
+                            [(GValue::String("x".into()), GValue::Integer(1.into()))].into()
+                        )
+                    ),
             },
         }
     );
@@ -1646,11 +1672,12 @@ mod request {
                 args: Args::new()
                     .arg("gremlin", "g.V(x)")
                     .arg("language", "gremlin-groovy")
-                    .arg("bindings", {
-                        let mut tmp = IndexMap::new();
-                        tmp.insert("x".into(), GValue::Integer(1.into()));
-                        GValue::Map(Map::from(tmp))
-                    }),
+                    .arg(
+                        "bindings",
+                        GValue::Map(
+                            [(GValue::String("x".into()), GValue::Integer(1.into()))].into()
+                        )
+                    ),
             },
         }
     );
@@ -1667,16 +1694,18 @@ mod request {
                 args: Args::new()
                     .arg("gremlin", "social.V(x)")
                     .arg("language", "gremlin-groovy")
-                    .arg("aliases", {
-                        let mut tmp = IndexMap::new();
-                        tmp.insert("g".into(), GValue::from("social"));
-                        GValue::Map(Map::from(tmp))
-                    })
-                    .arg("bindings", {
-                        let mut tmp = IndexMap::new();
-                        tmp.insert("x".into(), GValue::Integer(1.into()));
-                        GValue::Map(Map::from(tmp))
-                    }),
+                    .arg(
+                        "aliases",
+                        GValue::Map(
+                            [(GValue::String("g".into()), GValue::String("social".into()))].into()
+                        )
+                    )
+                    .arg(
+                        "bindings",
+                        GValue::Map(
+                            [(GValue::String("x".into()), GValue::Integer(1.into()))].into()
+                        )
+                    ),
             },
         }
     );
