@@ -46,6 +46,7 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V3> {
             GValue::Operator(val) => handle!(val, Operator),
             GValue::Order(val) => handle!(val, Order),
             GValue::P(val) => handle!(val, P),
+            GValue::Pick(val) => handle!(val, Pick),
             GValue::Pop(val) => handle!(val, Pop),
             GValue::Scope(val) => handle!(val, Scope),
             GValue::T(val) => handle!(val, T),
@@ -180,6 +181,9 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V3> {
                         blob.value.deserialize::<Self, D, Order>().map(GValue::from)
                     }
                     <P as Tag_<D>>::tag => blob.value.deserialize::<Self, D, P>().map(GValue::from),
+                    <Pick as Tag_<D>>::tag => {
+                        blob.value.deserialize::<Self, D, Pick>().map(GValue::from)
+                    }
                     <Pop as Tag_<D>>::tag => {
                         blob.value.deserialize::<Self, D, Pop>().map(GValue::from)
                     }
