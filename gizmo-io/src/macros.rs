@@ -94,12 +94,6 @@ pub(crate) use {expect_f32, expect_f64, expect_i32, expect_i64, expect_i128, get
 
 #[cfg(test)]
 pub(crate) mod test_macros {
-    pub fn _debug_pad<T, R>(test: &T, result: &R) {
-        std::hint::black_box(test);
-        std::hint::black_box(result);
-        ()
-    }
-
     macro_rules! test_prelude {
         () => {
             pub(self) use super::*;
@@ -128,7 +122,6 @@ pub(crate) mod test_macros {
                 #[test]
                 fn ok() {
                     let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    $crate::macros::test_macros::_debug_pad(&TEST_CASE, &result);
 
                     match result {
                         Ok(_) => {
@@ -143,7 +136,6 @@ pub(crate) mod test_macros {
                 #[test]
                 fn accurate() {
                     let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    $crate::macros::test_macros::_debug_pad(&TEST_CASE, &result);
                     // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                     match result {
                         Err(e) => {
@@ -171,14 +163,12 @@ pub(crate) mod test_macros {
                 #[test]
                 fn ok() {
                     let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
-                    $crate::macros::test_macros::_debug_pad(&TEST_CASE, &result);
                     assert!(result.is_ok(), "deserialization failed: {:?}", result);
                 }
 
                 #[test]
                 fn accurate() {
                     let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
-                    $crate::macros::test_macros::_debug_pad(&TEST_CASE, &result);
                     match result {
                         Err(e) => {
                             assert!(false, "deserialization failed: {:#?}", e);
