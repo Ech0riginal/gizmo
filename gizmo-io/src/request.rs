@@ -1,6 +1,7 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::{GValue, Map, Named};
+use crate::api::Named;
+use crate::types::{GValue, Map};
 use derive_builder::Builder;
 use indexmap::IndexMap;
 use std::hash::Hasher;

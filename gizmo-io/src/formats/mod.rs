@@ -3,5 +3,5 @@
 // mod binary;
 mod graphson;
 
-pub use graphson::{GraphSON, GraphsonDeserializer, GraphsonSerializer};
-// pub use binary::{GraphBinary, GraphBinaryDeserializer, GraphBinarySerializer};
+pub use graphson::GraphSON;
+// pub use binary::GraphBinary;

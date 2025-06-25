@@ -20,6 +20,7 @@ pub trait GraphsonSerializer<T, D> {
 }
 
 mod blankets {
+    use super::*;
     use crate::*;
     use snafu::ResultExt;
 

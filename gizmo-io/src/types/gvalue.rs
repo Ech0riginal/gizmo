@@ -1,6 +1,6 @@
 //! Just here so we don't get fined by the compiler
 
-use crate::GValue;
+use crate::types::GValue;
 
 pub trait GValued {
     fn gvalue(self) -> GValue;
