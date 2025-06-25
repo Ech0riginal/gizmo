@@ -23,21 +23,18 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V2> {
                 .deserialize::<Self, D, GValue>()?,
             GValue::Long
         )?;
-        let annotations = get_value!(
-            metric
-                .ensure("annotations")?
-                .deserialize::<Self, D, GValue>()?,
-            GValue::Map
-        )
-        .map(|map| {
-            map.iter()
-                .filter_map(|(k, v)| {
-                    get_value!(k, GValue::String)
-                        .map(|k| (k.clone(), v.clone()))
-                        .ok()
-                })
-                .collect::<Map<String, GValue>>()
-        })?;
+        let annotations = metric
+            .ensure("annotations")?
+            .deserialize::<Self, D, Map<String, GValue>>()?;
+        // .map(|map| {
+        //     map.iter()
+        //         .filter_map(|(k, v)| {
+        //             get_value!(k, GValue::String)
+        //                 .map(|k| (k.clone(), v.clone()))
+        //                 .ok()
+        //         })
+        //         .collect::<Map<String, GValue>>()
+        // })?;
 
         let nested = if let Ok(metrics) = metric.ensure("metrics") {
             let gval = metrics.deserialize::<Self, D, GValue>()?;

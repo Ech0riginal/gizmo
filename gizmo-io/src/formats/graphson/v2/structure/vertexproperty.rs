@@ -1,43 +1,5 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<super::VertexProperties, D> for GraphSON<V2> {
-    fn deserialize(val: &Value) -> Result<super::VertexProperties, Error> {
-        match val {
-            Value::Object(o) => {
-                let mut p = Map::new();
-                for (k, v) in o {
-                    match v {
-                        Value::Array(arr) => {
-                            let list = arr
-                                .iter()
-                                .map(|e| e.typed())
-                                .collect::<Result<List<_>, _>>()?
-                                .into_iter()
-                                .map(|tt| tt.value.deserialize::<Self, D, VertexProperty>())
-                                .collect::<Result<List<_>, _>>()?;
-                            p.insert(k.clone(), list);
-                        }
-                        value => {
-                            return Err(Error::Unexpected {
-                                expectation: "array for properties".to_string(),
-                                actual: format!("{value}"),
-                                location: location!(),
-                            });
-                        }
-                    };
-                }
-                Ok(p)
-            }
-            Value::Null => Ok(Map::new()),
-            value => Err(Error::Unexpected {
-                expectation: "object or null for properties".into(),
-                actual: format!("{value}"),
-                location: location!(),
-            }),
-        }
-    }
-}
-
 impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<VertexProperty, Error> {
         let _debug = val.to_string();

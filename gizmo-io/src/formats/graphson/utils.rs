@@ -42,6 +42,37 @@ mod ensure {
         }
     }
 
+    impl<K> Ensure<K, crate::GValue> for crate::Map<K, crate::GValue>
+    where
+        K: Sized + std::fmt::Debug,
+        K: Eq + std::hash::Hash,
+    {
+        #[track_caller]
+        fn ensure(&self, key: &K) -> Result<&crate::GValue, Error> {
+            self.get(key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key: format!("{key:?}"),
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
+    impl Ensure<str, crate::GValue> for crate::Map<String, crate::GValue> {
+        #[track_caller]
+        fn ensure(&self, key: &str) -> Result<&crate::GValue, Error> {
+            let _key = key.to_string();
+            self.get(&_key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key: format!("{key:?}"),
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
     impl<K> Ensure<K, Value> for Value
     where
         K: ?Sized + AsRef<str>,

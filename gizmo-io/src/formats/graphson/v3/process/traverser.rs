@@ -17,7 +17,7 @@ impl<D: Dialect> GraphsonDeserializer<Traverser, D> for GraphSON<V3> {
 impl<D: Dialect> GraphsonSerializer<Traverser, D> for GraphSON<V3> {
     fn serialize(val: &Traverser) -> Result<Value, Error> {
         Ok(json!({
-            BULK: GValue::from(val.bulk).serialize::<Self, D>()?,
+            BULK: val.bulk.gvalue().serialize::<Self, D>()?,
             VALUE: val.value.serialize::<Self, D>()?,
         }))
     }

@@ -7,7 +7,8 @@ impl<D: Dialect> GraphsonDeserializer<Vertex, D> for GraphSON<V2> {
             .map(|f| get_value!(f, Value::String).map(Clone::clone))
             .unwrap_or_else(|| Ok(String::from("vertex")))?;
         let id = val["id"].deserialize::<Self, D, GID>()?;
-        let properties = val["properties"].deserialize::<Self, D, super::VertexProperties>()?;
+        let properties =
+            val["properties"].deserialize::<Self, D, Map<String, List<VertexProperty>>>()?;
         let vertex = Vertex {
             id,
             label,

@@ -1424,7 +1424,7 @@ mod process {
         GraphSON<V3>,
         SQLg,
         Test {
-            serial: json!({ "@type" : "g:TraversalMetrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 0.004 }, "metrics", { "@type" : "g:List", "@value" : [ { "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 4 }, "elementCount", { "@type" : "g:Int64", "@value" : 4 } ] }, "name", "TinkerGraphStep(vertex,[~label.eq(person)])", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "7.0.0()" ] } }, { "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 13 }, "elementCount", { "@type" : "g:Int64", "@value" : 13 } ] }, "name", "VertexStep(OUT,vertex)", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "2.0.0()" ] } }, { "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 7 }, "elementCount", { "@type" : "g:Int64", "@value" : 7 } ] }, "name", "VertexStep(OUT,vertex)", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "3.0.0()" ] } }, { "@type" : "g:Metrics", "@value" : { "@type" : "g:Map", "@value" : [ "dur", { "@type" : "g:Double", "@value" : 100.0 }, "counts", { "@type" : "g:Map", "@value" : [ "traverserCount", { "@type" : "g:Int64", "@value" : 1 }, "elementCount", { "@type" : "g:Int64", "@value" : 1 } ] }, "name", "TreeStep", "annotations", { "@type" : "g:Map", "@value" : [ "percentDur", { "@type" : "g:Double", "@value" : 25.0 } ] }, "id", "4.0.0()" ] } } ] } ] }}),
+            serial: json!({"@type":"g:TraversalMetrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":0.004},"metrics",{"@type":"g:List","@value":[{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":4},"elementCount",{"@type":"g:Int64","@value":4}]},"name","TinkerGraphStep(vertex,[~label.eq(person)])","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","7.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":13},"elementCount",{"@type":"g:Int64","@value":13}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","2.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":7},"elementCount",{"@type":"g:Int64","@value":7}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","3.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":1},"elementCount",{"@type":"g:Int64","@value":1}]},"name","TreeStep","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","4.0.0()"]}}]}]}}),
             object: GValue::TraversalMetrics(TraversalMetrics::new(
                 Double(0.004),
                 list![
@@ -1486,7 +1486,7 @@ mod process {
                             list![VertexProperty {
                                 id: GID::Long(0.into()),
                                 value: Box::new(GValue::String("marko".into())),
-                                vertex: Some(GID::Integer(1.into())),
+                                vertex: None,
                                 label: "name".to_string(),
                                 properties: None,
                             }],
@@ -1497,7 +1497,7 @@ mod process {
                                 VertexProperty {
                                     id: GID::Long(6.into()),
                                     value: GValue::from("san diego").boxed(),
-                                    vertex: Some(GID::Integer(1.into())),
+                                    vertex: None,
                                     label: "location".into(),
                                     properties: {
                                         let mut tmp = Map::new();
@@ -1509,7 +1509,7 @@ mod process {
                                 VertexProperty {
                                     id: GID::Long(7.into()),
                                     value: GValue::from("santa cruz").boxed(),
-                                    vertex: Some(GID::Integer(1.into())),
+                                    vertex: None,
                                     label: "location".into(),
                                     properties: {
                                         let mut tmp = Map::new();
@@ -1521,7 +1521,7 @@ mod process {
                                 VertexProperty {
                                     id: GID::Long(8.into()),
                                     value: GValue::from("brussels").boxed(),
-                                    vertex: Some(GID::Integer(1.into())),
+                                    vertex: None,
                                     label: "location".into(),
                                     properties: {
                                         let mut tmp = Map::new();
@@ -1533,7 +1533,7 @@ mod process {
                                 VertexProperty {
                                     id: GID::Long(9.into()),
                                     value: GValue::from("santa fe").boxed(),
-                                    vertex: Some(GID::Integer(1.into())),
+                                    vertex: None,
                                     label: "location".into(),
                                     properties: {
                                         let mut tmp = Map::new();
