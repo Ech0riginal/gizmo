@@ -18,5 +18,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Update 
       run: rustup update nightly && rustup default nightly
-    - name: Build structure
+    - name: Build io
       run: cargo build --verbose --lib -p gizmo-io --features tracing
+    - name: Test graphson io
+      run: cargo test -p gizmo-io --features tracing --lib formats::graphson::tests
