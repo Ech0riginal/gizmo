@@ -4,7 +4,7 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val.deserialize::<Self, D, GValue>()?, GValue::Map)?.to_owned();
 
-        let duration = get_value!(metric.ensure("dur")?, GValue::Double)?.clone();
+        let duration = *get_value!(metric.ensure("dur")?, GValue::Double)?;
 
         let counts = get_value!(metric.ensure("counts")?, GValue::Map)?;
         let name = get_value!(metric.ensure("name")?, GValue::String)?;

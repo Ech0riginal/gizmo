@@ -136,7 +136,6 @@ pub(crate) mod test_macros {
                 #[test]
                 fn accurate() {
                     let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    // <$engine as $crate::api::GraphsonSerializer<$ty, $dialect>>::serialize(&TEST_CASE.object);
                     match result {
                         Err(e) => {
                             assert!(false, "serialization failed: {}", e);

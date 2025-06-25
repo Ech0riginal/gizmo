@@ -68,7 +68,7 @@ impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V3> {
                 GValue::List(inner) if inner.len() <= 2 => inner.serialize::<Self, D>(),
                 any => any.serialize::<Self, D>(),
             },
-            _ => (&*val.value).serialize::<Self, D>(),
+            _ => (*val.value).serialize::<Self, D>(),
         }?;
 
         Ok(json!({
