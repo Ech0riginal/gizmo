@@ -1,11 +1,12 @@
-<div align="center"><p>
+<div align="center">
+<p><strong>An opinionated Apache TinkerPop client and IO library</strong></p>
+<p>
 
 [![Build](https://github.com/Ech0riginal/gizmo/actions/workflows/build.yml/badge.svg)](https://github.com/Ech0riginal/gizmo/actions/workflows/build.yml)
 [![Test](https://github.com/Ech0riginal/gizmo/actions/workflows/test.yml/badge.svg)](https://github.com/Ech0riginal/gizmo/actions/workflows/test.yml)
 
-</p></div>
-
-An opinionated Apache TinkerPop client.
+</p>
+</div>
 
 ## Why?
 
