@@ -1,3 +1,10 @@
+<div style="margin: 0px auto; width: 50%;">
+[![Build](https://github.com/Ech0riginal/gizmo/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Ech0riginal/gizmo/actions/workflows/build.yml)
+</div>
+<div style="margin: 0px auto; width: 50%;">
+[![Test](https://github.com/Ech0riginal/gizmo/actions/workflows/test.yml/badge.svg)](https://github.com/Ech0riginal/gizmo/actions/workflows/test.yml)
+</div>
+
 An opinionated Apache TinkerPop client.
 
 ## Why?
