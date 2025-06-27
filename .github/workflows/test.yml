@@ -17,4 +17,4 @@ jobs:
     - name: Update 
       run: rustup update nightly && rustup default nightly
     - name: Run graphson io tests
-      run: cargo test -p gizmo-io --features tracing --lib formats::graphson::tests
+      run: cargo test -p gizmo-io --features happy_paths --lib formats::graphson::tests
