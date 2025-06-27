@@ -29,11 +29,16 @@ macro_rules! gid {
         }
 
         $(
-            impl Into<GID> for $variant {
-                fn into(self) -> GID {
-                    GID::$variant(self)
+            impl From<$variant> for GID {
+                fn from(val: $variant) -> GID {
+                    GID::$variant(val)
                 }
             }
+            //impl Into<GID> for $variant {
+            //    fn into(self) -> GID {
+            //        GID::$variant(self)
+            //    }
+            //}
         )+
     };
 }
