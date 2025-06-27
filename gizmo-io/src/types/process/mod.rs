@@ -34,5 +34,4 @@ pub use text_p::{Text, TextP};
 pub use traversal_metrics::TraversalMetrics;
 
 #[allow(unused_imports)]
-#[allow(clippy::unused_import)]
 pub(crate) use bytecode::Instruction;

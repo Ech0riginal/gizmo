@@ -30,7 +30,7 @@ pub use datetime::*;
 pub use edge::Edge;
 pub use either::*;
 pub use geometry::*;
-pub use gid::{GID, GIDs};
+pub use gid::GID;
 pub use label::{LabelType, Labels};
 pub use list::List;
 pub use map::Map;
