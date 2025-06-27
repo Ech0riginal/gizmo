@@ -10,6 +10,7 @@ mod response;
 pub mod types;
 
 pub(crate) use api::*;
+#[allow(unused_imports)]
 pub(crate) use dialects::{JanusGraph, SQLg};
 pub(crate) use types::*;
 
