@@ -24,14 +24,15 @@ macro_rules! primitive {
 
         $crate::display!($name);
 
-        impl Into<$inner> for $name {
-            fn into(self) -> $inner {
-                self.0
+        impl From<$inner> for $name {
+            fn from(val: $inner) -> Self {
+                $name(val)
             }
         }
-        impl Into<$name> for $inner {
-            fn into(self) -> $name {
-                $name(self)
+
+        impl From<$name> for $inner {
+            fn from(val: $name) -> Self {
+                val.0
             }
         }
     };
