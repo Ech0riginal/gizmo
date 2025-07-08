@@ -11,7 +11,7 @@ pub mod types;
 
 pub(crate) use api::*;
 #[allow(unused_imports)]
-pub(crate) use dialects::{JanusGraph, SQLg};
+pub(crate) use dialects::{Janus, SQLg};
 pub(crate) use types::*;
 
 pub use crate::api::Error;

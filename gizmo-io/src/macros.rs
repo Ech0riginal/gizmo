@@ -116,39 +116,21 @@ pub(crate) mod test_macros {
 
     macro_rules! module {
         ($engine:ty, $dialect:ident, serialize $ty:ty) => {
-            mod serialization {
-                pub(self) use super::*;
-
-                #[test]
-                fn ok() {
-                    let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-
-                    match result {
-                        Ok(_) => {
-                            assert!(true);
-                        }
-                        Err(e) => {
-                            assert!(false, "serialization failed: {:?}", e);
-                        }
+            #[test]
+            fn serialization() {
+                let result = TEST_CASE.object.serialize::<$engine, $dialect>();
+                match result {
+                    Err(e) => {
+                        assert!(false, "serialization failed: {}", e);
                     }
-                }
-
-                #[test]
-                fn accurate() {
-                    let result = TEST_CASE.object.serialize::<$engine, $dialect>();
-                    match result {
-                        Err(e) => {
-                            assert!(false, "serialization failed: {}", e);
-                        }
-                        Ok(item) => {
-                            if (TEST_CASE.serial != item) {
-                                let debug = TEST_CASE.serial.diff(&item);
-                                assert!(
-                                    debug.diff == Difference::Same,
-                                    "serialization is not accurate: {}",
-                                    debug
-                                );
-                            }
+                    Ok(item) => {
+                        if (TEST_CASE.serial != item) {
+                            let debug = TEST_CASE.serial.diff(&item);
+                            assert!(
+                                debug.diff == Difference::Same,
+                                "serialization is not accurate: {}",
+                                debug
+                            );
                         }
                     }
                 }
@@ -156,31 +138,21 @@ pub(crate) mod test_macros {
         };
 
         ($engine:ty, $dialect:ident, deserialize $ty:ty) => {
-            mod deserialization {
-                pub(self) use super::*;
-
-                #[test]
-                fn ok() {
-                    let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
-                    assert!(result.is_ok(), "deserialization failed: {:?}", result);
-                }
-
-                #[test]
-                fn accurate() {
-                    let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
-                    match result {
-                        Err(e) => {
-                            assert!(false, "deserialization failed: {:#?}", e);
-                        }
-                        Ok(item) => {
-                            if (TEST_CASE.object != item) {
-                                let debug = TEST_CASE.object.diff(&item);
-                                assert!(
-                                    debug.diff == Difference::Same,
-                                    "deserialization is not accurate: {}",
-                                    debug
-                                );
-                            }
+            #[test]
+            fn deserialization() {
+                let result = TEST_CASE.serial.deserialize::<$engine, $dialect, $ty>();
+                match result {
+                    Err(e) => {
+                        assert!(false, "deserialization failed: {:#?}", e);
+                    }
+                    Ok(item) => {
+                        if (TEST_CASE.object != item) {
+                            let debug = TEST_CASE.object.diff(&item);
+                            assert!(
+                                debug.diff == Difference::Same,
+                                "deserialization is not accurate: {}",
+                                debug
+                            );
                         }
                     }
                 }

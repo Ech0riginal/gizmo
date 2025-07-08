@@ -94,6 +94,7 @@ Null,
         $(primitive_interop!($variant, $primitive);)+
     }
 }
+
 impl GValue {
     #[allow(dead_code)]
     pub(crate) fn boxed(self) -> Box<Self> {

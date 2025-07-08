@@ -6,7 +6,13 @@ primitive_prelude!();
 very_primitive!(Geometry, geo_types::Geometry<f64>);
 
 // TODO impl for backends once available
-tag!(Geometry);
+impl Tag_<SQLg> for Geometry {
+    const tag: &'static str = "g:Geometry";
+}
+
+impl Tag_<Janus> for Geometry {
+    const tag: &'static str = "g:Geoshape";
+}
 
 impl std::hash::Hash for Geometry {
     fn hash<H: Hasher>(&self, state: &mut H) {

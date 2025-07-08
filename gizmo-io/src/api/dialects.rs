@@ -1,4 +1,6 @@
 pub trait Dialect: Sized {
+    type Handler;
+    
     fn tag<T>() -> &'static str
     where
         T: crate::Tag_<Self>,
@@ -6,3 +8,5 @@ pub trait Dialect: Sized {
         T::tag
     }
 }
+
+pub trait SupportsGeometry {}
