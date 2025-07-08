@@ -8,7 +8,7 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<P, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<P, Error> {
         let map = get_value!(val, Value::Object)?;

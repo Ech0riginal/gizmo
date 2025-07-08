@@ -21,9 +21,9 @@ where
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V3> 
+impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V3>
 where
-    Self: Serializer<GValue, Value, D>
+    Self: Serializer<GValue, Value, D>,
 {
     fn serialize(val: &Set) -> Result<Value, Error> {
         let elements = val

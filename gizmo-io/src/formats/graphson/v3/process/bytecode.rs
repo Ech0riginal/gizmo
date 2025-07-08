@@ -38,7 +38,7 @@ where
 
 impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<Instruction, Error> {
         let arr = get_value!(val, Value::Array)?;
@@ -62,7 +62,7 @@ where
 
 impl<D: Dialect> GraphsonSerializer<Bytecode, D> for GraphSON<V3>
 where
-    Self: Serializer<GValue, Value, D>
+    Self: Serializer<GValue, Value, D>,
 {
     fn serialize(val: &Bytecode) -> Result<Value, Error> {
         let steps = val

@@ -2,7 +2,7 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
         let typed = val.typed()?;

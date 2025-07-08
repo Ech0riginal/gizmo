@@ -2,7 +2,7 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Binding, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<Binding, Error> {
         let obj = get_value!(val, Value::Object)?;
@@ -17,7 +17,7 @@ where
 
 impl<D: Dialect> GraphsonSerializer<Binding, D> for GraphSON<V3>
 where
-    Self: Serializer<GValue, Value, D>
+    Self: Serializer<GValue, Value, D>,
 {
     fn serialize(val: &Binding) -> Result<Value, Error> {
         val.value.serialize::<Self, D>().map(|value| {

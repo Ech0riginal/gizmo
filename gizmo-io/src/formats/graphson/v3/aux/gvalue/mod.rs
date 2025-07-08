@@ -1,7 +1,7 @@
-mod sqlg;
 mod janus;
-mod tinker;
 mod neptune;
+mod sqlg;
+mod tinker;
 
 macro_rules! serde {
     (
@@ -21,7 +21,7 @@ macro_rules! serde {
                     GValue::Null => Ok(Value::Null),
                     GValue::Bool(b) => Ok(Value::Bool(**b)),
                     GValue::String(string) => Ok(Value::String(string.to_string())),
-                    
+
                     $(
                         GValue::$var(v) => serialize!(v, $val),
                     )*
@@ -34,7 +34,7 @@ macro_rules! serde {
                 }
             }
         }
-        
+
         impl GraphsonDeserializer<GValue, $dia> for GraphSON<V3> {
             fn deserialize(val: &Value) -> Result<GValue, Error> {
                 macro_rules! deserialize {
@@ -42,7 +42,7 @@ macro_rules! serde {
                         $val_.deserialize::<Self, $dia, $var_>().map(GValue::from)
                     };
                 }
-                
+
                 match val {
                     Value::String(string) => Ok(GValue::from(string)),
                     Value::Number(_) => deserialize!(val, Integer),
@@ -51,7 +51,7 @@ macro_rules! serde {
                             $(
                                 <$val as Tag_<$dia>>::tag => deserialize!(blob.value, $val),
                             )*
-     
+
                             type_tag => Err(Error::Unsupported {
                                 tag: type_tag.to_string(),
                                 location: location!(),

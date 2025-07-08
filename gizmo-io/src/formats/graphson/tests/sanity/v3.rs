@@ -1,6 +1,6 @@
 #[allow(unused_imports)] // They're very much used
 pub use super::macros::*;
-pub use crate::{formats::*, dialects::*, types::*, *};
+pub use crate::{dialects::*, formats::*, types::*, *};
 
 pub use crate::api::V3;
 pub use chrono::TimeZone;
@@ -1834,7 +1834,7 @@ mod response {
 }
 // mod extended {
 //     use super::*;
-// 
+//
 //     test!(
 //         bigdecimal,
 //         V3,

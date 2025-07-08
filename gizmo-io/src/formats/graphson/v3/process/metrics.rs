@@ -2,7 +2,7 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val.deserialize::<Self, D, GValue>()?, GValue::Map)?.to_owned();

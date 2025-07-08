@@ -5,7 +5,7 @@ const VALUE: &str = "value";
 
 impl<D: Dialect> GraphsonDeserializer<Traverser, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<Traverser, Error> {
         let map = get_value!(val, Value::Object)?;

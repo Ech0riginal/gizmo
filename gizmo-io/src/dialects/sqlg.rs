@@ -4,4 +4,6 @@ pub struct SQLg;
 pub struct SQLgHandler;
 pub trait SQLgMark {}
 
-impl Dialect for SQLg { type Handler = SQLgHandler; }
+impl Dialect for SQLg {
+    type Handler = SQLgHandler;
+}

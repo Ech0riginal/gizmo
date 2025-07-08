@@ -1,7 +1,7 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<GID, D> for GraphSON<V3> 
-where 
+impl<D: Dialect> GraphsonDeserializer<GID, D> for GraphSON<V3>
+where
     Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<GID, Error> {

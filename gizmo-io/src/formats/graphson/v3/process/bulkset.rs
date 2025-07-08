@@ -2,7 +2,7 @@ use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<BulkSet, D> for GraphSON<V3>
 where
-    Self: GraphsonDeserializer<GValue, D>
+    Self: GraphsonDeserializer<GValue, D>,
 {
     fn deserialize(val: &Value) -> Result<BulkSet, Error> {
         if val.to_string().contains("[null]") {

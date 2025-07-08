@@ -36,7 +36,7 @@ where
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V3> 
+impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V3>
 where
     Self: GraphsonSerializer<GValue, D>,
 {
@@ -52,7 +52,7 @@ where
     }
 }
 
-fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> 
+fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error>
 where
     GraphSON<V3>: GraphsonSerializer<GValue, D>,
 {
@@ -78,7 +78,7 @@ where
     }))
 }
 
-fn serialize_small_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> 
+fn serialize_small_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error>
 where
     GraphSON<V3>: GraphsonSerializer<GValue, D>,
 {
