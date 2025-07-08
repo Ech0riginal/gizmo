@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<Bytecode, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Bytecode, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<Bytecode, Error> {
         let obj = get_value!(val, Value::Object)?;
         let mut source_instructions = list![];
@@ -33,7 +36,10 @@ impl<D: Dialect> GraphsonDeserializer<Bytecode, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>
+{
     fn deserialize(val: &Value) -> Result<Instruction, Error> {
         let arr = get_value!(val, Value::Array)?;
         if arr.is_empty() {
@@ -54,7 +60,10 @@ impl<D: Dialect> GraphsonDeserializer<Instruction, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Bytecode, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Bytecode, D> for GraphSON<V3>
+where
+    Self: Serializer<GValue, Value, D>
+{
     fn serialize(val: &Bytecode) -> Result<Value, Error> {
         let steps = val
             .steps()

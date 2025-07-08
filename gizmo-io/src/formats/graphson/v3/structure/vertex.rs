@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<Vertex, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Vertex, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<Vertex, Error> {
         let map = get_value!(val, Value::Object)?;
         let id = map.ensure("id")?.deserialize::<Self, D, GID>()?;
@@ -33,7 +36,10 @@ impl<D: Dialect> GraphsonDeserializer<Vertex, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V3> 
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &Vertex) -> Result<Value, Error> {
         // 'embedded' Vertices don't include 'properties'?
         // If I have to refactor this whole thing to
@@ -46,7 +52,10 @@ impl<D: Dialect> GraphsonSerializer<Vertex, D> for GraphSON<V3> {
     }
 }
 
-fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> {
+fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> 
+where
+    GraphSON<V3>: GraphsonSerializer<GValue, D>,
+{
     let mut properties = serde_json::Map::new();
     for (k, v) in v.properties.iter() {
         let mut props = vec![];
@@ -69,7 +78,10 @@ fn serialize_big_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> {
     }))
 }
 
-fn serialize_small_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> {
+fn serialize_small_vertex<D: Dialect>(v: &Vertex) -> Result<Value, Error> 
+where
+    GraphSON<V3>: GraphsonSerializer<GValue, D>,
+{
     Ok(json!({
         "id": v.id.serialize::<GraphSON<V3>, D>()?,
         "label": v.label.serialize::<GraphSON<V3>, D>()?,

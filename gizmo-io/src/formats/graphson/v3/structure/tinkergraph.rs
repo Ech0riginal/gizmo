@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<TinkerGraph, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<TinkerGraph, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<TinkerGraph, Error> {
         let _debug = val.to_string();
         let vertex_values = get_value!(val.ensure("vertices")?, Value::Array)?;
@@ -24,7 +27,10 @@ impl<D: Dialect> GraphsonDeserializer<TinkerGraph, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<TinkerGraph, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<TinkerGraph, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &TinkerGraph) -> Result<Value, Error> {
         let vertices = val
             .vertices

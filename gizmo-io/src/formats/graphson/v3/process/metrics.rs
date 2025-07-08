@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>
+{
     fn deserialize(val: &Value) -> Result<Metrics, Error> {
         let metric = get_value!(val.deserialize::<Self, D, GValue>()?, GValue::Map)?.to_owned();
 
@@ -38,7 +41,11 @@ impl<D: Dialect> GraphsonDeserializer<Metrics, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Metrics, D> for GraphSON<V3>
+where
+    Self: Serializer<GValue, Value, D>,
+    Self: Serializer<Map<String, GValue>, Value, D>,
+{
     fn serialize(val: &Metrics) -> Result<Value, Error> {
         let mut map = {
             let tmp = json!([

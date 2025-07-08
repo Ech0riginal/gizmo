@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<Property, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Property, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<Property, Error> {
         let val = get_value!(val, Value::Object)?;
         let key = val.ensure("key")?.deserialize::<Self, D, String>()?;
@@ -19,7 +22,10 @@ impl<D: Dialect> GraphsonDeserializer<Property, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Property, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Property, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &Property) -> Result<Value, Error> {
         Ok(json!({
           "key" : val.key.serialize::<Self, D>()?,

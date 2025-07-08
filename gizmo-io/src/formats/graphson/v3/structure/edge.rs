@@ -1,7 +1,10 @@
 use crate::formats::graphson::prelude::*;
 use std::collections::HashMap;
 
-impl<D: Dialect> GraphsonDeserializer<Edge, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Edge, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<Edge, Error> {
         let map = get_value!(val, Value::Object)?;
         let id = map.ensure("id")?.deserialize::<Self, D, GID>()?;
@@ -39,7 +42,10 @@ impl<D: Dialect> GraphsonDeserializer<Edge, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Edge, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Edge, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &Edge) -> Result<Value, Error> {
         let mut value = HashMap::new();
         value.insert("id", val.id.serialize::<Self, D>()?);

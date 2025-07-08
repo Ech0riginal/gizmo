@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>
+{
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
         let typed = val.typed()?;
         let mapped = match typed.tag {
@@ -24,7 +27,10 @@ impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<TraversalMetrics, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<TraversalMetrics, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &TraversalMetrics) -> Result<Value, Error> {
         let mut tmp = Map::new();
         tmp.insert(GValue::String("dur".into()), val.duration.gvalue());

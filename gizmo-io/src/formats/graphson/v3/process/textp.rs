@@ -1,6 +1,9 @@
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<TextP, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<TextP, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>
+{
     fn deserialize(val: &Value) -> Result<TextP, Error> {
         let map = get_value!(val, Value::Object)?;
         let value = map
@@ -27,7 +30,10 @@ impl<D: Dialect> GraphsonDeserializer<Text, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<TextP, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<TextP, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &TextP) -> Result<Value, Error> {
         Ok(json!({
             "predicate" : match val.predicate {

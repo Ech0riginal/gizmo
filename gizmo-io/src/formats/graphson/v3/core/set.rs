@@ -3,7 +3,10 @@
 use crate::formats::graphson::prelude::*;
 use indexmap::IndexSet;
 
-impl<D: Dialect> GraphsonDeserializer<Set, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Set, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<Set, Error> {
         let set = get_value!(val, Value::Array)?
             .iter()
@@ -18,7 +21,10 @@ impl<D: Dialect> GraphsonDeserializer<Set, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Set, D> for GraphSON<V3> 
+where
+    Self: Serializer<GValue, Value, D>
+{
     fn serialize(val: &Set) -> Result<Value, Error> {
         let elements = val
             .iter()

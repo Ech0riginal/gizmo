@@ -1,7 +1,10 @@
 use crate::formats::graphson::prelude::*;
 use indexmap::IndexMap;
 use snafu::location;
-impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(val: &Value) -> Result<VertexProperty, Error> {
         let map = get_value!(val, Value::Object)?;
         let id = map.ensure("id")?.deserialize::<Self, D, GID>()?;
@@ -32,7 +35,10 @@ impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<VertexProperty, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<VertexProperty, D> for GraphSON<V3>
+where
+    GraphSON<V3>: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &VertexProperty) -> Result<Value, Error> {
         let mut tmp = IndexMap::new();
         tmp.insert("id", val.id.serialize::<Self, D>()?);

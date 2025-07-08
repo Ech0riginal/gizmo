@@ -1,7 +1,10 @@
 use crate::formats::graphson::prelude::*;
 use crate::{Args, Request};
 
-impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &Request) -> Result<Value, Error> {
         Ok(json!({
             "requestId": val.id,
@@ -14,7 +17,10 @@ impl<D: Dialect> GraphsonSerializer<Request, D> for GraphSON<V3> {
         }))
     }
 }
-impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Args, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(value: &Args) -> Result<Value, Error> {
         value.0.serialize::<Self, D>()
     }

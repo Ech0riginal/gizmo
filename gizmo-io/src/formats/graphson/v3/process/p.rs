@@ -6,7 +6,10 @@
 
 use crate::formats::graphson::prelude::*;
 
-impl<D: Dialect> GraphsonDeserializer<P, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<P, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>
+{
     fn deserialize(val: &Value) -> Result<P, Error> {
         let map = get_value!(val, Value::Object)?;
         let predicate = map
@@ -52,7 +55,11 @@ impl<D: Dialect> GraphsonDeserializer<Predicate, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<P, D> for GraphSON<V3>
+where
+    Self: Serializer<GValue, Value, D>,
+    Self: Serializer<List<GValue>, Value, D>,
+{
     fn serialize(val: &P) -> Result<Value, Error> {
         let value = match val.predicate {
             // This is fine, totally fine. (who thought this behavior's okay?)

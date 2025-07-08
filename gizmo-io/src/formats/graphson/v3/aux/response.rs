@@ -3,7 +3,10 @@ use crate::{Response, Status};
 
 use serde_json::Value;
 
-impl<D: Dialect> GraphsonDeserializer<Response, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonDeserializer<Response, D> for GraphSON<V3>
+where
+    Self: GraphsonDeserializer<GValue, D>,
+{
     fn deserialize(value: &Value) -> Result<Response, Error> {
         let map = get_value!(value, Value::Object)?;
         let id = map
@@ -54,7 +57,10 @@ impl<D: Dialect> GraphsonDeserializer<Status, D> for GraphSON<V3> {
     }
 }
 
-impl<D: Dialect> GraphsonSerializer<Response, D> for GraphSON<V3> {
+impl<D: Dialect> GraphsonSerializer<Response, D> for GraphSON<V3>
+where
+    Self: GraphsonSerializer<GValue, D>,
+{
     fn serialize(val: &Response) -> Result<Value, Error> {
         let mut meta = IndexMap::new();
 
