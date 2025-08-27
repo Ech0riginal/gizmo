@@ -1,0 +1,104 @@
+use crate::{Bytable, Error};
+use bytes::Bytes;
+pub use ensure::Ensure;
+
+mod ensure {
+    use crate::Error;
+    use serde_json::Value;
+    use snafu::Location;
+
+    pub trait Ensure<K: ?Sized, V> {
+        #[track_caller]
+        fn ensure(&self, key: &K) -> Result<&V, Error>;
+    }
+
+    impl<K> Ensure<K, Value> for serde_json::Map<String, Value>
+    where
+        K: ?Sized + AsRef<str>,
+    {
+        #[track_caller]
+        fn ensure(&self, key: &K) -> Result<&Value, Error> {
+            let key = key.as_ref().to_string();
+            self.get(&key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key,
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
+    impl Ensure<str, crate::GValue> for crate::Map<crate::GValue, crate::GValue> {
+        #[track_caller]
+        fn ensure(&self, key: &str) -> Result<&crate::GValue, Error> {
+            let key = crate::GValue::from(key);
+            self.get(&key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key: format!("{key:?}"),
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
+    impl<K> Ensure<K, crate::GValue> for crate::Map<K, crate::GValue>
+    where
+        K: Sized + std::fmt::Debug,
+        K: Eq + std::hash::Hash,
+    {
+        #[track_caller]
+        fn ensure(&self, key: &K) -> Result<&crate::GValue, Error> {
+            self.get(key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key: format!("{key:?}"),
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
+    impl Ensure<str, crate::GValue> for crate::Map<String, crate::GValue> {
+        #[track_caller]
+        fn ensure(&self, key: &str) -> Result<&crate::GValue, Error> {
+            let _key = key.to_string();
+            self.get(&_key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key: format!("{key:?}"),
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+
+    impl<K> Ensure<K, Value> for Value
+    where
+        K: ?Sized + AsRef<str>,
+    {
+        #[track_caller]
+        fn ensure(&self, key: &K) -> Result<&Value, Error> {
+            let key = key.as_ref().to_string();
+            self.get(&key).ok_or({
+                let caller = std::panic::Location::caller();
+                Error::Missing {
+                    key,
+                    location: Location::new(caller.file(), caller.line(), caller.column()),
+                }
+            })
+        }
+    }
+}
+
+impl Bytable for serde_json::Value {
+    fn into_bytes(self) -> Bytes {
+        let vec = self.to_string().into_bytes();
+        Bytes::from(vec)
+    }
+
+    fn from_bytes(bytes: Bytes) -> Result<Self, Error> {
+        serde_json::from_slice(&bytes).map_err(Error::from)
+    }
+}
