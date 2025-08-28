@@ -1,9 +1,11 @@
 use super::*;
-use crate::io::{Deserialize, GremlinIO, Request, Response};
 use crate::{Error, GremlinResult};
-use bytes::Bytes;
+use bytes::{Bytes, BytesMut};
 use futures::StreamExt;
-use serde_json::Value;
+use gizmio::{
+    Bytable, DeserializeExt, Deserializer, Dialect, Format, Request, Response, SerializeExt,
+    Serializer,
+};
 use std::marker::PhantomData;
 use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -21,8 +23,21 @@ pub struct GremlinSocket<V> {
     _v: PhantomData<V>,
 }
 
-impl GremlinSocket<!> {
-    pub fn new<V: GremlinIO>(ws_stream: WSStream) -> GremlinSocket<V> {
+pub struct NewGremlinSocket<D, F> {
+    pub valid: Arc<RwLock<bool>>,
+    tx: UnboundedSender<Bytes>,
+    rx: UnboundedReceiver<Bytes>,
+    _f: PhantomData<F>,
+    _d: PhantomData<D>,
+}
+
+
+impl NewGremlinSocket<!, !> {
+    pub fn new<D, F>(ws_stream: WSStream) -> NewGremlinSocket<D, F>
+    where
+        F: Format,
+        D: Dialect,
+    {
         let valid = Arc::new(RwLock::new(true));
         let (data_tx, data_rx) = mpsc::unbounded_channel();
         let (req_tx, mut req_rx) = mpsc::unbounded_channel();
@@ -33,6 +48,7 @@ impl GremlinSocket<!> {
 
         let sink_clone = sink.clone();
         let valid_clone = valid.clone();
+
         tokio::spawn(async move {
             macro_rules! send {
                 ($sender:ident, $data:expr) => {
@@ -96,20 +112,43 @@ impl GremlinSocket<!> {
             *valid_clone.write().await = false;
         });
 
-        GremlinSocket {
+        NewGremlinSocket {
             valid,
             tx: req_tx,
-            rx: Arc::new(RwLock::new(data_rx)),
-            _v: PhantomData::<V>::default(),
+            rx: data_rx,
+            _f: PhantomData::<F>::default(),
+            _d: PhantomData::<D>::default(),
         }
     }
 }
 
-impl<V: GremlinIO> GremlinSocket<V> {
+impl<D, F> NewGremlinSocket<D, F> {
+    pub async fn valid(&self) -> bool {
+        *self.valid.read().await
+    }
+
+    pub fn valid_blocking(&self) -> bool {
+        *self.valid.blocking_read()
+    }
+}
+
+impl<D, F> NewGremlinSocket<D, F>
+where
+    F: Format,
+    F: Serializer<Request, F::Serial, D>,
+    F: Deserializer<Response, F::Serial, D>,
+    D: Dialect,
+{
     pub fn send(&self, request: &Request) -> GremlinResult<()> {
-        match V::serialize(request) {
-            Ok(json) => {
-                let bytes = Bytes::from(json.to_string().into_bytes());
+        match request.serialize::<F, D>() {
+            Ok(serial) => {
+                let mut payload = BytesMut::with_capacity(2048);
+                payload.extend(&[F::mime.len() as u8]);
+                payload.extend(F::mime.bytes());
+                payload.extend(serial.into_bytes());
+                let bytes = payload.freeze();
+                tracing::trace!("serialized {} bytes", bytes.len());
+                tracing::debug!("sending {}", String::from_utf8_lossy(&bytes));
                 self.tx.send(bytes).map_err(|_| Error::Closed)?;
             }
             Err(e) => {
@@ -123,36 +162,28 @@ impl<V: GremlinIO> GremlinSocket<V> {
     pub async fn recv(&mut self) -> GremlinResult<Option<Response>> {
         let bytes = self
             .rx
-            .write()
-            .await
             .recv()
             .await
-            .ok_or(Error::Closed)?;
+            .ok_or_else(|| Error::Closed)?;
 
-        match serde_json::from_slice::<Value>(&bytes) {
-            Ok(json) => match json.deserialize::<V, Response>() {
-                Ok(response) => Ok(Some(response)),
-                Err(e) => {
-                    tracing::warn!("Gremlin deserialization error: {:?}", e);
-                    Ok(None)
-                }
-            },
+        let serial = match F::Serial::from_bytes(bytes) {
+            Ok(serial) => serial,
             Err(e) => {
-                tracing::warn!("JSON deserialization error: {:?}", e);
+                tracing::warn!("Malformed serialization format: {:?}", e);
+                return Ok(None);
+            }
+        };
+
+        match serial.deserialize::<F, D, Response>() {
+            Ok(response) => Ok(Some(response)),
+            Err(e) => {
+                tracing::warn!("Malformed response: {:?}", e);
                 Ok(None)
             }
         }
     }
-
-    pub async fn valid(&self) -> bool {
-        *self.valid.read().await
-    }
-
-    pub fn valid_blocking(&self) -> bool {
-        *self.valid.blocking_read()
-    }
 }
 
-unsafe impl<V> Send for GremlinSocket<V> {}
+unsafe impl<D, F> Send for NewGremlinSocket<D, F> {}
 
-unsafe impl<V> Sync for GremlinSocket<V> {}
+unsafe impl<D, F> Sync for NewGremlinSocket<D, F> {}

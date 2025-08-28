@@ -1,0 +1,3 @@
+[submodule "docker/janusgraph"]
+	path = docker/janusgraph
+	url = https://github.com/JanusGraph/janusgraph-docker
