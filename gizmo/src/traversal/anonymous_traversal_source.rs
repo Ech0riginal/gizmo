@@ -1,3 +1,5 @@
+use gizmio::types::{Either2, GID, GValue, Labels, List, T};
+
 use super::TraversalBuilder;
 use super::step::HasStep;
 use super::step::LoopsStep;
@@ -9,13 +11,13 @@ use super::step::RepeatStep;
 use super::step::SelectStep;
 use super::step::UntilStep;
 use super::step::WhereStep;
-use crate::*;
-use crate::{Either2, GIDs, IntoPredicate, Labels, T};
+use crate::traversal::predicates::IntoPredicate;
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,
 }
 
+#[allow(unused)]
 impl AnonymousTraversalSource {
     pub fn new() -> AnonymousTraversalSource {
         AnonymousTraversalSource {
@@ -75,7 +77,7 @@ impl AnonymousTraversalSource {
 
     pub fn v<T>(&self, ids: T) -> TraversalBuilder
     where
-        T: Into<GIDs>,
+        T: Into<List<GID>>,
     {
         self.traversal.clone().v(ids)
     }

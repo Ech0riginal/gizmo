@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct DedupStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl DedupStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         DedupStep { params }
     }
 }
 
-impl From<DedupStep> for Vec<GValue> {
+impl From<DedupStep> for List<GValue> {
     fn from(step: DedupStep) -> Self {
         step.params
     }
@@ -18,12 +18,12 @@ impl From<DedupStep> for Vec<GValue> {
 
 impl From<()> for DedupStep {
     fn from(_: ()) -> DedupStep {
-        DedupStep::new(vec![])
+        DedupStep::new(list![])
     }
 }
 
 impl From<&str> for DedupStep {
     fn from(param: &str) -> DedupStep {
-        DedupStep::new(vec![String::from(param).into()])
+        DedupStep::new(list![String::from(param).into()])
     }
 }

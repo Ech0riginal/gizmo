@@ -11,15 +11,15 @@ impl LimitStep {
     }
 }
 
-impl From<LimitStep> for Vec<GValue> {
+impl From<LimitStep> for List<GValue> {
     fn from(step: LimitStep) -> Self {
         let mut params = step
             .scope
             .map(|m| match m {
-                Scope::Global => vec![String::from("Global").into()],
-                Scope::Local => vec![String::from("Local").into()],
+                Scope::Global => list![String::from("Global").into()],
+                Scope::Local => list![String::from("Local").into()],
             })
-            .unwrap_or_else(Vec::new);
+            .unwrap_or_else(List::new);
 
         params.push(step.limit);
         params

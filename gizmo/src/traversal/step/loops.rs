@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct LoopsStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl LoopsStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         LoopsStep { params }
     }
 }
 
-impl From<LoopsStep> for Vec<GValue> {
+impl From<LoopsStep> for List<GValue> {
     fn from(step: LoopsStep) -> Self {
         step.params
     }
@@ -18,18 +18,18 @@ impl From<LoopsStep> for Vec<GValue> {
 
 impl From<()> for LoopsStep {
     fn from(_: ()) -> LoopsStep {
-        LoopsStep::new(vec![])
+        LoopsStep::new(list![])
     }
 }
 
 impl From<&str> for LoopsStep {
     fn from(param: &str) -> LoopsStep {
-        LoopsStep::new(vec![param.into()])
+        LoopsStep::new(list![param.into()])
     }
 }
 
 impl From<String> for LoopsStep {
     fn from(param: String) -> LoopsStep {
-        LoopsStep::new(vec![param.into()])
+        LoopsStep::new(list![param.into()])
     }
 }

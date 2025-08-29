@@ -1,5 +1,4 @@
-use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
-use crate::{GValue, GremlinResult};
+use gizmio::{GValue, List};
 
 pub fn traversal() -> RemoteTraversalSource {
     RemoteTraversalSource {}
@@ -8,10 +7,13 @@ pub fn traversal() -> RemoteTraversalSource {
 pub struct RemoteTraversalSource {}
 
 impl RemoteTraversalSource {
-    pub fn with_remote<V: GremlinIO>(
+    pub fn with_remote<D: Dialect, F: Supports<D>>(
         &self,
-        client: GremlinClient<V>,
-    ) -> GraphTraversalSource<AsyncTerminator<V>> {
+        client: GremlinClient<D, F>,
+    ) -> GraphTraversalSource<AsyncTerminator<D, F>>
+    where
+        <F as Format>::Serial: Send + Sync,
+    {
         GraphTraversalSource::<MockTerminator>::new(MockTerminator {}).with_remote(client)
     }
 
@@ -142,28 +144,40 @@ pub trait Terminator<T>: Clone {
 //     }
 // }
 
-use crate::client::GremlinClient;
-use crate::io::GremlinIO;
-use crate::network::GremlinStream;
 use futures::StreamExt;
 use futures::future::{BoxFuture, FutureExt};
+use gizmio::{Dialect, Format};
+
+use crate::GremlinResult;
+use crate::client::{GremlinClient, Supports};
+use crate::traversal::{GraphTraversal, GraphTraversalSource, RemoteTraversalStream};
 
 #[derive(Clone)]
-pub struct AsyncTerminator<V: GremlinIO> {
-    client: GremlinClient<V>,
+pub struct AsyncTerminator<D: Dialect, F: Supports<D>>
+where
+    <F as Format>::Serial: Send + Sync,
+{
+    client: GremlinClient<D, F>,
 }
 
-impl<V: GremlinIO> AsyncTerminator<V> {
-    pub fn new(client: GremlinClient<V>) -> AsyncTerminator<V> {
+impl<D: Dialect, F: Supports<D>> AsyncTerminator<D, F>
+where
+    <F as Format>::Serial: Send + Sync,
+{
+    pub fn new(client: GremlinClient<D, F>) -> AsyncTerminator<D, F> {
         AsyncTerminator { client }
     }
 }
 
-impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerminator<V> {
+impl<D: Dialect, F: Supports<D>, T: From<GValue> + Send + 'static> Terminator<T>
+    for AsyncTerminator<D, F>
+where
+    <F as Format>::Serial: Send + Sync,
+{
     type List = BoxFuture<'static, GremlinResult<Vec<T>>>;
     type Next = BoxFuture<'static, GremlinResult<Option<T>>>;
     type HasNext = BoxFuture<'static, GremlinResult<bool>>;
-    type Iter = BoxFuture<'static, GremlinResult<impl GremlinStream>>;
+    type Iter = BoxFuture<'static, GremlinResult<RemoteTraversalStream<T>>>;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
@@ -176,8 +190,12 @@ impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerm
 
             let mut vec = vec![];
             #[allow(irrefutable_let_patterns)]
-            while let Some(Some(result)) = stream.next().await {
-                vec.push(result?.into());
+            while let option = stream.next().await {
+                if let Some(item) = option {
+                    vec.push(item?);
+                } else {
+                    break;
+                }
             }
             Ok(vec)
         }
@@ -194,8 +212,8 @@ impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerm
             let mut stream = iter.await?;
 
             let mut vec = vec![];
-            while let Some(Some(item)) = stream.next().await {
-                vec.push(item?.into());
+            while let Some(item) = stream.next().await {
+                vec.push(item?);
             }
             Ok(vec.pop())
         }
@@ -212,7 +230,7 @@ impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerm
             let mut stream = iter.await?;
 
             let mut vec = vec![];
-            while let Some(Some(item)) = stream.next().await {
+            while let Some(item) = stream.next().await {
                 vec.push(item?);
             }
             Ok(vec.len() > 0)
@@ -226,9 +244,12 @@ impl<V: GremlinIO, T: From<GValue> + Send + 'static> Terminator<T> for AsyncTerm
     {
         let client = self.client.clone();
         let bytecode = traversal.bytecode().clone();
-        Box::pin(async move {
+
+        async move {
             let stream = client.execute(bytecode).await?;
-            Ok(stream)
-        })
+
+            Ok(RemoteTraversalStream::new(stream))
+        }
+        .boxed()
     }
 }

@@ -1,8 +1,10 @@
-use crate::GValue;
-use crate::process::traversal::step::*;
-use crate::process::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
-use crate::*;
 use std::marker::PhantomData;
+
+use gizmio::types::*;
+
+use crate::traversal::predicates::IntoPredicate;
+use crate::traversal::step::*;
+use crate::traversal::{Terminator, TraversalBuilder, WRITE_OPERATORS};
 
 #[derive(Clone)]
 pub struct GraphTraversal<S, E, T> {
@@ -30,7 +32,7 @@ where
         self.bytecode()
             .steps()
             .iter()
-            .any(|instruction| WRITE_OPERATORS.contains(&&*instruction.operator.as_ref()))
+            .any(|instruction| WRITE_OPERATORS.contains(&&*instruction.op.as_ref()))
     }
 
     pub fn bytecode(&self) -> &Bytecode {
@@ -337,10 +339,10 @@ where
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn property_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
+    pub fn property_map<L>(mut self, labels: L) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
         L: Into<Labels>,
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.property_map(labels);
         GraphTraversal::new(self.terminator, self.builder)
@@ -355,19 +357,19 @@ where
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn value_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
+    pub fn value_map<L>(mut self, labels: L) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
         L: Into<Labels>,
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.value_map(labels);
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn element_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
+    pub fn element_map<L>(mut self, labels: L) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
         L: Into<Labels>,
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.element_map(labels);
         GraphTraversal::new(self.terminator, self.builder)
@@ -381,9 +383,9 @@ where
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn group_count(mut self) -> GraphTraversal<S, Map, T>
+    pub fn group_count(mut self) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.group_count(None);
         GraphTraversal::new(self.terminator, self.builder)
@@ -391,16 +393,16 @@ where
 
     pub fn group_count_as<A>(mut self, key: A) -> GraphTraversal<S, E, T>
     where
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
         A: Into<String>,
     {
         self.builder = self.builder.group_count(Some(key.into()));
         self
     }
 
-    pub fn group(mut self) -> GraphTraversal<S, Map, T>
+    pub fn group(mut self) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.group(None);
         GraphTraversal::new(self.terminator, self.builder)
@@ -408,7 +410,7 @@ where
 
     pub fn group_as<A>(mut self, key: A) -> GraphTraversal<S, E, T>
     where
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
         A: Into<String>,
     {
         self.builder = self.builder.group(Some(key.into()));
@@ -432,9 +434,9 @@ where
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn fold(mut self) -> GraphTraversal<S, List, T>
+    pub fn fold(mut self) -> GraphTraversal<S, List<GValue>, T>
     where
-        T: Terminator<List>,
+        T: Terminator<List<GValue>>,
     {
         self.builder = self.builder.fold();
         GraphTraversal::new(self.terminator, self.builder)
@@ -544,10 +546,10 @@ where
         self
     }
 
-    pub fn match_<A>(mut self, step: A) -> GraphTraversal<S, Map, T>
+    pub fn match_<A>(mut self, step: A) -> GraphTraversal<S, Map<GValue, GValue>, T>
     where
         A: Into<MatchStep>,
-        T: Terminator<Map>,
+        T: Terminator<Map<GValue, GValue>>,
     {
         self.builder = self.builder.match_(step);
         GraphTraversal::new(self.terminator, self.builder)
@@ -585,7 +587,7 @@ where
 
     pub fn v<VT>(mut self, ids: VT) -> Self
     where
-        VT: Into<GIDs>,
+        VT: Into<List<GID>>,
     {
         self.builder = self.builder.v(ids);
         self

@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct UntilStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl UntilStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         UntilStep { params }
     }
 }
 
-impl From<UntilStep> for Vec<GValue> {
+impl From<UntilStep> for List<GValue> {
     fn from(step: UntilStep) -> Self {
         step.params
     }
@@ -18,6 +18,6 @@ impl From<UntilStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for UntilStep {
     fn from(param: TraversalBuilder) -> Self {
-        UntilStep::new(vec![param.bytecode.into()])
+        UntilStep::new(list![param.bytecode.into()])
     }
 }

@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct CoalesceStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl CoalesceStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         CoalesceStep { params }
     }
 }
 
-impl From<CoalesceStep> for Vec<GValue> {
+impl From<CoalesceStep> for List<GValue> {
     fn from(step: CoalesceStep) -> Self {
         step.params
     }
@@ -18,7 +18,7 @@ impl From<CoalesceStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for CoalesceStep {
     fn from(param: TraversalBuilder) -> Self {
-        CoalesceStep::new(vec![param.bytecode.into()])
+        CoalesceStep::new(list![param.bytecode.into()])
     }
 }
 

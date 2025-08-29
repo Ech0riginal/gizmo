@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct LocalStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl LocalStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         LocalStep { params }
     }
 }
 
-impl From<LocalStep> for Vec<GValue> {
+impl From<LocalStep> for List<GValue> {
     fn from(step: LocalStep) -> Self {
         step.params
     }
@@ -18,6 +18,6 @@ impl From<LocalStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for LocalStep {
     fn from(param: TraversalBuilder) -> LocalStep {
-        LocalStep::new(vec![param.bytecode.into()])
+        LocalStep::new(list![param.bytecode.into()])
     }
 }

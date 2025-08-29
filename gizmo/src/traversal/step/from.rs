@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct FromStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl FromStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         FromStep { params }
     }
 }
 
-impl From<FromStep> for Vec<GValue> {
+impl From<FromStep> for List<GValue> {
     fn from(step: FromStep) -> Self {
         step.params
     }
@@ -18,18 +18,18 @@ impl From<FromStep> for Vec<GValue> {
 
 impl From<&str> for FromStep {
     fn from(param: &str) -> Self {
-        FromStep::new(vec![param.into()])
+        FromStep::new(list![param.into()])
     }
 }
 
 impl From<&Vertex> for FromStep {
     fn from(param: &Vertex) -> Self {
-        FromStep::new(vec![param.into()])
+        FromStep::new(list![param.into()])
     }
 }
 
 impl From<TraversalBuilder> for FromStep {
     fn from(param: TraversalBuilder) -> Self {
-        FromStep::new(vec![param.bytecode.into()])
+        FromStep::new(list![param.bytecode.into()])
     }
 }

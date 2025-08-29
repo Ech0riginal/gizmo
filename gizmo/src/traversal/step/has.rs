@@ -1,4 +1,5 @@
 use super::prelude::*;
+use crate::traversal::predicates::IntoPredicate;
 
 pub enum HasStepKey {
     Str(String),
@@ -29,9 +30,9 @@ pub struct HasStep {
     predicate: Option<Either2<P, TextP>>,
 }
 
-impl From<HasStep> for Vec<GValue> {
+impl From<HasStep> for List<GValue> {
     fn from(step: HasStep) -> Self {
-        let mut params: Vec<GValue> = vec![];
+        let mut params: List<GValue> = list![];
 
         if let Some(s) = step.label {
             params.push(Into::into(s));

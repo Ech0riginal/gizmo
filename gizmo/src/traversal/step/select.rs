@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct SelectStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl SelectStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         SelectStep { params }
     }
 }
 
-impl From<SelectStep> for Vec<GValue> {
+impl From<SelectStep> for List<GValue> {
     fn from(step: SelectStep) -> Self {
         step.params
     }
@@ -18,25 +18,25 @@ impl From<SelectStep> for Vec<GValue> {
 
 impl From<&str> for SelectStep {
     fn from(param: &str) -> SelectStep {
-        SelectStep::new(vec![String::from(param).into()])
+        SelectStep::new(list![String::from(param).into()])
     }
 }
 
 impl From<Pop> for SelectStep {
     fn from(param: Pop) -> SelectStep {
-        SelectStep::new(vec![GValue::Pop(param)])
+        SelectStep::new(list![GValue::Pop(param)])
     }
 }
 
-impl From<Vec<&str>> for SelectStep {
-    fn from(param: Vec<&str>) -> SelectStep {
+impl From<List<&str>> for SelectStep {
+    fn from(param: List<&str>) -> SelectStep {
         SelectStep::new(param.into_iter().map(GValue::from).collect())
     }
 }
 
 impl From<TraversalBuilder> for SelectStep {
     fn from(param: TraversalBuilder) -> SelectStep {
-        SelectStep::new(vec![param.bytecode.into()])
+        SelectStep::new(list![param.bytecode.into()])
     }
 }
 
@@ -45,7 +45,7 @@ where
     B: Into<GValue>,
 {
     fn from(param: (Pop, B)) -> SelectStep {
-        SelectStep::new(vec![GValue::Pop(param.0), param.1.into()])
+        SelectStep::new(list![GValue::Pop(param.0), param.1.into()])
     }
 }
 

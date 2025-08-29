@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct MatchStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl MatchStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         MatchStep { params }
     }
 }
 
-impl From<MatchStep> for Vec<GValue> {
+impl From<MatchStep> for List<GValue> {
     fn from(step: MatchStep) -> Self {
         step.params
     }
@@ -18,12 +18,12 @@ impl From<MatchStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for MatchStep {
     fn from(param: TraversalBuilder) -> MatchStep {
-        MatchStep::new(vec![param.bytecode.into()])
+        MatchStep::new(list![param.bytecode.into()])
     }
 }
 
-impl From<Vec<TraversalBuilder>> for MatchStep {
-    fn from(param: Vec<TraversalBuilder>) -> MatchStep {
+impl From<List<TraversalBuilder>> for MatchStep {
+    fn from(param: List<TraversalBuilder>) -> MatchStep {
         MatchStep::new(param.into_iter().map(|s| s.bytecode.into()).collect())
     }
 }

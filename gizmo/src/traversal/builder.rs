@@ -1,5 +1,7 @@
-use crate::process::traversal::step::*;
-use crate::*;
+use gizmio::*;
+
+use crate::traversal::predicates::IntoPredicate;
+use crate::traversal::step::*;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -24,7 +26,7 @@ impl TraversalBuilder {
 
     pub fn v<T>(mut self, ids: T) -> TraversalBuilder
     where
-        T: Into<GIDs>,
+        T: Into<List<GID>>,
     {
         self.bytecode.add_step(
             String::from("V"),
@@ -35,7 +37,7 @@ impl TraversalBuilder {
 
     pub fn e<T>(mut self, ids: T) -> TraversalBuilder
     where
-        T: Into<GIDs>,
+        T: Into<List<GID>>,
     {
         self.bytecode.add_step(
             String::from("E"),
@@ -72,7 +74,7 @@ impl TraversalBuilder {
         K: Into<GValue>,
         A: Into<GValue>,
     {
-        let args = vec![key.into(), value.into()];
+        let args = list![key.into(), value.into()];
         self.bytecode.add_step(String::from("property"), args);
         self
     }
@@ -85,7 +87,7 @@ impl TraversalBuilder {
         for property in values {
             self.bytecode.add_step(
                 String::from("property"),
-                vec![property.0.into(), property.1.into()],
+                list![property.0.into(), property.1.into()],
             )
         }
 
@@ -104,7 +106,7 @@ impl TraversalBuilder {
     {
         self.bytecode.add_step(
             String::from("property"),
-            vec![cardinality.into(), key.into(), value.into()],
+            list![cardinality.into(), key.into(), value.into()],
         );
         self
     }
@@ -120,7 +122,7 @@ impl TraversalBuilder {
 
     pub fn has_id(mut self, id: &GID) -> Self {
         self.bytecode
-            .add_step(String::from("hasId"), vec![id.into()]);
+            .add_step(String::from("hasId"), list![id.into()]);
         self
     }
 
@@ -139,7 +141,7 @@ impl TraversalBuilder {
     {
         self.bytecode.add_source(
             String::from("withSideEffect"),
-            vec![step.0.into(), step.1.into()],
+            list![step.0.into(), step.1.into()],
         );
         self
     }
@@ -160,7 +162,7 @@ impl TraversalBuilder {
         A: Into<String>,
     {
         self.bytecode
-            .add_step(String::from("hasNot"), vec![key.into().into()]);
+            .add_step(String::from("hasNot"), list![key.into().into()]);
         self
     }
     pub fn as_<A>(mut self, alias: A) -> Self
@@ -168,7 +170,7 @@ impl TraversalBuilder {
         A: Into<String>,
     {
         self.bytecode
-            .add_step(String::from("as"), vec![alias.into().into()]);
+            .add_step(String::from("as"), list![alias.into().into()]);
 
         self
     }
@@ -210,7 +212,7 @@ impl TraversalBuilder {
     }
 
     pub fn out_v(mut self) -> Self {
-        self.bytecode.add_step(String::from("outV"), vec![]);
+        self.bytecode.add_step(String::from("outV"), list![]);
 
         self
     }
@@ -239,7 +241,7 @@ impl TraversalBuilder {
     }
 
     pub fn in_v(mut self) -> Self {
-        self.bytecode.add_step(String::from("inV"), vec![]);
+        self.bytecode.add_step(String::from("inV"), list![]);
 
         self
     }
@@ -269,25 +271,25 @@ impl TraversalBuilder {
     }
 
     pub fn other(mut self) -> Self {
-        self.bytecode.add_step(String::from("other"), vec![]);
+        self.bytecode.add_step(String::from("other"), list![]);
 
         self
     }
 
     pub fn other_v(mut self) -> Self {
-        self.bytecode.add_step(String::from("otherV"), vec![]);
+        self.bytecode.add_step(String::from("otherV"), list![]);
 
         self
     }
 
     pub fn none(mut self) -> Self {
-        self.bytecode.add_step(String::from("none"), vec![]);
+        self.bytecode.add_step(String::from("none"), list![]);
 
         self
     }
 
     pub fn label(mut self) -> Self {
-        self.bytecode.add_step(String::from("label"), vec![]);
+        self.bytecode.add_step(String::from("label"), list![]);
 
         self
     }
@@ -368,12 +370,12 @@ impl TraversalBuilder {
     }
 
     pub fn count(mut self) -> Self {
-        self.bytecode.add_step(String::from("count"), vec![]);
+        self.bytecode.add_step(String::from("count"), list![]);
         self
     }
 
     pub fn group_count(mut self, key: Option<String>) -> Self {
-        let mut params = vec![];
+        let mut params = list![];
 
         if let Some(k) = key {
             params.push(k.into());
@@ -383,7 +385,7 @@ impl TraversalBuilder {
     }
 
     pub fn group(mut self, key: Option<String>) -> Self {
-        let mut params = vec![];
+        let mut params = list![];
 
         if let Some(k) = key {
             params.push(k.into());
@@ -411,16 +413,16 @@ impl TraversalBuilder {
     }
 
     pub fn fold(mut self) -> Self {
-        self.bytecode.add_step(String::from("fold"), vec![]);
+        self.bytecode.add_step(String::from("fold"), list![]);
         self
     }
     pub fn unfold(mut self) -> Self {
-        self.bytecode.add_step(String::from("unfold"), vec![]);
+        self.bytecode.add_step(String::from("unfold"), list![]);
         self
     }
 
     pub fn path(mut self) -> Self {
-        self.bytecode.add_step(String::from("path"), vec![]);
+        self.bytecode.add_step(String::from("path"), list![]);
         self
     }
 
@@ -449,7 +451,7 @@ impl TraversalBuilder {
         A: Into<Scope>,
     {
         self.bytecode
-            .add_step(String::from("sum"), vec![scope.into().into()]);
+            .add_step(String::from("sum"), list![scope.into().into()]);
 
         self
     }
@@ -459,7 +461,7 @@ impl TraversalBuilder {
         A: Into<Scope>,
     {
         self.bytecode
-            .add_step(String::from("max"), vec![scope.into().into()]);
+            .add_step(String::from("max"), list![scope.into().into()]);
 
         self
     }
@@ -469,7 +471,7 @@ impl TraversalBuilder {
         A: Into<Scope>,
     {
         self.bytecode
-            .add_step(String::from("mean"), vec![scope.into().into()]);
+            .add_step(String::from("mean"), list![scope.into().into()]);
 
         self
     }
@@ -479,7 +481,7 @@ impl TraversalBuilder {
         A: Into<Scope>,
     {
         self.bytecode
-            .add_step(String::from("min"), vec![scope.into().into()]);
+            .add_step(String::from("min"), list![scope.into().into()]);
 
         self
     }
@@ -489,7 +491,7 @@ impl TraversalBuilder {
         A: IntoPredicate,
     {
         self.bytecode
-            .add_step(String::from("is"), vec![val.into_predicate().into()]);
+            .add_step(String::from("is"), list![val.into_predicate().into()]);
 
         self
     }
@@ -517,7 +519,7 @@ impl TraversalBuilder {
         A: Into<Scope>,
     {
         self.bytecode
-            .add_step(String::from("order"), vec![scope.into().into()]);
+            .add_step(String::from("order"), list![scope.into().into()]);
 
         self
     }
@@ -532,7 +534,7 @@ impl TraversalBuilder {
     }
 
     pub fn drop(mut self) -> Self {
-        self.bytecode.add_step(String::from("drop"), vec![]);
+        self.bytecode.add_step(String::from("drop"), list![]);
         self
     }
 
@@ -584,7 +586,7 @@ impl TraversalBuilder {
     }
 
     pub fn simple_path(mut self) -> Self {
-        self.bytecode.add_step(String::from("simplePath"), vec![]);
+        self.bytecode.add_step(String::from("simplePath"), list![]);
 
         self
     }
@@ -592,7 +594,7 @@ impl TraversalBuilder {
     pub fn sample(mut self, step: i32) -> Self {
         let repr = Integer(step);
         self.bytecode
-            .add_step(String::from("sample"), vec![repr.into()]);
+            .add_step(String::from("sample"), list![repr.into()]);
         self
     }
 
@@ -619,12 +621,12 @@ impl TraversalBuilder {
         A: Into<String>,
     {
         self.bytecode
-            .add_step(String::from("aggregate"), vec![alias.into().into()]);
+            .add_step(String::from("aggregate"), list![alias.into().into()]);
         self
     }
 
     pub fn value(mut self) -> Self {
-        self.bytecode.add_step(String::from("value"), vec![]);
+        self.bytecode.add_step(String::from("value"), list![]);
         self
     }
 
@@ -678,7 +680,7 @@ impl TraversalBuilder {
     }
 
     pub fn identity(mut self) -> Self {
-        self.bytecode.add_step(String::from("identity"), vec![]);
+        self.bytecode.add_step(String::from("identity"), list![]);
         self
     }
 
@@ -687,25 +689,25 @@ impl TraversalBuilder {
         let step2_repr = Long(step2);
         self.bytecode.add_step(
             String::from("range"),
-            vec![step1_repr.into(), step2_repr.into()],
+            list![step1_repr.into(), step2_repr.into()],
         );
         self
     }
 
     pub fn cap(mut self, step: &'static str) -> Self {
         self.bytecode
-            .add_step(String::from("cap"), vec![step.into()]);
+            .add_step(String::from("cap"), list![step.into()]);
         self
     }
 
     pub fn barrier(mut self) -> Self {
-        self.bytecode.add_step(String::from("barrier"), vec![]);
+        self.bytecode.add_step(String::from("barrier"), list![]);
         self
     }
 
     pub fn optional(mut self, step: TraversalBuilder) -> Self {
         self.bytecode
-            .add_step(String::from("optional"), vec![step.bytecode.into()]);
+            .add_step(String::from("optional"), list![step.bytecode.into()]);
         self
     }
 
@@ -714,17 +716,23 @@ impl TraversalBuilder {
         A: Into<GValue>,
     {
         self.bytecode
-            .add_step(String::from("constant"), vec![value.into()]);
+            .add_step(String::from("constant"), list![value.into()]);
         self
     }
 
     pub fn emit(mut self) -> Self {
-        self.bytecode.add_step(String::from("emit"), vec![]);
+        self.bytecode.add_step(String::from("emit"), list![]);
         self
     }
 
     pub fn id(mut self) -> Self {
-        self.bytecode.add_step(String::from("id"), vec![]);
+        self.bytecode.add_step(String::from("id"), list![]);
         self
+    }
+}
+
+impl From<TraversalBuilder> for GValue {
+    fn from(value: TraversalBuilder) -> Self {
+        value.bytecode.into()
     }
 }

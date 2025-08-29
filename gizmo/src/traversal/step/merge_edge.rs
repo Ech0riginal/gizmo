@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct MergeEdgeStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl MergeEdgeStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         MergeEdgeStep { params }
     }
 }
 
-impl From<MergeEdgeStep> for Vec<GValue> {
+impl From<MergeEdgeStep> for List<GValue> {
     fn from(step: MergeEdgeStep) -> Self {
         step.params
     }
@@ -18,23 +18,23 @@ impl From<MergeEdgeStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for MergeEdgeStep {
     fn from(param: TraversalBuilder) -> Self {
-        MergeEdgeStep::new(vec![param.bytecode.into()])
+        MergeEdgeStep::new(list![param.bytecode.into()])
     }
 }
 
-impl From<HashMap<GKey, GValue>> for MergeEdgeStep {
-    fn from(value: HashMap<GKey, GValue>) -> Self {
-        MergeEdgeStep::new(vec![value.into()])
+impl From<Map<GValue, GValue>> for MergeEdgeStep {
+    fn from(value: Map<GValue, GValue>) -> Self {
+        MergeEdgeStep::new(list![value.into()])
     }
 }
 
 impl<K, V> From<(K, V)> for MergeEdgeStep
 where
-    K: Into<GKey>,
+    K: Into<GValue>,
     V: Into<GValue>,
 {
     fn from(value: (K, V)) -> Self {
-        let mut map = HashMap::<GKey, GValue>::new();
+        let mut map = Map::<GValue, GValue>::new();
         map.insert(value.0.into(), value.1.into());
         Self::from(map)
     }

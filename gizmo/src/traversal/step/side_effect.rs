@@ -1,16 +1,16 @@
 use super::prelude::*;
 
 pub struct SideEffectStep {
-    params: Vec<GValue>,
+    params: List<GValue>,
 }
 
 impl SideEffectStep {
-    fn new(params: Vec<GValue>) -> Self {
+    fn new(params: List<GValue>) -> Self {
         SideEffectStep { params }
     }
 }
 
-impl From<SideEffectStep> for Vec<GValue> {
+impl From<SideEffectStep> for List<GValue> {
     fn from(step: SideEffectStep) -> Self {
         step.params
     }
@@ -18,6 +18,6 @@ impl From<SideEffectStep> for Vec<GValue> {
 
 impl From<TraversalBuilder> for SideEffectStep {
     fn from(param: TraversalBuilder) -> Self {
-        SideEffectStep::new(vec![param.bytecode.into()])
+        SideEffectStep::new(list![param.bytecode.into()])
     }
 }
