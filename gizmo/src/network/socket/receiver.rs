@@ -36,13 +36,13 @@ where
         stream: SplitStream<WSStream>,
         requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
         sender: Sender<Cmd>,
-    ) -> Self {
-        ReceiverLoop {
+    ) -> Pin<Box<Self>> {
+        Box::pin(ReceiverLoop {
             stream,
             sender,
             requests,
             _pd: PhantomData,
-        }
+        })
     }
 }
 
@@ -56,21 +56,16 @@ where
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut this = self.project();
 
-        // Drain all immediately-ready items; exit as soon as the stream says Pending.
         loop {
             match this.stream.as_mut().poll_next(cx) {
-                // --- Stream ended: our Future completes
                 Poll::Ready(None) => return Poll::Ready(()),
 
-                // --- An I/O or protocol error: broadcast to all pending requests
                 Poll::Ready(Some(Err(error))) => {
-                    let mut requests = this.requests.clone();
+                    let requests = this.requests.clone();
                     task::spawn(async move {
-                        // let mut guard = requests.lock().await;
                         let error_msg = error.to_string();
 
                         for requests_ref in requests.iter() {
-                            // If your senders are `tokio::mpsc::Sender`, this is `.send(..).await`
                             let error = Err(Error::WebsocketClone(error_msg.clone()));
                             let _ = requests_ref.value().send(error).await;
                         }
@@ -78,7 +73,6 @@ where
                     });
                 }
 
-                // --- A normal frame arrived
                 Poll::Ready(Some(Ok(msg))) => {
                     match msg {
                         Message::Binary(bytes) => {
@@ -103,9 +97,7 @@ where
                             let id = response.id;
                             let requests = Arc::clone(&this.requests);
 
-                            // Hand off the lock + async sends to a task; driver never waits here.
                             task::spawn(async move {
-                                // let mut guard = requests.lock().await;
                                 if is_final {
                                     if let Some((id, tx)) = requests.remove(&id) {
                                         if let Err(e) = tx.send(Ok(response)).await {
@@ -137,7 +129,6 @@ where
                     }
                 }
 
-                // --- No more work right now: park the task
                 Poll::Pending => return Poll::Pending,
             }
         }

@@ -44,14 +44,14 @@ where
         sink: futures::stream::SplitSink<WSStream, Message>,
         requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
         receiver: Receiver<Cmd>,
-    ) -> Self {
-        Self {
+    ) -> Pin<Box<Self>> {
+        Box::pin(Self {
             sink,
             requests,
             receiver,
             in_flight: None,
             _pd: core::marker::PhantomData,
-        }
+        })
     }
 }
 
@@ -135,10 +135,9 @@ where
                     match cmd {
                         Cmd::Msg((caller, request)) => {
                             this.requests.insert(request.id, caller);
-
                             match request.serialize::<F, D>() {
+                                // pack it up pack it in
                                 Ok(serial) => {
-                                    // Build payload: [len(mime) as u8][mime bytes][serialized body]
                                     let body = serial.into_bytes();
                                     let mut buf =
                                         BytesMut::with_capacity(1 + F::mime.len() + body.len());
@@ -156,6 +155,7 @@ where
 
                                     continue;
                                 }
+                                // jump around
                                 Err(e) => {
                                     if let Some((_, tx)) = this.requests.remove(&request.id) {
                                         tokio::spawn(async move {
