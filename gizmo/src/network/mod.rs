@@ -1,11 +1,15 @@
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
-mod connection;
+mod cmd;
+mod receiver;
+mod sender;
 mod socket;
 
 mod manage;
-mod sugar;
 
+pub(crate) use cmd::Cmd;
+pub(self) use receiver::ReceiverLoop;
+pub(self) use sender::SenderLoop;
 pub use socket::*;
 
 pub type WSStream = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;

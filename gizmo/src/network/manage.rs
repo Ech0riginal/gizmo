@@ -81,12 +81,12 @@ where
             if conn.valid {
                 Ok(())
             } else {
-                Err(Error::Generic("Connection is disconnected".into()))
+                Err(Error::Generic("Connection is invalid".into()))
             }
         }
     }
 
     fn has_broken(&self, conn: &mut Self::Connection) -> bool {
-        conn.valid
+        !conn.valid
     }
 }

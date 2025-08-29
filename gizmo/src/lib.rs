@@ -22,11 +22,13 @@ pub use error::Error;
 
 #[cfg(test)]
 mod tests {
-    use gizmio::V3;
     use gizmio::dialects::Janus;
     use gizmio::formats::GraphSON;
-    use tokio::console;
+    use gizmio::{V3, Vertex};
+    use tokio::stream::StreamExt;
+    use tokio::task::JoinSet;
     use tokio::tracing::Level;
+    use tokio::{console, join};
     use tracing_subscriber::Layer;
     use tracing_subscriber::filter::Targets;
     use tracing_subscriber::layer::SubscriberExt;
@@ -36,7 +38,7 @@ mod tests {
     use crate::client::GremlinClient;
     pub use crate::error::Error;
     use crate::options::ConnectionOptions;
-    use crate::traversal::traversal;
+    use crate::traversal::{RemoteTraversalStream, traversal};
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
     #[tracing::instrument]
@@ -63,16 +65,25 @@ mod tests {
             .format::<GraphSON<V3>>()
             .host("0.0.0.0".to_string())
             .port(8182)
-            .pool_size(1)
+            .pool_size(3)
             .build()
             .unwrap();
 
         let client = GremlinClient::connect(options).await?;
         let g = traversal().with_remote(client);
-        // let traversal = g.v(());
-        for idk in g.v(()).to_list().await?.into_iter() {
-            tracing::info!("{:?}", idk);
+        let mut set = JoinSet::new();
+
+        for _ in 0..16 {
+            let _g = g.clone();
+            set.spawn(async move {
+                let mut a: RemoteTraversalStream<Vertex> = _g.v(()).iter().await.unwrap();
+                while let Some(Ok(thing)) = a.next().await {
+                    tracing::info!("{:?}", thing);
+                }
+            });
         }
+
+        set.join_all().await;
 
         Ok(())
     }
