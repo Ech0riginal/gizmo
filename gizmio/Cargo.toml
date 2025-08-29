@@ -17,10 +17,11 @@ indexmap            = { version = "2.9.0", features = ["serde"] }
 lazy_static         = { version = "1.5.0" }
 serde               = { version = "1.0.219" }
 serde_json          = { version = "1.0.140", features = ["arbitrary_precision"] }
-snafu               = { version = "0.8.6" }
+snafu               = { version = "0.8.8" }
 uuid                = { version = "1.17.0", features = ["serde", "v4"] }
 
 tracing             = { version = "0.1.41", features = ["default"], optional = true }
+http = "1.3.1"
 
 [features]
 tracing     = ["dep:tracing"]
