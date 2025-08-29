@@ -1,13 +1,16 @@
-use crate::Error;
-use crate::io::GremlinIO;
-use derive_builder::Builder;
-use rustls_pki_types::pem::PemObject;
-use rustls_pki_types::{CertificateDer, PrivateKeyDer};
 use std::io::BufReader;
+use std::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::Duration;
+
+use derive_builder::Builder;
+use gizmio::{Dialect, Format};
+use rustls_pki_types::pem::PemObject;
+use rustls_pki_types::{CertificateDer, PrivateKeyDer};
 use tokio::tracing;
 use webpki_roots::TLS_SERVER_ROOTS;
+
+use crate::Error;
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
@@ -23,7 +26,7 @@ pub struct TlsOptions {
 impl TlsOptions {
     /// Copied pretty directly from https://github.com/rustls/rustls/blob/main/examples/src/bin/tlsclient-mio.rs
     /// and https://github.com/rustls/tokio-rustls/blob/main/examples/client.rs
-    pub(crate) fn config(self) -> Result<tokio::rustls::rustls::ClientConfig, Error> {
+    pub(crate) fn config(self) -> Result<rustls::ClientConfig, Error> {
         let mut cert_store = rustls::RootCertStore::empty();
 
         if let Some(ca_file) = self.authority {
@@ -36,8 +39,7 @@ impl TlsOptions {
             cert_store.extend(TLS_SERVER_ROOTS.iter().cloned());
         }
 
-        let base_config =
-            tokio::rustls::rustls::ClientConfig::builder().with_root_certificates(cert_store);
+        let base_config = rustls::ClientConfig::builder().with_root_certificates(cert_store);
         match (&self.private_key, &self.auth_certs) {
             (None, None) => Ok(base_config.with_no_client_auth()),
             (Some(key_file), Some(certs_file)) => {
@@ -68,10 +70,13 @@ impl TlsOptions {
 
 #[derive(Clone, Debug, Builder)]
 #[builder(pattern = "owned")]
-pub struct ConnectionOptions<V> {
+pub struct ConnectionOptions<D, F> {
     #[allow(unused)]
-    #[builder(setter(custom))]
-    pub(crate) version: V,
+    #[builder(setter(skip))]
+    pub(crate) dialect: std::marker::PhantomData<D>,
+    #[allow(unused)]
+    #[builder(setter(skip))]
+    pub(crate) format: std::marker::PhantomData<F>,
     #[builder(default = "Self::default_host()")]
     pub(crate) host: String,
     #[builder(default = "Self::default_port()")]
@@ -92,16 +97,19 @@ pub struct ConnectionOptions<V> {
     pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
-impl<V_> ConnectionOptionsBuilder<V_> {
-    fn version<V: GremlinIO>(self, version: V) -> ConnectionOptionsBuilder<V> {
-        ConnectionOptionsBuilder::<V> {
-            version: Some(version),
+impl<F_, D_> ConnectionOptionsBuilder<D_, F_> {
+    pub fn dialect<D: Dialect>(self) -> ConnectionOptionsBuilder<D, F_> {
+        ConnectionOptionsBuilder {
+            dialect: PhantomData::<PhantomData<D>>::default(),
             ..self
         }
     }
-}
-
-impl<V> ConnectionOptionsBuilder<V> {
+    pub fn format<F: Format>(self) -> ConnectionOptionsBuilder<D_, F> {
+        ConnectionOptionsBuilder {
+            format: PhantomData::<PhantomData<F>>::default(),
+            ..self
+        }
+    }
     fn default_host() -> String {
         "127.0.0.1".into()
     }
@@ -197,13 +205,13 @@ impl WebSocketOptionsBuilder {
     }
 }
 
-impl ConnectionOptions<()> {
-    pub fn builder() -> ConnectionOptionsBuilder<()> {
+impl ConnectionOptions<(), ()> {
+    pub fn builder() -> ConnectionOptionsBuilder<(), ()> {
         ConnectionOptionsBuilder::create_empty()
     }
 }
 
-impl<V: GremlinIO> ConnectionOptions<V> {
+impl<F: Format, D> ConnectionOptions<D, F> {
     pub fn websocket_url(&self) -> String {
         let protocol = if self.ssl { "wss" } else { "ws" };
         format!("{}://{}:{}/gremlin", protocol, self.host, self.port)
