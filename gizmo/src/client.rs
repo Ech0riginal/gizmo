@@ -1,19 +1,30 @@
-use crate::io::{Args, GremlinIO, Request};
-use crate::network::GremlinStream;
-use crate::options::ConnectionOptions;
-use crate::*;
-use crate::{Error, GremlinResult};
-use bb8::{Pool, PooledConnection};
+// use crate::io::{Args, GremlinIO, Request};
 use std::collections::HashMap;
 
-pub struct SessionedClient<'c, V: GremlinIO> {
-    connection: PooledConnection<'c, ConnectionOptions<V>>,
+use bb8::{Pool, PooledConnection};
+use gizmio::types::{Bytecode, GValue};
+use gizmio::{Args, Deserializer, Dialect, Format, Request, Response, Serializer};
+
+use crate::network::Socketed;
+use crate::options::ConnectionOptions;
+use crate::{Error, GremlinResult};
+
+pub struct SessionedClient<'c, D: Dialect, F: Supports<D>>
+where
+    <F as Format>::Serial: Send + Sync,
+{
+    connection: PooledConnection<'c, ConnectionOptions<D, F>>,
     session: Option<String>,
     alias: Option<String>,
 }
 
-impl<'a, V: GremlinIO> SessionedClient<'a, V> {
-    pub async fn close(mut self) -> GremlinResult<impl GremlinStream + 'a> {
+impl<'a, D, F> SessionedClient<'a, D, F>
+where
+    D: Dialect,
+    F: Supports<D>,
+    F::Serial: Send + Sync,
+{
+    pub async fn close(mut self) -> GremlinResult<Socketed> {
         if let Some(session_name) = self.session.take() {
             let request = Request::builder()
                 .op(CLOSE)
@@ -28,9 +39,25 @@ impl<'a, V: GremlinIO> SessionedClient<'a, V> {
     }
 }
 
+pub trait Supports<D: Dialect>:
+    Format + Serializer<Request, Self::Serial, D> + Deserializer<Response, Self::Serial, D>
+{
+}
+impl<D, T> Supports<D> for T
+where
+    D: Dialect,
+    T: Format,
+    T: Serializer<Request, Self::Serial, D> + Deserializer<Response, Self::Serial, D>,
+    T::Serial: Send + Sync,
+{
+}
+
 #[derive(Clone)]
-pub struct GremlinClient<V: GremlinIO> {
-    pool: bb8::Pool<ConnectionOptions<V>>,
+pub struct GremlinClient<D: Dialect, F: Supports<D>>
+where
+    <F as Format>::Serial: Send + Sync,
+{
+    pool: bb8::Pool<ConnectionOptions<D, F>>,
     session: Option<String>,
     alias: Option<String>,
     // pub(crate) options: ConnectionOptions<V>,
@@ -46,13 +73,15 @@ const CLOSE: &'static str = "close";
 const SESSION: &'static str = "session";
 const EVAL: &'static str = "eval";
 
-impl<V> GremlinClient<V>
+impl<D, F> GremlinClient<D, F>
 where
-    V: GremlinIO,
+    D: Dialect,
+    F: Supports<D>,
+    F::Serial: Send + Sync,
 {
-    pub async fn connect(options: ConnectionOptions<V>) -> GremlinResult<GremlinClient<V>> {
+    pub async fn connect(options: ConnectionOptions<D, F>) -> GremlinResult<GremlinClient<D, F>> {
         let pool = Pool::builder()
-            .min_idle(3)
+            .min_idle(1)
             .max_size(options.pool_size)
             .idle_timeout(options.idle_timeout)
             .connection_timeout(options.connection_timeout)
@@ -66,7 +95,10 @@ where
         })
     }
 
-    pub async fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient<V>> {
+    pub async fn create_session(
+        &mut self,
+        name: String,
+    ) -> GremlinResult<SessionedClient<'_, D, F>> {
         let connection = self.pool.get().await?;
 
         Ok(SessionedClient {
@@ -77,7 +109,7 @@ where
     }
 
     /// Return a cloned client with the provided alias
-    pub fn alias<T>(&mut self, alias: T) -> GremlinClient<V>
+    pub fn alias<T>(&mut self, alias: T) -> GremlinClient<D, F>
     where
         T: Into<String>,
     {
@@ -90,7 +122,7 @@ where
         &'a self,
         script: S,
         params: &'a [(&'a str, impl Into<GValue> + Clone)],
-    ) -> GremlinResult<impl GremlinStream + 'a>
+    ) -> GremlinResult<Socketed>
     where
         S: AsRef<str>,
     {
@@ -132,16 +164,13 @@ where
             .args(args)
             .build()
             .unwrap();
-        let conn = self.pool.get().await?;
-        let stream = conn.send(request).await?;
+        let mut conn = self.pool.get().await?;
+        let socket = conn.send(request).await?;
 
-        Ok(stream)
+        Ok(socket)
     }
 
-    pub async fn execute<'a>(
-        &self,
-        bytecode: Bytecode,
-    ) -> GremlinResult<impl GremlinStream + use<'a, V>> {
+    pub async fn execute<'a>(&self, bytecode: Bytecode) -> GremlinResult<Socketed> {
         let bytecode = GValue::Bytecode(bytecode);
         let request = Request::builder()
             .op("bytecode")
@@ -164,9 +193,10 @@ where
             )
             .build()
             .unwrap();
-        let conn = self.pool.get().await?;
-        let stream = conn.send(request).await?;
-
-        Ok(stream)
+        tracing::trace!("Acquiring connection from pool");
+        let mut conn = self.pool.get().await?;
+        tracing::trace!("Acquired connection from pool; Sending request");
+        let socket = conn.send(request).await?;
+        Ok(socket)
     }
 }
