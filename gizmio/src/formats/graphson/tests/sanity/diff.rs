@@ -3,11 +3,12 @@
 use std::cmp::PartialEq;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::Hash;
-use http::StatusCode;
-use Difference::*;
 
-use crate::*;
+use Difference::*;
+use http::StatusCode;
+
 use crate::response::Code;
+use crate::*;
 
 #[derive(Debug)]
 pub struct Debuggery<'a> {
@@ -457,11 +458,11 @@ impl Diff for Code {
             Code::Raw(this) => match other {
                 Code::Raw(other) => this.diff(other),
                 _ => self.differ(other, Intrinsic),
-            }
+            },
             Code::Http(this) => match other {
                 Code::Http(other) => this.diff(other),
                 _ => self.differ(other, Intrinsic),
-            }
+            },
         }
     }
 }

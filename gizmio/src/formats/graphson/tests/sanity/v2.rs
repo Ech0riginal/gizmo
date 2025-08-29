@@ -1,12 +1,12 @@
 pub use std::str::FromStr;
 
 pub use chrono::TimeZone;
-pub use serde_json::json;
 pub use http::StatusCode;
-pub use crate::response::Code;
+pub use serde_json::json;
 
 #[allow(unused_imports)] // They're very much used
 pub use super::macros::*;
+pub use crate::response::Code;
 pub use crate::{formats::*, types::*, *};
 
 mod core {
@@ -1551,7 +1551,9 @@ mod response {
             object: crate::Response {
                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
                 status: crate::Status {
-                    code: StatusCode::from_u16(407).map(Code::Http).unwrap_or(Code::Raw(407)),
+                    code: StatusCode::from_u16(407)
+                        .map(Code::Http)
+                        .unwrap_or(Code::Raw(407)),
                     message: Default::default(),
                     attributes: serde_json::Value::Object(serde_json::Map::new()),
                 },
@@ -1569,7 +1571,9 @@ mod response {
             object: crate::Response {
                 id: uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap(),
                 status: crate::Status {
-                    code: StatusCode::from_u16(200).map(Code::Http).unwrap_or(Code::Raw(200)),
+                    code: StatusCode::from_u16(200)
+                        .map(Code::Http)
+                        .unwrap_or(Code::Raw(200)),
                     message: None,
                     attributes: serde_json::Value::Object(serde_json::Map::new()),
                 },
