@@ -1,19 +1,25 @@
-use crate::Error;
-use crate::io::GremlinIO;
-use crate::options::ConnectionOptions;
-use bb8::ManageConnection;
 use std::sync::Arc;
+
+use bb8::ManageConnection;
+use gizmio::{Deserializer, Dialect, Format, Request, Response, Serializer};
 use tokio_tungstenite::{Connector, connect_async_with_config};
 use tungstenite::{
     client::{IntoClientRequest, uri_mode},
     stream::{Mode, NoDelay},
 };
 
-impl<V> ManageConnection for ConnectionOptions<V>
+use crate::Error;
+use crate::options::ConnectionOptions;
+
+impl<D, F> ManageConnection for ConnectionOptions<D, F>
 where
-    V: GremlinIO,
+    F: Format,
+    F: Serializer<Request, F::Serial, D>,
+    F: Deserializer<Response, F::Serial, D>,
+    F::Serial: Send + Sync,
+    D: Dialect,
 {
-    type Connection = super::Connection<V>;
+    type Connection = super::Socketeer<D, F>;
     type Error = Error;
 
     fn connect(&self) -> impl Future<Output = Result<Self::Connection, Self::Error>> + Send {
@@ -43,12 +49,11 @@ where
             });
             let mut stream = std::net::TcpStream::connect((host, port))
                 .map_err(|e| Error::Generic(format!("Unable to connect {e:?}")))?;
-            NoDelay::set_nodelay(&mut stream, true)
-                .map_err(|e| Error::Generic(e.to_string()))?;
+            NoDelay::set_nodelay(&mut stream, true).map_err(|e| Error::Generic(e.to_string()))?;
 
             let websocket_config = self.websocket_options.clone().map(Into::into);
 
-            let (client, _) = match &connector {
+            let (stream, _) = match &connector {
                 Connector::Plain => connect_async_with_config(url, websocket_config, false).await,
                 Connector::Rustls(_) => {
                     tokio_tungstenite::connect_async_tls_with_config(
@@ -62,7 +67,9 @@ where
                 _ => panic!("NativeTls isn't supported :D"),
             }?;
 
-            Ok(super::Connection::new(client, self.clone()))
+            tracing::trace!("Connected to ws://{}:{}", host, port);
+
+            Ok(super::Socketeer::new(stream))
         }
     }
 
@@ -71,15 +78,15 @@ where
         conn: &mut Self::Connection,
     ) -> impl Future<Output = Result<(), Self::Error>> + Send {
         async move {
-            if !conn.valid().await {
-                Err(Error::Generic("Connection is disconnected".into()))
-            } else {
+            if conn.valid {
                 Ok(())
+            } else {
+                Err(Error::Generic("Connection is disconnected".into()))
             }
         }
     }
 
     fn has_broken(&self, conn: &mut Self::Connection) -> bool {
-        !conn.healthcheck()
+        conn.valid
     }
 }
