@@ -1,12 +1,13 @@
-#[allow(unused_imports)] // They're very much used
-pub use super::macros::*;
-pub use crate::{dialects::*, formats::*, types::*, *};
+pub use std::str::FromStr;
 
-pub use crate::api::V3;
 pub use chrono::TimeZone;
 pub use indexmap::{IndexMap, indexset};
 pub use serde_json::json;
-pub use std::str::FromStr;
+
+#[allow(unused_imports)] // They're very much used
+pub use super::macros::*;
+pub use crate::api::V3;
+pub use crate::{dialects::*, formats::*, types::*, *};
 
 mod core {
     use super::*;
@@ -16,7 +17,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Class as Tag_<Tinker>>::tag, "@value" : "java.io.File"}),
+            serial: json!({ "@type" : <Class as AST<Tinker>>::tag, "@value" : "java.io.File"}),
             object: GValue::Class("java.io.File".into()),
         }
     );
@@ -25,7 +26,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Date as Tag_<Tinker>>::tag, "@value" : 1481750076295i64 }),
+            serial: json!({ "@type" : <Date as AST<Tinker>>::tag, "@value" : 1481750076295i64 }),
             object: GValue::Date(Date(
                 chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()
             )),
@@ -36,7 +37,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Double as Tag_<Tinker>>::tag, "@value" : 100.0f64 }),
+            serial: json!({ "@type" : <Double as AST<Tinker>>::tag, "@value" : 100.0f64 }),
             object: Double(100.0).into(),
         }
     );
@@ -45,7 +46,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Float as Tag_<Tinker>>::tag, "@value" : 100.0f32 }),
+            serial: json!({ "@type" : <Float as AST<Tinker>>::tag, "@value" : 100.0f32 }),
             object: Float(100.0).into(),
         }
     );
@@ -54,7 +55,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Integer as Tag_<Tinker>>::tag, "@value" : 100i32 }),
+            serial: json!({ "@type" : <Integer as AST<Tinker>>::tag, "@value" : 100i32 }),
             object: Integer(100).into(),
         }
     );
@@ -76,7 +77,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Long as Tag_<Tinker>>::tag, "@value" : 100u64 }),
+            serial: json!({ "@type" : <Long as AST<Tinker>>::tag, "@value" : 100u64 }),
             object: Long(100).into(),
         }
     );
@@ -86,7 +87,7 @@ mod core {
         Tinker,
         Test {
             serial: json!({
-                "@type" : <Map<GValue, GValue> as Tag_<Tinker>>::tag,
+                "@type" : <Map<GValue, GValue> as AST<Tinker>>::tag,
                 "@value" : [
                     {"@type" : "g:Date", "@value" : 1481750076295u64 }, "red",
 
@@ -128,7 +129,7 @@ mod core {
         GraphSON<V3>,
         Tinker,
         Test {
-            serial: json!({ "@type" : <Set as Tag_<Tinker>>::tag, "@value" : [ { "@type" : <Integer as Tag_<Tinker>>::tag, "@value" : 1 }, "person", true ]}),
+            serial: json!({ "@type" : <Set as AST<Tinker>>::tag, "@value" : [ { "@type" : <Integer as AST<Tinker>>::tag, "@value" : 1 }, "person", true ]}),
             object: GValue::Set(
                 indexset![
                     GValue::Integer(Integer(1)),

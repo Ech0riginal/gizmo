@@ -3,7 +3,7 @@ pub trait Dialect: Clone + Sized + Send + Sync + 'static {
 
     fn tag<T>() -> &'static str
     where
-        T: crate::Tag_<Self>,
+        T: crate::AST<Self>,
     {
         T::tag
     }

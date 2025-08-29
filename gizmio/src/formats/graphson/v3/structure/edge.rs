@@ -1,5 +1,6 @@
-use crate::formats::graphson::prelude::*;
 use std::collections::HashMap;
+
+use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Edge, D> for GraphSON<V3>
 where

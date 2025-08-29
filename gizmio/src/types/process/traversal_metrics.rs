@@ -1,5 +1,6 @@
-use crate::*;
 use std::hash::{Hash, Hasher};
+
+use crate::*;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct TraversalMetrics {

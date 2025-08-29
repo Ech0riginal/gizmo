@@ -1,7 +1,8 @@
 //! https://tinkerpop.apache.org/docs/3.7.3/dev/io/#_set
 
-use crate::formats::graphson::prelude::*;
 use indexmap::IndexSet;
+
+use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Set, D> for GraphSON<V3>
 where

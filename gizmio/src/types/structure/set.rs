@@ -1,7 +1,8 @@
-use crate::GValue;
+use std::hash::{Hash, Hasher};
 
 use indexmap::IndexSet;
-use std::hash::{Hash, Hasher};
+
+use crate::GValue;
 
 crate::primitive_prelude!();
 crate::very_primitive!(Set, IndexSet<GValue>);

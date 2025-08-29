@@ -1,22 +1,24 @@
+use std::hash::Hasher;
+
+use geo_types::Geometry::*;
+
 use crate::dialects::*;
 use crate::*;
-use geo_types::Geometry::*;
-use std::hash::Hasher;
 
 primitive_prelude!();
 very_primitive!(Geometry, geo_types::Geometry<f64>);
 
 // TODO impl for backends once available
 
-// default impl<D> Tag_<D> for Geometry {
+// default impl<D> AST<D> for Geometry {
 //     const tag: &'static str = "n/a";
 // }
 
-impl Tag_<SQLg> for Geometry {
+impl AST<SQLg> for Geometry {
     const tag: &'static str = "g:Geometry";
 }
 
-impl Tag_<Janus> for Geometry {
+impl AST<Janus> for Geometry {
     const tag: &'static str = "g:Geoshape";
 }
 

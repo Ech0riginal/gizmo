@@ -1,5 +1,6 @@
-use crate::*;
 use std::hash::Hash;
+
+use crate::*;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Tree {

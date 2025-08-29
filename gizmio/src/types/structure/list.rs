@@ -2,12 +2,13 @@ use crate::*;
 
 primitive_prelude!();
 
-pub struct List<T>(pub(crate) Vec<T>);
+#[derive(Debug, Clone)]
+pub struct List<T>(pub Vec<T>);
 impl<T: std::fmt::Debug> Named for List<T> {
     const name: &'static str = "List";
 }
 
-impl<T, D> Tag_<D> for List<T> {
+impl<T, D> AST<D> for List<T> {
     const tag: &'static str = "g:List";
 }
 
@@ -29,17 +30,11 @@ impl<T> Default for List<T> {
     }
 }
 
-impl<T: Clone> Clone for List<T> {
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
-    }
-}
-
-impl<T: fmt::Debug> fmt::Debug for List<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_fmt(::core::format_args!("{:?}", self.0))
-    }
-}
+// impl<T: fmt::Debug> fmt::Debug for List<T> {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         f.write_fmt(::core::format_args!("{:?}", self.0))
+//     }
+// }
 
 impl<T: fmt::Display> fmt::Display for List<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -108,6 +103,8 @@ impl<T> IntoIterator for List<T> {
     }
 }
 
+#[macro_export]
+
 macro_rules! list {
     [] => (
         $crate::List(std::vec::Vec::new())
@@ -121,4 +118,4 @@ macro_rules! list {
     );
 }
 
-pub(crate) use list;
+pub use list;

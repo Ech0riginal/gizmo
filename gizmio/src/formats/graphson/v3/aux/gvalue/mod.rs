@@ -45,7 +45,8 @@ macro_rules! serde {
                     Value::Object(_) => match val.typed() {
                         Ok(blob) => match blob.tag {
                             $(
-                                TypeTag::$var => deserialize!(blob.value, $val),
+                                <$val as AST<$dia>>::tag => deserialize!(blob.value, $val),
+                                // TypeTag::$var => deserialize!(blob.value, $val),
                             )*
 
                             type_tag => Err(Error::unsupported(type_tag)),

@@ -1,4 +1,4 @@
-use crate::T;
+use crate::{GValue, List, T, list};
 
 pub enum LabelType {
     Str(String),
@@ -6,33 +6,33 @@ pub enum LabelType {
     T(T),
 }
 
-pub struct Labels(pub(crate) Vec<LabelType>);
+pub struct Labels(pub List<LabelType>);
 
 impl From<&str> for Labels {
     fn from(param: &str) -> Labels {
-        Labels(vec![LabelType::Str(String::from(param))])
+        Labels(list![LabelType::Str(String::from(param))])
     }
 }
 
 impl From<String> for Labels {
     fn from(param: String) -> Labels {
-        Labels(vec![LabelType::Str(param)])
+        Labels(list![LabelType::Str(param)])
     }
 }
 
 impl From<T> for Labels {
     fn from(param: T) -> Labels {
-        Labels(vec![LabelType::T(param)])
+        Labels(list![LabelType::T(param)])
     }
 }
 
 impl From<()> for Labels {
     fn from(_: ()) -> Labels {
-        Labels(vec![])
+        Labels(list![])
     }
 }
-impl From<Vec<&str>> for Labels {
-    fn from(param: Vec<&str>) -> Labels {
+impl From<List<&str>> for Labels {
+    fn from(param: List<&str>) -> Labels {
         Labels(
             param
                 .into_iter()
@@ -41,38 +41,38 @@ impl From<Vec<&str>> for Labels {
         )
     }
 }
-impl From<Vec<String>> for Labels {
-    fn from(param: Vec<String>) -> Labels {
+impl From<List<String>> for Labels {
+    fn from(param: List<String>) -> Labels {
         Labels(param.into_iter().map(LabelType::Str).collect())
     }
 }
 
 impl From<bool> for Labels {
     fn from(param: bool) -> Labels {
-        Labels(vec![LabelType::Bool(param)])
+        Labels(list![LabelType::Bool(param)])
     }
 }
 
-impl From<(bool, Vec<&str>)> for Labels {
-    fn from(param: (bool, Vec<&str>)) -> Labels {
-        let mut out: Vec<LabelType> = vec![LabelType::Bool(param.0)];
+impl From<(bool, List<&str>)> for Labels {
+    fn from(param: (bool, List<&str>)) -> Labels {
+        let mut out = list![LabelType::Bool(param.0)];
         out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
         Labels(out)
     }
 }
 
-impl From<(bool, T, Vec<&str>)> for Labels {
-    fn from(param: (bool, T, Vec<&str>)) -> Labels {
-        let mut out: Vec<LabelType> = vec![LabelType::Bool(param.0)];
+impl From<(bool, T, List<&str>)> for Labels {
+    fn from(param: (bool, T, List<&str>)) -> Labels {
+        let mut out = list![LabelType::Bool(param.0)];
         out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
         out.append(&mut Into::<Labels>::into(param.2).0.drain(..).collect());
         Labels(out)
     }
 }
 
-impl From<(T, Vec<&str>)> for Labels {
-    fn from(param: (T, Vec<&str>)) -> Labels {
-        let mut out: Vec<LabelType> = vec![LabelType::T(param.0)];
+impl From<(T, List<&str>)> for Labels {
+    fn from(param: (T, List<&str>)) -> Labels {
+        let mut out = list![LabelType::T(param.0)];
         out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
         Labels(out)
     }
@@ -103,6 +103,12 @@ impl_into_labels_str!(7);
 impl_into_labels_str!(8);
 impl_into_labels_str!(9);
 impl_into_labels_str!(10);
+impl_into_labels_str!(11);
+impl_into_labels_str!(12);
+impl_into_labels_str!(13);
+impl_into_labels_str!(14);
+impl_into_labels_str!(15);
+impl_into_labels_str!(16);
 
 macro_rules! impl_into_labels_string {
     ($n:expr) => {
@@ -129,3 +135,30 @@ impl_into_labels_string!(7);
 impl_into_labels_string!(8);
 impl_into_labels_string!(9);
 impl_into_labels_string!(10);
+impl_into_labels_string!(11);
+impl_into_labels_string!(13);
+impl_into_labels_string!(14);
+impl_into_labels_string!(15);
+impl_into_labels_string!(16);
+impl TryFrom<GValue> for Labels {
+    type Error = crate::Error;
+
+    fn try_from(value: GValue) -> Result<Self, Self::Error> {
+        match value {
+            GValue::String(value) => Ok(Labels::from(value)),
+            GValue::Bool(value) => Ok(Labels::from(value.0)),
+            GValue::T(value) => Ok(Labels::from(value)),
+            value => Err(crate::Error::unsupported(value)),
+        }
+    }
+}
+
+// impl<A, B> Into<Labels> for (A, B)
+// where
+//     A: Into<GValue>,
+//     B: Into<GValue>,
+// {
+//     fn into(self) -> Labels {
+//         GValue::List(list![self.0.into(), self.1.into()])
+//     }
+// }

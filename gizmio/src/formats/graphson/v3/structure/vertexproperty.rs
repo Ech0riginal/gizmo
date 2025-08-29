@@ -1,6 +1,7 @@
-use crate::formats::graphson::prelude::*;
 use indexmap::IndexMap;
 use snafu::location;
+
+use crate::formats::graphson::prelude::*;
 impl<D: Dialect> GraphsonDeserializer<VertexProperty, D> for GraphSON<V3>
 where
     Self: GraphsonDeserializer<GValue, D>,

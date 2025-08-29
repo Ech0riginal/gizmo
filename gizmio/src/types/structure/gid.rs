@@ -57,6 +57,21 @@ impl From<Uuid> for GID {
     }
 }
 
+impl<T> From<T> for List<GID>
+where
+    GID: From<T>,
+{
+    fn from(value: T) -> Self {
+        list![GID::from(value)]
+    }
+}
+
+impl From<()> for List<GID> {
+    fn from(_: ()) -> Self {
+        list![]
+    }
+}
+
 // impl TryFrom<GValue> for GID {
 //     type Error = Error;
 //

@@ -1,6 +1,7 @@
-use crate::formats::graphson::prelude::*;
-use crate::formats::{TypeTag, Typed};
 use serde_json::Value;
+
+use crate::formats::Typed;
+use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
     fn serialize(val: &GValue) -> Result<Value, Error> {
@@ -29,13 +30,9 @@ impl<D: Dialect> GraphsonSerializer<GValue, D> for GraphSON<V2> {
             GValue::Edge(val) => serialize!(val, Edge),
             GValue::Path(val) => serialize!(val, Path),
             GValue::Property(val) => serialize!(val, Property),
-            GValue::StarGraph(val) => {
-                let json = val
-                    .serialize::<Self, D>()
-                    .map(|value| json!({ D::tag::<StarGraph>(): value }))?;
-                let _debug = format!("{}", &json);
-                Ok(json)
-            }
+            GValue::StarGraph(val) => val
+                .serialize::<Self, D>()
+                .map(|value| json!({ D::tag::<StarGraph>(): value })),
             GValue::TinkerGraph(val) => serialize!(val, TinkerGraph),
             GValue::Tree(val) => serialize!(val, Tree),
             GValue::Vertex(val) => serialize!(val, Vertex),
@@ -81,43 +78,50 @@ impl<D: Dialect> GraphsonDeserializer<GValue, D> for GraphSON<V2> {
                     }
 
                     match blob.tag {
-                        TypeTag::Class => deserialize!(Class),
-                        TypeTag::Date => deserialize!(Date),
-                        TypeTag::Double => deserialize!(Double),
-                        TypeTag::Float => deserialize!(Float),
-                        TypeTag::Integer => deserialize!(Integer),
-                        TypeTag::Long => deserialize!(Long),
-                        TypeTag::Timestamp => deserialize!(Timestamp),
-                        TypeTag::Uuid => deserialize!(Uuid),
-                        TypeTag::Edge => deserialize!(Edge),
-                        TypeTag::Path => deserialize!(Path),
-                        TypeTag::Property => deserialize!(Property),
-                        TypeTag::StarGraph => deserialize!(StarGraph),
-                        TypeTag::TinkerGraph => deserialize!(TinkerGraph),
-                        TypeTag::Tree => deserialize!(Tree),
-                        TypeTag::Vertex => deserialize!(Vertex),
-                        TypeTag::VertexProperty => deserialize!(VertexProperty),
-                        TypeTag::Barrier => deserialize!(Barrier),
-                        TypeTag::Binding => deserialize!(Binding),
-                        TypeTag::Bytecode => deserialize!(Bytecode),
-                        TypeTag::Cardinality => deserialize!(Cardinality),
-                        TypeTag::Column => deserialize!(Column),
-                        TypeTag::Direction => deserialize!(Direction),
-                        TypeTag::Lambda => deserialize!(Lambda),
-                        // TypeTag::DT => blob.value.deserialize::<Self, DT>().map(GValue::from),
-                        TypeTag::Merge => deserialize!(Merge),
-                        TypeTag::Metrics => deserialize!(Metrics),
-                        TypeTag::Operator => deserialize!(Operator),
-                        TypeTag::Order => deserialize!(Order),
-                        TypeTag::P => deserialize!(P),
-                        TypeTag::Pick => deserialize!(Pick),
-                        TypeTag::Pop => deserialize!(Pop),
-                        TypeTag::Scope => deserialize!(Scope),
-                        TypeTag::T => deserialize!(T),
-                        TypeTag::TextP => deserialize!(TextP),
-                        TypeTag::TraversalMetrics => deserialize!(TraversalMetrics),
-                        TypeTag::Traverser => deserialize!(Traverser),
-                        type_tag => Err(Error::unsupported(type_tag)),
+                        <Class as AST<D>>::tag => deserialize!(Class),
+                        <Date as AST<D>>::tag => deserialize!(Date),
+                        <Double as AST<D>>::tag => deserialize!(Double),
+                        <Float as AST<D>>::tag => deserialize!(Float),
+                        <Integer as AST<D>>::tag => deserialize!(Integer),
+                        // <List as AST<D>>::tag => deserialize!(List<GValue>),,
+                        <Long as AST<D>>::tag => deserialize!(Long),
+                        // <Map as AST<D>>::tag => blob.value.deserialize::<Self, Map>().map(GValue::from),
+                        // <Set as AST<D>>::tag => blob.value.deserialize::<Self, Set>().map(GValue::from),
+                        <Timestamp as AST<D>>::tag => deserialize!(Timestamp),
+                        <Uuid as AST<D>>::tag => deserialize!(Uuid),
+                        <Edge as AST<D>>::tag => deserialize!(Edge),
+                        <Path as AST<D>>::tag => deserialize!(Path),
+                        <Property as AST<D>>::tag => deserialize!(Property),
+                        <StarGraph as AST<D>>::tag => deserialize!(StarGraph),
+                        <TinkerGraph as AST<D>>::tag => deserialize!(TinkerGraph),
+                        <Tree as AST<D>>::tag => deserialize!(Tree),
+                        <Vertex as AST<D>>::tag => deserialize!(Vertex),
+                        <VertexProperty as AST<D>>::tag => deserialize!(VertexProperty),
+                        // <BulkSet as AST<D>>::tag => deserialize!(BulkSet),,
+                        <Barrier as AST<D>>::tag => deserialize!(Barrier),
+                        <Binding as AST<D>>::tag => deserialize!(Binding),
+                        <Bytecode as AST<D>>::tag => deserialize!(Bytecode),
+                        <Cardinality as AST<D>>::tag => deserialize!(Cardinality),
+                        <Column as AST<D>>::tag => deserialize!(Column),
+                        <Direction as AST<D>>::tag => deserialize!(Direction),
+                        <Lambda as AST<D>>::tag => deserialize!(Lambda),
+                        // <DT as AST<D>>::tag => blob.value.deserialize::<Self, DT>().map(GValue::from),
+                        <Merge as AST<D>>::tag => deserialize!(Merge),
+                        <Metrics as AST<D>>::tag => deserialize!(Metrics),
+                        <Operator as AST<D>>::tag => deserialize!(Operator),
+                        <Order as AST<D>>::tag => deserialize!(Order),
+                        <P as AST<D>>::tag => deserialize!(P),
+                        <Pick as AST<D>>::tag => deserialize!(Pick),
+                        <Pop as AST<D>>::tag => deserialize!(Pop),
+                        <Scope as AST<D>>::tag => deserialize!(Scope),
+                        <T as AST<D>>::tag => deserialize!(T),
+                        <TextP as AST<D>>::tag => deserialize!(TextP),
+                        <TraversalMetrics as AST<D>>::tag => deserialize!(TraversalMetrics),
+                        <Traverser as AST<D>>::tag => deserialize!(Traverser),
+                        type_tag => Err(Error::Unsupported {
+                            tag: type_tag.to_string(),
+                            location: location!(),
+                        }),
                     }
                 }
                 Err(err) => match err {

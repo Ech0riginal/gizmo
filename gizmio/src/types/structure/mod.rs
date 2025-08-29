@@ -33,6 +33,7 @@ pub use geometry::*;
 pub use gid::GID;
 pub use label::{LabelType, Labels};
 pub use list::List;
+pub use list::list;
 pub use map::Map;
 pub use merge::Merge;
 pub use null::Null;
@@ -49,5 +50,3 @@ pub use uuid::Uuid;
 pub use value::GValue;
 pub use vertex::Vertex;
 pub use vertex_property::{GProperty, VertexProperty};
-
-pub(crate) use list::list;

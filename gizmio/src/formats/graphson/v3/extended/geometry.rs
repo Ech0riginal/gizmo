@@ -1,7 +1,8 @@
-use crate::Geometry;
-use crate::formats::graphson::prelude::*;
 use geo_types::{Coord, Geometry as GeoTypes, LineString, Point, Polygon};
 use serde_json::{Value, from_value};
+
+use crate::Geometry;
+use crate::formats::graphson::prelude::*;
 
 type PointType = Vec<f64>;
 type LineStringType = Vec<PointType>;

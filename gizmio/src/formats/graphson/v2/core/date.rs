@@ -1,5 +1,6 @@
-use crate::formats::graphson::prelude::*;
 use chrono::{TimeZone, Utc};
+
+use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<Date, D> for GraphSON<V2> {
     fn deserialize(val: &Value) -> Result<Date, Error> {

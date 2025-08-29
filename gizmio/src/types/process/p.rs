@@ -86,10 +86,132 @@ impl P {
     expose!(LessThan, lt);
     expose!(LessThanOrEqual, lte);
     expose!(Within, within);
+
+    // pub fn within<V>(value: V) -> P
+    // where
+    //     V: Into<GValue>,
+    // {
+    //     P {
+    //         predicate: Predicate::Within,
+    //         value: value.into().boxed(),
+    //     }
+    // }
+
     expose!(Without, without);
     expose!(Inside, inside);
     expose!(Outside, outside);
     expose!(Between, between);
     expose!(And, and);
     expose!(Or, or);
+}
+
+// macro_rules! intzoo {
+//     ($($var:ident),* => $($ind:expr),*) => {
+//         impl<$($var),*> Into<GValue> for ($($var),*)
+//             where
+//                 $($var: Into<GValue>),*
+//         {
+//             fn into(self) -> GValue {
+//                 GValue::List(list![])
+//                 GValue::List(list![$(self.$ind.into()),*])
+//             }
+//         }
+//     };
+// }
+
+impl<A, B> Into<GValue> for (A, B)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![self.0.into(), self.1.into()])
+    }
+}
+
+impl<A, B, C> Into<GValue> for (A, B, C)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+    C: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![self.0.into(), self.1.into(), self.2.into()])
+    }
+}
+impl<A, B, C, D> Into<GValue> for (A, B, C, D)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+    C: Into<GValue>,
+    D: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![
+            self.0.into(),
+            self.1.into(),
+            self.2.into(),
+            self.3.into()
+        ])
+    }
+}
+impl<A, B, C, D, E> Into<GValue> for (A, B, C, D, E)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+    C: Into<GValue>,
+    D: Into<GValue>,
+    E: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![
+            self.0.into(),
+            self.1.into(),
+            self.2.into(),
+            self.3.into(),
+            self.4.into()
+        ])
+    }
+}
+impl<A, B, C, D, E, F> Into<GValue> for (A, B, C, D, E, F)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+    C: Into<GValue>,
+    D: Into<GValue>,
+    E: Into<GValue>,
+    F: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![
+            self.0.into(),
+            self.1.into(),
+            self.2.into(),
+            self.3.into(),
+            self.4.into(),
+            self.5.into()
+        ])
+    }
+}
+impl<A, B, C, D, E, F, G> Into<GValue> for (A, B, C, D, E, F, G)
+where
+    A: Into<GValue>,
+    B: Into<GValue>,
+    C: Into<GValue>,
+    D: Into<GValue>,
+    E: Into<GValue>,
+    F: Into<GValue>,
+    G: Into<GValue>,
+{
+    fn into(self) -> GValue {
+        GValue::List(list![
+            self.0.into(),
+            self.1.into(),
+            self.2.into(),
+            self.3.into(),
+            self.4.into(),
+            self.5.into(),
+            self.6.into()
+        ])
+    }
 }

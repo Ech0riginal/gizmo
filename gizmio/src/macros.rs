@@ -1,13 +1,14 @@
 #![allow(unused_macros)]
 
+#[macro_export]
 macro_rules! get_value {
     ($value:expr,Value::$v:ident) => {
         match $value {
             serde_json::Value::$v(e) => Ok(e),
-            _ => Err($crate::api::Error::Unexpected {
+            _ => Err($crate::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
-                location: location!(),
+                location: ::snafu::location!(),
             }),
         }
     };
@@ -15,10 +16,10 @@ macro_rules! get_value {
     ($value:expr,GValue::$v:ident) => {
         match $value {
             $crate::GValue::$v(e) => Ok(e),
-            _ => Err($crate::api::Error::Unexpected {
+            _ => Err($crate::Error::Unexpected {
                 expectation: stringify!($v).to_string(),
                 actual: format!("{:?}", $value),
-                location: location!(),
+                location: ::snafu::location!(),
             }),
         }
     };
@@ -96,11 +97,12 @@ pub(crate) use {expect_f32, expect_f64, expect_i32, expect_i64, expect_i128, get
 pub(crate) mod test_macros {
     macro_rules! test_prelude {
         () => {
-            pub(self) use super::*;
             #[allow(unused_imports)]
             pub(self) use $crate::formats::graphson::tests::sanity::diff::{Diff, Difference};
             #[allow(unused_imports)]
             pub(self) use $crate::*;
+
+            pub(self) use super::*;
         };
     }
 

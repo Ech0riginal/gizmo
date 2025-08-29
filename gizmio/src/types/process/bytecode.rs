@@ -1,5 +1,6 @@
-use crate::*;
 use std::fmt::Formatter;
+
+use crate::*;
 
 #[derive(Default, Eq, PartialEq, Clone, Hash)]
 pub struct Bytecode {
@@ -53,7 +54,7 @@ impl Bytecode {
 
 #[derive(Eq, PartialEq, Clone, Hash)]
 pub struct Instruction {
-    pub(crate) op: String,
+    pub op: String,
     pub(crate) args: List<GValue>,
 }
 

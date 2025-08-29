@@ -1,10 +1,12 @@
 //! A lot of our tests get thrown off by out-of-order items. I don't care about order, thus:
 
-use crate::*;
-use Difference::*;
 use std::cmp::PartialEq;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::Hash;
+
+use Difference::*;
+
+use crate::*;
 
 #[derive(Debug)]
 pub struct Debuggery<'a> {
@@ -345,8 +347,9 @@ mod gvalues {
     basic!(i128);
 }
 mod serde {
-    use super::*;
     use serde_json::Value;
+
+    use super::*;
 
     impl Diff for Value {
         fn diff<'a>(&'a self, other: &'a Self) -> Debuggery<'a> {

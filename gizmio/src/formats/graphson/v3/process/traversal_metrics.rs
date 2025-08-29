@@ -1,4 +1,3 @@
-use crate::formats::TypeTag;
 use crate::formats::graphson::prelude::*;
 
 impl<D: Dialect> GraphsonDeserializer<TraversalMetrics, D> for GraphSON<V3>
@@ -8,7 +7,9 @@ where
     fn deserialize(val: &Value) -> Result<TraversalMetrics, Error> {
         let typed = val.typed()?;
         let mapped = match typed.tag {
-            TypeTag::Map => typed.value.deserialize::<Self, D, Map<String, GValue>>(),
+            <Map<(), ()> as AST<D>>::tag => {
+                typed.value.deserialize::<Self, D, Map<String, GValue>>()
+            }
             _ => Err(Error::unexpected(val, "something else")),
         }?;
 

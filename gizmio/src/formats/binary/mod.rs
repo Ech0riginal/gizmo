@@ -1,7 +1,8 @@
 mod v1;
 
-use crate::{Deserializer, Serializer};
 use bytes::Bytes;
+
+use crate::{Deserializer, Serializer};
 
 #[derive(Clone, Copy, Debug)]
 pub struct GraphBinary<V> {

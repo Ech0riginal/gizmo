@@ -1,5 +1,6 @@
-use crate::{Dialect, Edge, List, Tag_, Vertex, obj};
 use std::hash::{Hash, Hasher};
+
+use crate::{AST, Dialect, Edge, List, Vertex, obj};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TinkerGraph {
@@ -9,7 +10,7 @@ pub struct TinkerGraph {
 
 obj!(TinkerGraph);
 
-impl<D: Dialect> Tag_<D> for TinkerGraph {
+impl<D: Dialect> AST<D> for TinkerGraph {
     const tag: &'static str = "tinker:graph";
 }
 

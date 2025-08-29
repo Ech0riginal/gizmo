@@ -1,11 +1,13 @@
-use crate::{Bytable, Error};
 use bytes::Bytes;
 pub use ensure::Ensure;
 
+use crate::{Bytable, Error};
+
 mod ensure {
-    use crate::Error;
     use serde_json::Value;
     use snafu::Location;
+
+    use crate::Error;
 
     pub trait Ensure<K: ?Sized, V> {
         #[track_caller]

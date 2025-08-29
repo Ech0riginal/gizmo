@@ -1,20 +1,23 @@
 //! https://tinkerpop.apache.org/docs/current/dev/provider/#_graph_driver_provider_requirements
 
-use crate::api::Named;
-use crate::types::{GValue, Map};
+use std::collections::HashMap;
+use std::fmt::Formatter;
+use std::hash::Hasher;
+
 use derive_builder::Builder;
 use indexmap::IndexMap;
-use std::collections::HashMap;
-use std::hash::Hasher;
 use uuid::Uuid;
+
+use crate::api::Named;
+use crate::types::{GValue, Map};
 
 #[derive(Clone, Debug, Builder)]
 pub struct Request {
     #[builder(default = "uuid::Uuid::new_v4()")]
     pub id: Uuid,
-    pub(crate) op: &'static str,
-    pub(crate) proc: &'static str,
-    pub(crate) args: Args,
+    pub op: &'static str,
+    pub proc: &'static str,
+    pub args: Args,
 }
 impl Request {
     pub fn builder() -> RequestBuilder {
@@ -36,8 +39,13 @@ impl std::hash::Hash for Request {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Args(pub(crate) Map<String, GValue>);
+impl std::fmt::Debug for Args {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
 crate::obj!(Args);
 crate::tag!(Args, "g:Map");
 

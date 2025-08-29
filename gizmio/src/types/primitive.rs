@@ -1,4 +1,4 @@
-pub trait Tag_<D> {
+pub trait AST<D> {
     #[allow(nonstandard_style)]
     const tag: &'static str;
 }
@@ -14,7 +14,7 @@ macro_rules! primitive_prelude {
 macro_rules! primitive {
     ($name:ident, $inner:ty) => {
         #[derive(Clone)]
-        pub struct $name(pub(crate) $inner);
+        pub struct $name(pub $inner);
 
         impl $crate::Named for $name {
             const name: &'static str = stringify!($name);
@@ -71,7 +71,7 @@ macro_rules! tag {
         $crate::tag!($id, const_format::concatcp!("g:", stringify!($id)));
     };
     ($id:ident, $tag:expr) => {
-        impl<D: $crate::Dialect> $crate::Tag_<D> for $id {
+        impl<D: $crate::Dialect> $crate::AST<D> for $id {
             const tag: &'static str = $tag;
         }
     };
@@ -83,7 +83,7 @@ macro_rules! tag {
         );
     };
     ($id:ident, $dialect:ident, $tag:expr) => {
-        impl $crate::Tag_<$dialect> for $id {
+        impl $crate::AST<$dialect> for $id {
             const tag: &'static str = $tag;
         }
     };

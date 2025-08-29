@@ -11,7 +11,7 @@ where
             "op": val.op,
             "processor": val.proc,
             "args": {
-                "@type": <Map::<(),()> as Tag_<D>>::tag,
+                "@type": <Map::<(),()> as AST<D>>::tag,
                 "@value": val.args.serialize::<Self, D>()?,
             },
         }))

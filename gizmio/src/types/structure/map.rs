@@ -1,8 +1,10 @@
-use crate::api::{Error, MissingSnafu};
-use crate::*;
+use std::hash::{Hash, Hasher};
+
 use indexmap::IndexMap;
 use snafu::OptionExt;
-use std::hash::{Hash, Hasher};
+
+use crate::api::{Error, MissingSnafu};
+use crate::*;
 // Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has the ability to allow for non-String keys.
 // TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 
@@ -13,7 +15,7 @@ pub struct Map<K, V>(pub(crate) IndexMap<K, V>);
 impl<K: fmt::Debug, V: fmt::Debug> crate::Named for Map<K, V> {
     const name: &'static str = "Map";
 }
-impl<K, V, D> Tag_<D> for Map<K, V> {
+impl<K, V, D> AST<D> for Map<K, V> {
     const tag: &'static str = "g:Map";
 }
 

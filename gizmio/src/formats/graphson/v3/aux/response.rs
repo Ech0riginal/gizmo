@@ -1,7 +1,7 @@
+use serde_json::Value;
+
 use crate::formats::graphson::prelude::*;
 use crate::{Response, Status};
-
-use serde_json::Value;
 
 impl<D: Dialect> GraphsonDeserializer<Response, D> for GraphSON<V3>
 where
@@ -60,7 +60,8 @@ impl<D: Dialect> GraphsonDeserializer<Status, D> for GraphSON<V3> {
     fn deserialize(val: &Value) -> Result<Status, Error> {
         let code = val
             .ensure("code")
-            .map(|code| code.as_i64().unwrap() as i16)?;
+            .map(|code| code.as_i64().unwrap() as i16)?
+            .into();
         let message = {
             let tmp = val.ensure("message")?;
             let str = get_value!(tmp, Value::String)?;
@@ -89,7 +90,7 @@ impl<D: Dialect> GraphsonSerializer<Status, D> for GraphSON<V3> {
         };
 
         Ok(json!({
-            "code": val.code,
+            "code": val.code.i16(),
             "message": message,
             "attributes": val.attributes,
         }))

@@ -1,6 +1,8 @@
-use crate::*;
-use indexmap::map::IntoIter;
 use std::hash::Hasher;
+
+use indexmap::map::IntoIter;
+
+use crate::*;
 
 #[derive(Debug, Clone)]
 pub struct Vertex {

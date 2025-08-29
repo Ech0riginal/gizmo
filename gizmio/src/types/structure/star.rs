@@ -1,6 +1,6 @@
-use crate::{Dialect, GID, List, Map, Tag_, Vertex, VertexProperty, obj};
-
 use std::hash::{Hash, Hasher};
+
+use crate::{AST, Dialect, GID, List, Map, Vertex, VertexProperty, obj};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StarGraph {
@@ -11,7 +11,7 @@ pub struct StarGraph {
 
 obj!(StarGraph);
 
-impl<D: Dialect> Tag_<D> for StarGraph {
+impl<D: Dialect> AST<D> for StarGraph {
     const tag: &'static str = "starVertex";
 }
 

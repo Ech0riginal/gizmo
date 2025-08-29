@@ -1,9 +1,11 @@
+pub use std::str::FromStr;
+
+pub use chrono::TimeZone;
+pub use serde_json::json;
+
 #[allow(unused_imports)] // They're very much used
 pub use super::macros::*;
 pub use crate::{formats::*, types::*, *};
-pub use chrono::TimeZone;
-pub use serde_json::json;
-pub use std::str::FromStr;
 
 mod core {
     use super::*;
@@ -13,7 +15,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Class as Tag_<SQLg>>::tag, "@value" : "java.io.File"}),
+            serial: json!({ "@type" : <Class as AST<SQLg>>::tag, "@value" : "java.io.File"}),
             object: GValue::Class("java.io.File".into()),
         }
     );
@@ -23,7 +25,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Date as Tag_<SQLg>>::tag, "@value" : 1481750076295i64 }),
+            serial: json!({ "@type" : <Date as AST<SQLg>>::tag, "@value" : 1481750076295i64 }),
             object: GValue::Date(Date(
                 chrono::Utc.timestamp_millis_opt(1481750076295i64).unwrap()
             )),
@@ -34,7 +36,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Timestamp as Tag_<SQLg>>::tag, "@value" : 1481750076295i64 }),
+            serial: json!({ "@type" : <Timestamp as AST<SQLg>>::tag, "@value" : 1481750076295i64 }),
             object: GValue::Timestamp(Timestamp(1481750076295i64)),
         }
     );
@@ -43,7 +45,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Double as Tag_<SQLg>>::tag, "@value" : 100.0f64 }),
+            serial: json!({ "@type" : <Double as AST<SQLg>>::tag, "@value" : 100.0f64 }),
             object: GValue::Double(100.0.into()),
         }
     );
@@ -52,7 +54,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Float as Tag_<SQLg>>::tag, "@value" : 100.0f32 }),
+            serial: json!({ "@type" : <Float as AST<SQLg>>::tag, "@value" : 100.0f32 }),
             object: GValue::Float(100.0.into()),
         }
     );
@@ -61,7 +63,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Integer as Tag_<SQLg>>::tag, "@value" : 100i32 }),
+            serial: json!({ "@type" : <Integer as AST<SQLg>>::tag, "@value" : 100i32 }),
             object: GValue::Integer(100.into()),
         }
     );
@@ -70,7 +72,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Long as Tag_<SQLg>>::tag, "@value" : 100u64 }),
+            serial: json!({ "@type" : <Long as AST<SQLg>>::tag, "@value" : 100u64 }),
             object: GValue::Long(100.into()),
         }
     );
@@ -79,7 +81,7 @@ mod core {
         GraphSON<V2>,
         SQLg,
         Test {
-            serial: json!({ "@type" : <Uuid as Tag_<SQLg>>::tag, "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786"}),
+            serial: json!({ "@type" : <Uuid as AST<SQLg>>::tag, "@value" : "41d2e28a-20a4-4ab0-b379-d810dede3786"}),
             object: GValue::Uuid(
                 ::uuid::Uuid::from_str("41d2e28a-20a4-4ab0-b379-d810dede3786").unwrap()
             ),

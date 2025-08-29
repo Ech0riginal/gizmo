@@ -21,9 +21,10 @@ pub trait GraphsonSerializer<T, D> {
 }
 
 mod blankets {
+    use snafu::ResultExt;
+
     use super::*;
     use crate::*;
-    use snafu::ResultExt;
 
     impl<O, D, T> Deserializer<O, serde_json::Value, D> for T
     where
@@ -55,10 +56,7 @@ pub(crate) mod prelude {
 
     pub use super::*;
     pub use crate::api::*;
-    pub use crate::types::*;
-
-    pub(crate) use crate::formats::TypeTag;
     pub(crate) use crate::formats::Typed;
-
     pub(crate) use crate::macros::*;
+    pub use crate::types::*;
 }

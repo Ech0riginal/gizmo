@@ -1,8 +1,9 @@
-use crate::*;
-
-use indexmap::map::IntoIter;
 use std::cmp::PartialEq;
 use std::hash::Hasher;
+
+use indexmap::map::IntoIter;
+
+use crate::*;
 
 #[derive(Debug, Clone)]
 pub struct Edge {

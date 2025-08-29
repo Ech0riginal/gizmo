@@ -1,8 +1,10 @@
-use crate::Error;
-use crate::*;
-use indexmap::IndexMap;
 use std::convert::Infallible;
 use std::fmt::Formatter;
+
+use indexmap::IndexMap;
+
+use crate::Error;
+use crate::*;
 
 macro_rules! from_primitive {
     ($variant:ident, $primitive:ty) => {

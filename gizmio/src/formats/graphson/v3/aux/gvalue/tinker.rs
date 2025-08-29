@@ -1,4 +1,4 @@
-use super::serde;
+use super::*;
 use crate::dialects::Tinker;
 use crate::formats::graphson::prelude::*;
 

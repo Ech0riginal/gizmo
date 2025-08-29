@@ -22,12 +22,11 @@ pub use bytes::*;
 pub use deserialize::*;
 pub use dialects::*;
 pub use error::Error;
+pub(crate) use error::*;
 pub use format::*;
 pub use name::*;
 pub use serialize::*;
 pub use versions::*;
-
-pub(crate) use error::*;
 
 mod blankets {
     use super::*;

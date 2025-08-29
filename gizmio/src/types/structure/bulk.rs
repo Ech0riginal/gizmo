@@ -1,5 +1,6 @@
-use crate::*;
 use std::hash::{Hash, Hasher};
+
+use crate::*;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct BulkSet {

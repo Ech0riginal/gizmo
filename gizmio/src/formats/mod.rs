@@ -5,7 +5,6 @@ mod binary;
 mod graphson;
 mod typing;
 
-pub(crate) use typing::*;
-
 pub use binary::GraphBinary;
 pub use graphson::GraphSON;
+pub(crate) use typing::*;

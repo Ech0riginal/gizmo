@@ -19,6 +19,8 @@ mod traversal_metrics;
 pub use barrier::Barrier;
 pub use binding::Binding;
 pub use bytecode::Bytecode;
+#[allow(unused_imports)]
+pub(crate) use bytecode::Instruction;
 pub use cardinality::Cardinality;
 pub use column::Column;
 pub use direction::Direction;
@@ -32,6 +34,3 @@ pub use scope::Scope;
 pub use t::T;
 pub use text_p::{Text, TextP};
 pub use traversal_metrics::TraversalMetrics;
-
-#[allow(unused_imports)]
-pub(crate) use bytecode::Instruction;
