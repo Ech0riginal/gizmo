@@ -22,11 +22,14 @@ pub use error::Error;
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use gizmio::dialects::Janus;
     use gizmio::formats::GraphSON;
     use gizmio::{V3, Vertex};
     use tokio::stream::StreamExt;
     use tokio::task::JoinSet;
+    use tokio::time::sleep;
     use tokio::tracing::Level;
     use tokio::{console, join};
     use tracing_subscriber::Layer;
@@ -65,25 +68,36 @@ mod tests {
             .format::<GraphSON<V3>>()
             .host("0.0.0.0".to_string())
             .port(8182)
-            .pool_size(3)
+            .pool_size(12)
             .build()
             .unwrap();
 
         let client = GremlinClient::connect(options).await?;
         let g = traversal().with_remote(client);
-        let mut set = JoinSet::new();
+        // let mut set = JoinSet::new();
 
-        for _ in 0..16 {
-            let _g = g.clone();
-            set.spawn(async move {
-                let mut a: RemoteTraversalStream<Vertex> = _g.v(()).iter().await.unwrap();
-                while let Some(Ok(thing)) = a.next().await {
-                    tracing::info!("{:?}", thing);
-                }
-            });
+        let mut a: RemoteTraversalStream<Vertex> = g.v(()).iter().await.unwrap();
+        while let Some(Ok(thing)) = a.next().await {
+            tracing::info!("{:?}", thing.id());
         }
 
-        set.join_all().await;
+        // let mut _g = g.add_v("person");
+        // for _ in 0..4096 {
+        //     _g = _g.add_v("person");
+        // }
+        // let _ = _g.next().await;
+
+        // for _ in 0..1 {
+        //     let _g = g.clone();
+        //     set.spawn(async move {
+        //         let mut a: RemoteTraversalStream<Vertex> = _g.v(()).iter().await.unwrap();
+        //         while let Some(Ok(thing)) = a.next().await {
+        //             tracing::info!("{:?}", thing);
+        //         }
+        //     });
+        // }
+
+        // set.join_all().await;
 
         Ok(())
     }

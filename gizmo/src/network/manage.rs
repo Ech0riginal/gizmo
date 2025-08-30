@@ -24,14 +24,13 @@ where
 
     fn connect(&self) -> impl Future<Output = Result<Self::Connection, Self::Error>> + Send {
         async move {
-            let websocket_url = self.websocket_url();
-            let request = websocket_url
-                .clone()
+            let request = self
+                .websocket_url()
                 .into_client_request()
                 .map_err(|e| Error::Generic(e.to_string()))?;
 
             let connector = if let Some(opts) = &self.tls_options {
-                let config = opts.clone().config()?;
+                let config: rustls::ClientConfig = opts.clone().config()?;
                 let config = Arc::new(config);
                 Connector::Rustls(config)
             } else {

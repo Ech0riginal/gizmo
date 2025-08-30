@@ -193,9 +193,7 @@ where
             )
             .build()
             .unwrap();
-        tracing::trace!("Acquiring connection from pool");
         let mut conn = self.pool.get().await?;
-        tracing::trace!("Acquired connection from pool; Sending request");
         let socket = conn.send(request).await?;
         Ok(socket)
     }
