@@ -22,7 +22,7 @@ use crate::client::Supports;
 use crate::network::WSStream;
 use crate::{Error, GremlinResult};
 
-const POLL_BUDGET: usize = 8;
+const POLL_BUDGET: usize = 32;
 
 #[pin_project]
 pub struct ReceiverLoop<D, F> {
@@ -32,7 +32,6 @@ pub struct ReceiverLoop<D, F> {
     sender: Sender<Cmd>,
     requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
     head: Pending,
-    queue: VecDeque<Pending>,
     _pd: PhantomData<(F, D)>,
 }
 
@@ -52,7 +51,6 @@ where
             sender,
             requests,
             head: Pending::None,
-            queue: VecDeque::with_capacity(32),
             _pd: PhantomData,
         })
     }
@@ -62,18 +60,6 @@ where
 enum Pending {
     None,
     Call(Response),
-}
-
-#[derive(Debug)]
-struct Call {
-    id: Uuid,
-    resp: Response,
-}
-
-impl PartialEq for Call {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
 }
 
 impl<D, F> Future for ReceiverLoop<D, F>
