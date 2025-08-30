@@ -14,6 +14,12 @@ pub struct Vertex {
 crate::obj!(Vertex);
 crate::tag!(Vertex);
 
+impl Vertex {
+    pub fn id(&self) -> &GID {
+        &self.id
+    }
+}
+
 impl IntoIterator for Vertex {
     type Item = (String, List<VertexProperty>);
     type IntoIter = IntoIter<String, List<VertexProperty>>;

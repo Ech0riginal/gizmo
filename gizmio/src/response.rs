@@ -4,7 +4,7 @@ use std::ops::Deref;
 
 use crate::{Either2, GValue, Map, Named};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Response {
     pub id: uuid::Uuid,
     pub data: GValue,
@@ -28,6 +28,7 @@ impl std::hash::Hash for Response {
     }
 }
 
+#[derive(Clone)]
 pub enum Code {
     Raw(i16),
     Http(http::StatusCode),
@@ -67,7 +68,7 @@ impl std::fmt::Debug for Code {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Status {
     pub code: Code,
     pub message: Option<String>,
