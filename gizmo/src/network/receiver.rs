@@ -3,26 +3,19 @@ use core::{
     pin::Pin,
     task::{Context, Poll},
 };
-use std::collections::VecDeque;
-use std::ops::Deref;
-use std::{marker::PhantomData, sync::Arc};
+use std::marker::PhantomData;
 
-use dashmap::DashMap;
-use futures::{Sink, Stream};
+use futures::Stream;
 use gizmio::{Bytable, DeserializeExt, Dialect, Response};
 use pin_project::pin_project;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::mpsc::error::TrySendError;
 use tokio::task;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use uuid::Uuid;
 
-use super::Cmd;
+use super::{Cmd, RequestMap};
 use crate::client::Supports;
 use crate::network::WSStream;
-use crate::{Error, GremlinResult};
-
-const POLL_BUDGET: usize = 32;
 
 #[pin_project]
 pub struct ReceiverLoop<D, F> {
@@ -30,7 +23,7 @@ pub struct ReceiverLoop<D, F> {
     #[pin]
     stream: futures::stream::SplitStream<WSStream>,
     sender: Sender<Cmd>,
-    requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
+    requests: RequestMap,
     head: Pending,
     _pd: PhantomData<(F, D)>,
 }
@@ -42,7 +35,7 @@ where
 {
     pub fn new(
         stream: futures::stream::SplitStream<WSStream>,
-        requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
+        requests: RequestMap,
         sender: Sender<Cmd>,
     ) -> Pin<Box<Self>> {
         Box::pin(Self {
@@ -56,10 +49,12 @@ where
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 enum Pending {
     None,
     Call(Response),
+    Error(String),
+    Closed(String),
 }
 
 impl<D, F> Future for ReceiverLoop<D, F>
@@ -72,55 +67,50 @@ where
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
         let mut this = self.project();
 
-        if let Pending::Call(call) = this.head {
-            match this.requests.remove(&call.id) {
-                Some((id, tx)) => match tx.try_send(Ok(call.clone())) {
-                    Ok(_) if call.status.code.i16() != 206 => {
-                        std::mem::swap(&mut *this.head, &mut Pending::None);
-                    }
-                    Ok(_) => {
-                        this.requests.insert(id, tx);
-                        std::mem::swap(&mut *this.head, &mut Pending::None);
-                    }
-                    Err(error) => match error {
-                        TrySendError::Full(_) => {
-                            return Poll::Pending;
+        let mut pending = Pending::None;
+        std::mem::swap(&mut *this.head, &mut pending);
+
+        match pending {
+            Pending::None => {}
+            Pending::Call(call) => {
+                if let Some(tx) = this.requests.get(&call.id) {
+                    match tx.try_send(Ok(call.clone())) {
+                        Ok(_) => {
+                            if call.status.code.i16() != 206 {
+                                return Poll::Ready(());
+                            }
                         }
-                        TrySendError::Closed(_) => {
-                            _ = this.requests.remove(&call.id);
-                        }
-                    },
-                },
-                None => {}
+                        Err(error) => match error {
+                            TrySendError::Full(_) => {
+                                std::mem::swap(&mut *this.head, &mut Pending::Call(call));
+                                cx.waker().wake_by_ref();
+                                return Poll::Pending;
+                            }
+                            TrySendError::Closed(_) => {
+                                return Poll::Ready(());
+                            }
+                        },
+                    }
+                }
+            }
+            Pending::Error(error) => {
+                tracing::debug!(?error);
+                return Poll::Ready(());
+            }
+            Pending::Closed(reason) => {
+                tracing::debug!(?reason);
+                return Poll::Ready(());
             }
         }
 
         match this.stream.as_mut().poll_next(cx) {
             Poll::Pending => Poll::Pending,
-
-            Poll::Ready(None) => {
-                let senders: Vec<_> = this.requests.iter().map(|e| e.value().clone()).collect();
-                this.requests.clear();
-                task::spawn(async move {
-                    let msg = "websocket closed".to_string();
-                    for tx in senders {
-                        let _ = tx.send(Err(Error::WebsocketClone(msg.clone()))).await;
-                    }
-                });
-                Poll::Ready(())
-            }
+            Poll::Ready(None) => Poll::Ready(()),
 
             Poll::Ready(Some(Err(error))) => {
-                let senders: Vec<_> = this.requests.iter().map(|e| e.value().clone()).collect();
-                this.requests.clear();
-
-                let err_str = error.to_string();
-                task::spawn(async move {
-                    for tx in senders {
-                        let _ = tx.send(Err(Error::WebsocketClone(err_str.clone()))).await;
-                    }
-                });
-                Poll::Ready(())
+                *this.head = Pending::Error(error.to_string());
+                cx.waker().wake_by_ref();
+                Poll::Pending
             }
 
             Poll::Ready(Some(Ok(msg))) => match msg {
@@ -144,7 +134,7 @@ where
 
                     let new = Pending::Call(response);
                     *this.head = new;
-                    // Always poll after this path
+                    // // Always poll after this path
                     cx.waker().wake_by_ref();
 
                     Poll::Pending
@@ -172,16 +162,9 @@ where
 
                     tracing::debug!(?reason);
 
-                    let senders: Vec<_> = this.requests.iter().map(|e| e.value().clone()).collect();
-                    this.requests.clear();
-
-                    task::spawn(async move {
-                        for tx in senders {
-                            let _ = tx.send(Err(Error::WebsocketClone(reason.clone()))).await;
-                        }
-                    });
-
-                    Poll::Ready(())
+                    *this.head = Pending::Closed(reason.clone());
+                    cx.waker().wake_by_ref();
+                    Poll::Pending
                 }
 
                 Message::Pong(_) | Message::Text(_) | _ => Poll::Pending,

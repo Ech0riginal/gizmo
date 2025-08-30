@@ -4,20 +4,18 @@ use core::{
     pin::Pin,
     task::{Context, Poll},
 };
-use std::sync::Arc;
 
 use bytes::{Bytes, BytesMut};
-use dashmap::DashMap;
 use futures::Sink;
-use gizmio::{Bytable, Dialect, Response, SerializeExt};
+use gizmio::{Bytable, Dialect, SerializeExt};
 use pin_project::pin_project;
-use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::sync::mpsc::Receiver;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use uuid::Uuid;
 
+use crate::Error;
 use crate::client::Supports;
-use crate::network::{Cmd, WSStream};
-use crate::{Error, GremlinResult};
+use crate::network::{Cmd, RequestMap, WSStream};
 
 const POLL_BUDGET: usize = 64;
 
@@ -25,17 +23,11 @@ const POLL_BUDGET: usize = 64;
 pub struct SenderLoop<D, F> {
     #[pin]
     sink: futures::stream::SplitSink<WSStream, Message>,
-    requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
+    requests: RequestMap,
     #[pin]
     receiver: Receiver<Cmd>,
     in_flight: Option<InFlight>,
     _pd: core::marker::PhantomData<(D, F)>,
-}
-
-#[derive(Debug, Clone, Copy)]
-enum FrameId {
-    Request(Uuid),
-    Control,
 }
 
 #[derive(Debug)]
@@ -52,7 +44,7 @@ where
 {
     pub fn new(
         sink: futures::stream::SplitSink<WSStream, Message>,
-        requests: Arc<DashMap<Uuid, Sender<GremlinResult<Response>>>>,
+        requests: RequestMap,
         receiver: Receiver<Cmd>,
     ) -> Pin<Box<Self>> {
         Box::pin(Self {
